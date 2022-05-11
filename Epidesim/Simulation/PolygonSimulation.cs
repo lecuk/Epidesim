@@ -29,7 +29,7 @@ namespace Epidesim.Simulation
 			timeElapsed = 0;
 			timeLastPolygonAdded = 0;
 
-			for (int i = 0; i < 10000; ++i)
+			for (int i = 0; i < 100; ++i)
 			{
 				Polygon polygon = CreateRandomPolygon();
 				Polygons.Add(polygon);
@@ -49,21 +49,20 @@ namespace Epidesim.Simulation
 
 			foreach (Polygon polygon in Polygons)
 			{
-				//polygon.Position += polygon.Speed * fDeltaTime;
+				polygon.Position += polygon.Speed * fDeltaTime * 0.05f;
 				polygon.Rotation += polygon.RotationSpeed * fDeltaTime;
-
+				
 				if (Math.Abs(polygon.Position.X) > 1.5 || Math.Abs(polygon.Position.Y) > 1.5)
 				{
 					toRemove.Add(polygon);
 				}
 			}
-
-			/*
+			
 			if (timeElapsed - timeLastPolygonAdded > 0.01)
 			{
 				for (int i = 0; i < 10; ++i)
 				{
-					Polygons.Add(CreateSpawnedPolygon());
+					//Polygons.Add(CreateSpawnedPolygon());
 					timeLastPolygonAdded = timeElapsed;
 				}
 			}
@@ -72,15 +71,14 @@ namespace Epidesim.Simulation
 			{
 				Polygons.Remove(polygon);
 			}
-			*/
 		}
 
 		private Polygon CreateRandomPolygon()
 		{
 			Polygon polygon = new Polygon();
 
-			polygon.Position.X = (float)(random.NextDouble() * 2.0 - 1.0);
-			polygon.Position.Y = (float)(random.NextDouble() * 2.0 - 1.0);
+			polygon.Position.X = (float)(random.NextDouble() * 1.5 - 0.75);
+			polygon.Position.Y = (float)(random.NextDouble() * 1.5 - 0.75);
 			polygon.Speed.X = (float)(0.18 - random.NextDouble() * 0.24);
 			polygon.Speed.Y = -(float)(0.08 + random.NextDouble() * 0.32);
 			polygon.Radius = (float)(0.01 + random.NextDouble() * 0.09);

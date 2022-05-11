@@ -56,10 +56,7 @@ namespace Epidesim.Engine
 		{
 			base.OnLoad(e);
 
-			vertexShader = new VertexShader(@"Engine/Drawing/Shaders/VertexShader.glsl");
-			fragmentShader = new FragmentShader(@"Engine/Drawing/Shaders/FragmentShader.glsl");
-			shaderProgram = new ShaderProgram(vertexShader, fragmentShader);
-			shaderProgram.UseProgram();
+			GL.Enable(EnableCap.DepthTest);
 		}
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
@@ -79,7 +76,7 @@ namespace Epidesim.Engine
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
 			GL.ClearColor(BackgroundColor);
-			GL.Clear(ClearBufferMask.ColorBufferBit);
+			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
 			SimulationRenderer.Render(SimulationToRun);
 
@@ -97,7 +94,6 @@ namespace Epidesim.Engine
 
 		protected override void OnUnload(EventArgs e)
 		{
-			shaderProgram.Dispose();
 		}
 
 		#endregion

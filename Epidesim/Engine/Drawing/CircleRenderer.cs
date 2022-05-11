@@ -21,8 +21,8 @@ namespace Epidesim.Engine.Drawing
 
 		public CircleRenderer()
 		{
-			vertexShader = new VertexShader(@"Engine/Drawing/Shaders/Circle/VertexShader.glsl");
-			fragmentShader = new FragmentShader(@"Engine/Drawing/Shaders/Circle/FragmentShader.glsl");
+			vertexShader = new VertexShader(@"Shaders/Circle/VertexShader.glsl");
+			fragmentShader = new FragmentShader(@"Shaders/Circle/FragmentShader.glsl");
 			shaderProgram = new ShaderProgram(vertexShader, fragmentShader);
 
 			VBO_Vertices = new VertexBufferObject(VertexAttribPointerType.Float, sizeof(float), 2, false, BufferUsageHint.StaticDraw, BufferTarget.ArrayBuffer, GetPName.ArrayBufferBinding);

@@ -7,7 +7,7 @@ namespace Epidesim.Engine.Drawing.Types
 {
 	class ShaderProgram : IDisposable
 	{
-		public readonly int handle;
+		private readonly int handle;
 		private readonly VertexShader vertexShader;
 		private readonly FragmentShader fragmentShader;
 
@@ -22,14 +22,12 @@ namespace Epidesim.Engine.Drawing.Types
 			GL.LinkProgram(this.handle);
 			
 			GL.GetProgramInfoLog(handle, out string info);
-			Debug.WriteLine(String.Format("link ShaderProgram: ", info));
 		}
 
 		public void UseProgram()
 		{
 			GL.UseProgram(this.handle);
 			GL.GetProgramInfoLog(this.handle, out string info);
-			//Debug.WriteLine(String.Format("use ShaderProgram: ", info));
 		}
 
 		public void Dispose()
@@ -37,6 +35,16 @@ namespace Epidesim.Engine.Drawing.Types
 			vertexShader.DetachFromProgram(this.handle);
 			fragmentShader.DetachFromProgram(this.handle);
 			GL.DeleteProgram(this.handle);
+		}
+
+		public int GetAttributeIndex(string attributeName)
+		{
+			return GL.GetAttribLocation(this.handle, attributeName);
+		}
+
+		public int GetUniformIndex(string uniformName)
+		{
+			return GL.GetUniformLocation(this.handle, uniformName);
 		}
 	}
 }

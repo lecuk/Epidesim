@@ -54,9 +54,20 @@ namespace Epidesim.Engine.Drawing.Types
 
 		public void SetData<T>(T[] data)
 		{
-			this.data = new byte[data.Length * Size];
-			System.Buffer.BlockCopy(data, 0, this.data, 0, this.data.Length);
-			GL.BufferData(target, this.data.Length, this.data, hint);
+			SetData(data, data.Length);
+		}
+
+		public void SetData<T>(T[] data, int count)
+		{
+			if (this.data == null || this.data.Length != data.Length)
+			{
+				int size = data.Length * Size;
+				this.data = new byte[size];
+			}
+
+			int usedByteCount = count * Size;
+			System.Buffer.BlockCopy(data, 0, this.data, 0, usedByteCount);
+			GL.BufferData(target, usedByteCount, this.data, hint);
 		}
 
 		public bool TryUnbind()

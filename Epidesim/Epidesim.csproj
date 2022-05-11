@@ -53,9 +53,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine\Drawing\CircleRenderer.cs" />
-    <Compile Include="Engine\Drawing\Model.cs" />
+    <Compile Include="Engine\Drawing\Model2D.cs" />
     <Compile Include="Engine\Drawing\PrimitiveRendererImmediateMode.cs" />
-    <Compile Include="Engine\Drawing\PrimitiveRenderer.cs" />
+    <Compile Include="Engine\Drawing\PolygonRenderer.cs" />
     <Compile Include="Engine\Drawing\Renderer.cs" />
     <Compile Include="Engine\Drawing\ISimulationRenderer.cs" />
     <Compile Include="Engine\Drawing\Types\ShaderProgram.cs" />
@@ -82,16 +82,16 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <None Include="Engine\Drawing\Shaders\Circle\FragmentShader.glsl">
+    <None Include="Shaders\Circle\FragmentShader.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Engine\Drawing\Shaders\Circle\VertexShader.glsl">
+    <None Include="Shaders\Circle\VertexShader.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Engine\Drawing\Shaders\FragmentShader.glsl">
+    <None Include="Shaders\Simple\FragmentShader.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Engine\Drawing\Shaders\VertexShader.glsl">
+    <None Include="Shaders\Simple\VertexShader.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="OpenTK.dll.config" />
