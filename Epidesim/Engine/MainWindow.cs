@@ -22,11 +22,21 @@ namespace Epidesim.Engine
 		
 		public Color4 BackgroundColor { get; set; }
 
+		private static MainWindow _instance;
+		public static MainWindow Get()
+		{
+			if (_instance == null)
+			{
+				_instance = new MainWindow(1000, 700, "hello world");
+			}
+			return _instance;
+		}
+
 		#endregion
 
 		#region Constructors
 
-		public MainWindow(int width, int height, string title)
+		private MainWindow(int width, int height, string title)
 			: base(width, height, GraphicsMode.Default, title)
 		{
 			SimulationRenderer = new PolygonSimulationRenderer();
@@ -35,12 +45,6 @@ namespace Epidesim.Engine
 			SimulationRenderer.ScreenWidth = Width;
 			SimulationRenderer.ScreenHeight = Height;
 		}
-
-		public MainWindow(int width, int height)
-			: this(width, height, "no title") {  }
-
-		public MainWindow()
-			: this(800, 450) {  }
 
 		~MainWindow()
 		{
@@ -55,8 +59,7 @@ namespace Epidesim.Engine
 			base.OnLoad(e);
 
 			GL.Enable(EnableCap.DepthTest);
-			GL.DepthFunc(DepthFunction.Less);
-			GL.DepthRange(0, 99999);
+			GL.DepthRange(0, 1);
 		}
 
 		protected override void OnUpdateFrame(FrameEventArgs e)

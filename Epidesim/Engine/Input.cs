@@ -10,11 +10,18 @@ namespace Epidesim.Engine
 {
 	class Input
 	{
+		private static MainWindow Window { get; set; }
+
 		private static MouseState PreviousMouseState { get; set; }
 		private static MouseState MouseState { get; set; }
 
 		private static KeyboardState PreviousKeyboardState { get; set; }
 		private static KeyboardState KeyboardState { get; set; }
+
+		static Input()
+		{
+			Window = MainWindow.Get();
+		}
 
 		public static void Refresh()
 		{
@@ -58,6 +65,12 @@ namespace Epidesim.Engine
 		public static Vector2 GetMouseAbsolutePosition()
 		{
 			return new Vector2(MouseState.X, MouseState.Y);
+		}
+
+		public static Vector2 GetMouseLocalPosition()
+		{
+			var point = Window.PointToClient(new System.Drawing.Point(MouseState.X, MouseState.Y));
+			return new Vector2(point.X, point.Y);
 		}
 	}
 }

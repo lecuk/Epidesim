@@ -10,7 +10,7 @@ namespace Epidesim
 	{
 		static void Main()
 		{
-			using (var window = new MainWindow(800, 450, "hello world!"))
+			using (var window = MainWindow.Get())
 			{
 				window.Run(60.0);
 			}

@@ -57,7 +57,7 @@ namespace Epidesim.Simulation
 
 			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Left))
 			{
-				var position = Input.GetMouseAbsolutePosition();
+				var position = Input.GetMouseLocalPosition();
 				var delta = Input.GetMouseDelta();
 
 				Polygon polygon = CreateSpawnedPolygon();
