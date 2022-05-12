@@ -10,6 +10,7 @@ using Epidesim.Engine.Drawing.Types;
 using Epidesim.Engine.Drawing.Types.Shaders;
 using System.Diagnostics;
 using System.Drawing;
+using Epidesim.Simulation.Polygon;
 
 namespace Epidesim.Engine
 {

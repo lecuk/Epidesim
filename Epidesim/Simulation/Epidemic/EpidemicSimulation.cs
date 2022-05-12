@@ -5,7 +5,7 @@ using OpenTK.Graphics;
 using OpenTK.Input;
 using System;
 
-namespace Epidesim.Simulation
+namespace Epidesim.Simulation.Epidemic
 {
 	class EpidemicSimulation : ISimulation
 	{

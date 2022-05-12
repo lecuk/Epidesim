@@ -2,7 +2,7 @@
 using OpenTK.Graphics;
 using System;
 
-namespace Epidesim.Simulation
+namespace Epidesim.Simulation.Polygon
 {
 	class Polygon
 	{

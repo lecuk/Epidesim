@@ -67,12 +67,12 @@
     <Compile Include="Engine\Input.cs" />
     <Compile Include="Engine\ISimulation.cs" />
     <Compile Include="Engine\MainWindow.cs" />
-    <Compile Include="Simulation\EpidemicSimulation.cs" />
+    <Compile Include="Simulation\Epidemic\EpidemicSimulation.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Simulation\PolygonSimulationRenderer.cs" />
-    <Compile Include="Simulation\Polygon.cs" />
-    <Compile Include="Simulation\PolygonSimulation.cs" />
+    <Compile Include="Simulation\Polygon\PolygonSimulationRenderer.cs" />
+    <Compile Include="Simulation\Polygon\Polygon.cs" />
+    <Compile Include="Simulation\Polygon\PolygonSimulation.cs" />
     <Compile Include="Simulation\RendererHelper.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -110,5 +110,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

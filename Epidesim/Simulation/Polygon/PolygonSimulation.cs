@@ -1,4 +1,5 @@
 ﻿using Epidesim.Engine;
+using OpenTK;
 using OpenTK.Graphics;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Epidesim.Simulation
+namespace Epidesim.Simulation.Polygon
 {
 	class PolygonSimulation : ISimulation
 	{
@@ -16,7 +17,9 @@ namespace Epidesim.Simulation
 		public float OffsetX { get; set; }
 		public float OffsetY { get; set; }
 		public float Scale { get; set; }
-
+		public Vector2 TargetDirection { get; set; }
+		public Vector2 ActualDirection { get; set; }
+	
 		public List<Polygon> Polygons { get; private set; }
 
 		private double timeElapsed;
@@ -33,6 +36,8 @@ namespace Epidesim.Simulation
 			Scale = 1;
 			Polygons = new List<Polygon>();
 			random = new Random();
+			TargetDirection = new Vector2();
+			ActualDirection = new Vector2();
 			timeElapsed = 0;
 			timeLastPolygonAdded = 0;
 
@@ -48,6 +53,9 @@ namespace Epidesim.Simulation
 
 		public void Update(double deltaTime)
 		{
+			timeElapsed += deltaTime;
+			float fDeltaTime = (float)deltaTime;
+
 			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Right))
 			{
 				var delta = Input.GetMouseDelta();
@@ -58,15 +66,18 @@ namespace Epidesim.Simulation
 			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Left))
 			{
 				var position = Input.GetMouseLocalPosition();
-				var delta = Input.GetMouseDelta();
 
 				Polygon polygon = CreateSpawnedPolygon();
 				polygon.Position.X = position.X * 2 / Scale - OffsetX - Width / Scale;
 				polygon.Position.Y = -position.Y * 2 / Scale - OffsetY + Height / Scale;
-				polygon.Speed.X = delta.X * 10 / Scale;
-				polygon.Speed.Y = -delta.Y * 10 / Scale;
+				polygon.Speed.X = ActualDirection.X * 10 / Scale;
+				polygon.Speed.Y = -ActualDirection.Y * 10 / Scale;
 				Polygons.Add(polygon);
 			}
+
+			var mouseDelta = Input.GetMouseDelta();
+			TargetDirection = mouseDelta;
+			ActualDirection = ActualDirection + (TargetDirection - ActualDirection) * 0.1f;
 
 			float wheelDelta = Input.GetMouseWheelDelta();
 			if (wheelDelta > 0)
@@ -79,9 +90,6 @@ namespace Epidesim.Simulation
 				Scale /= 1.07f;
 			}
 
-			timeElapsed += deltaTime;
-			float fDeltaTime = (float)deltaTime;
-
 			List<Polygon> toRemove = new List<Polygon>();
 
 			foreach (Polygon polygon in Polygons)
@@ -89,12 +97,10 @@ namespace Epidesim.Simulation
 				polygon.Position += polygon.Speed * fDeltaTime * 1.5f;
 				polygon.Rotation += polygon.RotationSpeed * fDeltaTime;
 				
-				/*
-				if (Math.Abs(polygon.Position.X) > 1.5 || Math.Abs(polygon.Position.Y) > 1.5)
+				if (Math.Abs(polygon.Position.X) > Width * 5 || Math.Abs(polygon.Position.Y) > Height * 5)
 				{
 					toRemove.Add(polygon);
 				}
-				*/
 			}
 			
 			if (Input.IsKeyDown(OpenTK.Input.Key.Space))
