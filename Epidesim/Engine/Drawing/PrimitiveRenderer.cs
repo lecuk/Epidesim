@@ -9,6 +9,8 @@ namespace Epidesim.Engine.Drawing
 	{
 		private PrimitiveRendererEngine engine;
 
+		public bool WireframeMode { get; set; }
+
 		public PrimitiveRenderer(int maxVerticesCount, int maxTrianglesCount, int maxLinesCount)
 		{
 			engine = new PrimitiveRendererEngine(maxVerticesCount, maxTrianglesCount, maxLinesCount);
@@ -39,22 +41,33 @@ namespace Epidesim.Engine.Drawing
 				float x = center.X + (float)Math.Cos(angle) * radius;
 				float y = center.Y + (float)Math.Sin(angle) * radius;
 
-				int i1 = pivot + (i + 0) % polygonVerticesCount;
-				int i2 = pivot + (i + 1) % polygonVerticesCount;
+				int i0 = pivot + (i + 0) % polygonVerticesCount;
+				int i1 = pivot + (i + 1) % polygonVerticesCount;
 
 				engine.AddVertex(x, y, z, color.R, color.G, color.B, color.A);
-				engine.AddLineIndices(i1, i2);
+
+				if (!WireframeMode)
+				{
+					engine.AddLineIndices(i0, i1);
+				}
 			}
 
 			int polygonTrianglesCount = polygonVerticesCount - 2;
 
 			for (int i = 0; i < polygonTrianglesCount; ++i)
 			{
-				int i1 = pivot;
-				int i2 = pivot + i + 1;
-				int i3 = pivot + i + 2;
+				int i0 = pivot;
+				int i1 = pivot + i + 1;
+				int i2 = pivot + i + 2;
 
-				engine.AddTriangleIndices(i1, i2, i3);
+				engine.AddTriangleIndices(i0, i1, i2);
+
+				if (WireframeMode)
+				{
+					engine.AddLineIndices(i0, i1);
+					engine.AddLineIndices(i1, i2);
+					engine.AddLineIndices(i2, i0);
+				}
 			}
 		}
 
@@ -74,6 +87,11 @@ namespace Epidesim.Engine.Drawing
 			engine.AddLineIndices(p + 1, p + 2);
 			engine.AddLineIndices(p + 2, p + 3);
 			engine.AddLineIndices(p + 3, p + 0);
+			
+			if (WireframeMode)
+			{
+				engine.AddLineIndices(p + 0, p + 2);
+			}
 		}
 
 		public void AddTriangle(float x1, float y1, float x2, float y2, float x3, float y3, float z, Color4 color)

@@ -42,6 +42,26 @@ namespace Epidesim.Engine
 			return MouseState.IsButtonUp(button);
 		}
 
+		public static bool WasMouseButtonJustPressed(MouseButton button)
+		{
+			return MouseState.IsButtonDown(button) && PreviousMouseState.IsButtonUp(button);
+		}
+
+		public static bool WasMouseButtonJustReleased(MouseButton button)
+		{
+			return MouseState.IsButtonUp(button) && PreviousMouseState.IsButtonDown(button);
+		}
+
+		public static bool WasKeyJustPressed(Key key)
+		{
+			return KeyboardState.IsKeyDown(key) && PreviousKeyboardState.IsKeyUp(key);
+		}
+
+		public static bool WasKeyJustReleased(Key key)
+		{
+			return KeyboardState.IsKeyUp(key) && PreviousKeyboardState.IsKeyDown(key);
+		}
+
 		public static bool IsKeyDown(Key key)
 		{
 			return KeyboardState.IsKeyDown(key);

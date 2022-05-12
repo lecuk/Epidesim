@@ -18,6 +18,8 @@ namespace Epidesim.Simulation.Polygon
 		public void Render(PolygonSimulation simulation)
 		{
 			float widthToHeight = ScreenWidth / ScreenHeight;
+
+			renderer.WireframeMode = simulation.WireframeMode;
 			renderer.Reset();
 
 			renderer.TransformMatrix = Matrix4.Identity
@@ -37,7 +39,14 @@ namespace Epidesim.Simulation.Polygon
 
 			renderer.AddTriangle(50, 50, 55, 55, 50, 60, 1, Color4.White);
 
-			renderer.DrawHollowElements();
+			if (simulation.WireframeMode)
+			{
+				renderer.DrawHollowElements();
+			}
+			else
+			{
+				renderer.DrawFilledElements();
+			}
 		}
 
 		public void Dispose()

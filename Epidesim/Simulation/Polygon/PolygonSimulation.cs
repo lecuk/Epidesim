@@ -19,7 +19,8 @@ namespace Epidesim.Simulation.Polygon
 		public float Scale { get; set; }
 		public Vector2 TargetDirection { get; set; }
 		public Vector2 ActualDirection { get; set; }
-	
+		public bool WireframeMode { get; set; }
+
 		public List<Polygon> Polygons { get; private set; }
 
 		private double timeElapsed;
@@ -78,6 +79,11 @@ namespace Epidesim.Simulation.Polygon
 				polygon.Speed.Y = -ActualDirection.Y * 10 / Scale;
 				polygon.Radius = 1 * (10 + polygon.Speed.Length);
 				Polygons.Add(polygon);
+			}
+
+			if (Input.WasKeyJustPressed(OpenTK.Input.Key.W))
+			{
+				WireframeMode = !WireframeMode;
 			}
 
 			var mouseDelta = Input.GetMouseDelta();
