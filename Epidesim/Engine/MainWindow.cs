@@ -19,10 +19,6 @@ namespace Epidesim.Engine
 
 		private PolygonSimulation SimulationToRun;
 		private ISimulationRenderer<PolygonSimulation> SimulationRenderer;
-
-		private VertexShader vertexShader;
-		private FragmentShader fragmentShader;
-		private ShaderProgram shaderProgram;
 		
 		public Color4 BackgroundColor { get; set; }
 
@@ -33,7 +29,7 @@ namespace Epidesim.Engine
 		public MainWindow(int width, int height, string title)
 			: base(width, height, GraphicsMode.Default, title)
 		{
-			SimulationRenderer = new PolygonSimulationRenderer(shaderProgram);
+			SimulationRenderer = new PolygonSimulationRenderer();
 			SimulationToRun = new PolygonSimulation(width, height);
 			BackgroundColor = Color.MidnightBlue;
 			SimulationRenderer.ScreenWidth = Width;

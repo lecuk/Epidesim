@@ -35,7 +35,7 @@ namespace Epidesim.Simulation
 			renderer.Dispose();
 		}
 
-		public PolygonSimulationRenderer(ShaderProgram program)
+		public PolygonSimulationRenderer()
 		{
 			renderer = new PolygonRenderer(400000, 2000000);
 			rendererImmediate = new PrimitiveRendererImmediateMode();

@@ -48,11 +48,24 @@ namespace Epidesim.Simulation
 
 		public void Update(double deltaTime)
 		{
-			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Left))
+			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Right))
 			{
 				var delta = Input.GetMouseDelta();
 				OffsetX += delta.X / Scale * 2;
 				OffsetY -= delta.Y / Scale * 2;
+			}
+
+			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Left))
+			{
+				var position = Input.GetMouseAbsolutePosition();
+				var delta = Input.GetMouseDelta();
+
+				Polygon polygon = CreateSpawnedPolygon();
+				polygon.Position.X = position.X * 2 / Scale - OffsetX - Width / Scale;
+				polygon.Position.Y = -position.Y * 2 / Scale - OffsetY + Height / Scale;
+				polygon.Speed.X = delta.X * 10 / Scale;
+				polygon.Speed.Y = -delta.Y * 10 / Scale;
+				Polygons.Add(polygon);
 			}
 
 			float wheelDelta = Input.GetMouseWheelDelta();
@@ -88,7 +101,7 @@ namespace Epidesim.Simulation
 			{
 				if (timeElapsed - timeLastPolygonAdded > 0.1)
 				{
-					for (int i = 0; i < 20; ++i)
+					for (int i = 0; i < 100; ++i)
 					{
 						Polygons.Add(CreateSpawnedPolygon());
 						timeLastPolygonAdded = timeElapsed;
@@ -139,8 +152,8 @@ namespace Epidesim.Simulation
 				//polygon.Position.Y = (float)(random.NextDouble() * 2.0 - 1.0);
 			}
 
-			polygon.Speed.X = (float)(18 - random.NextDouble() * 24);
-			polygon.Speed.Y = -(float)(8 + random.NextDouble() * 32);
+			polygon.Speed.X = (float)(18 - random.NextDouble() * 240);
+			polygon.Speed.Y = -(float)(8 + random.NextDouble() * 320);
 			polygon.Radius = (float)(5 + random.NextDouble() * 15);
 			polygon.Edges = 3 + random.Next() % 6;
 			polygon.Rotation = (float)(random.NextDouble() * Math.PI);

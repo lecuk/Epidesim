@@ -11,10 +11,10 @@ namespace Epidesim.Engine
 	class Input
 	{
 		private static MouseState PreviousMouseState { get; set; }
-		public static MouseState MouseState { get; private set; }
+		private static MouseState MouseState { get; set; }
 
 		private static KeyboardState PreviousKeyboardState { get; set; }
-		public static KeyboardState KeyboardState { get; private set; }
+		private static KeyboardState KeyboardState { get; set; }
 
 		public static void Refresh()
 		{
@@ -53,6 +53,11 @@ namespace Epidesim.Engine
 		public static float GetMouseWheelDelta()
 		{
 			return MouseState.Wheel - PreviousMouseState.Wheel;
+		}
+
+		public static Vector2 GetMouseAbsolutePosition()
+		{
+			return new Vector2(MouseState.X, MouseState.Y);
 		}
 	}
 }
