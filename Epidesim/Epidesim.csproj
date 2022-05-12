@@ -64,6 +64,7 @@
     <Compile Include="Engine\Drawing\Types\Shaders\Shader.cs" />
     <Compile Include="Engine\Drawing\Types\Shaders\VertexShader.cs" />
     <Compile Include="Engine\Drawing\Types\VertexArrayObject.cs" />
+    <Compile Include="Engine\Input.cs" />
     <Compile Include="Engine\ISimulation.cs" />
     <Compile Include="Engine\MainWindow.cs" />
     <Compile Include="Simulation\EpidemicSimulation.cs" />

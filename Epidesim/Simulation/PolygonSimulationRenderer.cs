@@ -12,15 +12,20 @@ namespace Epidesim.Simulation
 		private readonly PrimitiveRendererImmediateMode rendererImmediate;
 		private readonly CircleRenderer circleRenderer;
 
+		public float ScreenWidth { get; set; }
+		public float ScreenHeight { get; set; }
+
 		public void Render(PolygonSimulation simulation)
 		{
+			float widthToHeight = ScreenWidth / ScreenHeight;
 			renderer.Reset();
-			float zIndex = 0;
+			renderer.TransformMatrix = Matrix4.Identity
+				* Matrix4.CreateTranslation(simulation.OffsetX, simulation.OffsetY, 0)
+				* Matrix4.CreateScale(simulation.Scale, simulation.Scale, 0)
+				* Matrix4.CreateScale(1.0f / ScreenWidth, 1.0f / ScreenHeight, 1.0f / 1000);
 			foreach (var polygon in simulation.Polygons)
 			{
-				//rendererImmediate.DrawPolygon(new Vector2d(polygon.Position.X, polygon.Position.Y), polygon.Radius, polygon.Edges, polygon.Rotation, polygon.FillColor, polygon.BorderColor, polygon.BorderThickness);
-				renderer.AddPolygon(polygon.Position, zIndex, polygon.Radius, polygon.Edges, polygon.Rotation, polygon.FillColor);
-				zIndex += 0.01f;
+				renderer.AddPolygon(polygon.Position, polygon.ZIndex, polygon.Radius, polygon.Edges, polygon.Rotation, polygon.FillColor);
 			}
 			renderer.DrawEverything();
 		}

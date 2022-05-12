@@ -36,6 +36,8 @@ namespace Epidesim.Engine
 			SimulationRenderer = new PolygonSimulationRenderer(shaderProgram);
 			SimulationToRun = new PolygonSimulation(width, height);
 			BackgroundColor = Color.MidnightBlue;
+			SimulationRenderer.ScreenWidth = Width;
+			SimulationRenderer.ScreenHeight = Height;
 		}
 
 		public MainWindow(int width, int height)
@@ -57,15 +59,17 @@ namespace Epidesim.Engine
 			base.OnLoad(e);
 
 			GL.Enable(EnableCap.DepthTest);
+			GL.DepthFunc(DepthFunction.Less);
+			GL.DepthRange(0, 99999);
 		}
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			KeyboardState inputState = Keyboard.GetState();
+			Input.Refresh();
 
 			SimulationToRun.Update(e.Time);
 
-			if (inputState.IsKeyDown(Key.Escape))
+			if (Input.IsKeyDown(Key.Escape))
 			{
 				base.Exit();
 			}
@@ -89,6 +93,8 @@ namespace Epidesim.Engine
 			GL.Viewport(0, 0, Width, Height);
 			SimulationToRun.Width = (float)Width;
 			SimulationToRun.Height = (float)Height;
+			SimulationRenderer.ScreenWidth = Width;
+			SimulationRenderer.ScreenHeight = Height;
 			base.OnResize(e);
 		}
 

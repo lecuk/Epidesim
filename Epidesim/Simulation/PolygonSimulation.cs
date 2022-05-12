@@ -13,6 +13,10 @@ namespace Epidesim.Simulation
 		public float Width { get; set; }
 		public float Height { get; set; }
 
+		public float OffsetX { get; set; }
+		public float OffsetY { get; set; }
+		public float Scale { get; set; }
+
 		public List<Polygon> Polygons { get; private set; }
 
 		private double timeElapsed;
@@ -24,6 +28,9 @@ namespace Epidesim.Simulation
 		{
 			Width = width;
 			Height = height;
+			OffsetX = 0;
+			OffsetY = 0;
+			Scale = 1;
 			Polygons = new List<Polygon>();
 			random = new Random();
 			timeElapsed = 0;
@@ -31,8 +38,7 @@ namespace Epidesim.Simulation
 
 			for (int i = 0; i < 100; ++i)
 			{
-				Polygon polygon = CreateRandomPolygon();
-				Polygons.Add(polygon);
+				Polygons.Add(CreateRandomPolygon());
 			}
 		}
 
@@ -42,6 +48,24 @@ namespace Epidesim.Simulation
 
 		public void Update(double deltaTime)
 		{
+			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Left))
+			{
+				var delta = Input.GetMouseDelta();
+				OffsetX += delta.X / Scale * 2;
+				OffsetY -= delta.Y / Scale * 2;
+			}
+
+			float wheelDelta = Input.GetMouseWheelDelta();
+			if (wheelDelta > 0)
+			{
+				Scale *= 1.07f;
+			}
+
+			if (wheelDelta < 0)
+			{
+				Scale /= 1.07f;
+			}
+
 			timeElapsed += deltaTime;
 			float fDeltaTime = (float)deltaTime;
 
@@ -49,21 +73,26 @@ namespace Epidesim.Simulation
 
 			foreach (Polygon polygon in Polygons)
 			{
-				polygon.Position += polygon.Speed * fDeltaTime * 0.05f;
+				polygon.Position += polygon.Speed * fDeltaTime * 1.5f;
 				polygon.Rotation += polygon.RotationSpeed * fDeltaTime;
 				
+				/*
 				if (Math.Abs(polygon.Position.X) > 1.5 || Math.Abs(polygon.Position.Y) > 1.5)
 				{
 					toRemove.Add(polygon);
 				}
+				*/
 			}
 			
-			if (timeElapsed - timeLastPolygonAdded > 0.01)
+			if (Input.IsKeyDown(OpenTK.Input.Key.Space))
 			{
-				for (int i = 0; i < 10; ++i)
+				if (timeElapsed - timeLastPolygonAdded > 0.1)
 				{
-					//Polygons.Add(CreateSpawnedPolygon());
-					timeLastPolygonAdded = timeElapsed;
+					for (int i = 0; i < 20; ++i)
+					{
+						Polygons.Add(CreateSpawnedPolygon());
+						timeLastPolygonAdded = timeElapsed;
+					}
 				}
 			}
 
@@ -77,11 +106,12 @@ namespace Epidesim.Simulation
 		{
 			Polygon polygon = new Polygon();
 
-			polygon.Position.X = (float)(random.NextDouble() * 1.5 - 0.75);
-			polygon.Position.Y = (float)(random.NextDouble() * 1.5 - 0.75);
-			polygon.Speed.X = (float)(0.18 - random.NextDouble() * 0.24);
-			polygon.Speed.Y = -(float)(0.08 + random.NextDouble() * 0.32);
-			polygon.Radius = (float)(0.01 + random.NextDouble() * 0.09);
+			polygon.Position.X = (float)(random.NextDouble() * Width * 2 - Width);
+			polygon.Position.Y = (float)(random.NextDouble() * Height * 2 - Height);
+			polygon.ZIndex = random.Next() % 1000;
+			polygon.Speed.X = (float)(0);
+			polygon.Speed.Y = -(float)(0);
+			polygon.Radius = (float)(1 + random.NextDouble() * 39);
 			polygon.Edges = 3 + random.Next() % 6;
 			polygon.Rotation = (float)(random.NextDouble() * Math.PI);
 			polygon.RotationSpeed = 0.4f + (float)random.NextDouble() * 5.0f;
@@ -95,23 +125,23 @@ namespace Epidesim.Simulation
 		private Polygon CreateSpawnedPolygon()
 		{
 			Polygon polygon = new Polygon();
-			
-			polygon.Position.X = -1.1f;
-			polygon.Position.Y = 1.1f;
+
+			polygon.Position.X = (float)(random.NextDouble() * Width * 2 - Width);
+			polygon.Position.Y = (float)(random.NextDouble() * Height * 2 - Height);
 
 			bool top = random.Next() % 2 == 1;
 			if (top)
 			{
-				polygon.Position.X = (float)(random.NextDouble() * 2.0 - 1.0);
+				//polygon.Position.X = (float)(random.NextDouble() * 2.0 - 1.0);
 			}
 			else
 			{
-				polygon.Position.Y = (float)(random.NextDouble() * 2.0 - 1.0);
+				//polygon.Position.Y = (float)(random.NextDouble() * 2.0 - 1.0);
 			}
 
-			polygon.Speed.X = (float)(0.18 - random.NextDouble() * 0.24);
-			polygon.Speed.Y = -(float)(0.08 + random.NextDouble() * 0.32);
-			polygon.Radius = (float)(0.01 + random.NextDouble() * 0.09);
+			polygon.Speed.X = (float)(18 - random.NextDouble() * 24);
+			polygon.Speed.Y = -(float)(8 + random.NextDouble() * 32);
+			polygon.Radius = (float)(5 + random.NextDouble() * 15);
 			polygon.Edges = 3 + random.Next() % 6;
 			polygon.Rotation = (float)(random.NextDouble() * Math.PI);
 			polygon.RotationSpeed = 0.4f + (float)random.NextDouble() * 5.0f;

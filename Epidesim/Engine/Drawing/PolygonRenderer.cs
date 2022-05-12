@@ -112,8 +112,8 @@ namespace Epidesim.Engine.Drawing
 			vao.EnableVertexBuffer(1);
 			vboColors.Unbind();
 
-			var identity = Matrix4.Identity;
-			GL.UniformMatrix4(program.GetUniformIndex("transform"), false, ref identity);
+			var transform = TransformMatrix;
+			GL.UniformMatrix4(program.GetUniformIndex("transform"), false, ref transform);
 			GL.DrawElements(PrimitiveType.Triangles, trianglesCount * 3, DrawElementsType.UnsignedInt, triangleIndexBuffer);
 
 			vao.Unbind();

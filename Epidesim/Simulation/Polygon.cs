@@ -7,6 +7,7 @@ namespace Epidesim.Simulation
 	class Polygon
 	{
 		public Vector2 Position;
+		public int ZIndex;
 		public Vector2 Speed;
 		public float Radius;
 		public int Edges;
