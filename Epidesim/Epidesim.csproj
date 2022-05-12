@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Engine\Drawing\CircleRenderer.cs" />
     <Compile Include="Engine\Drawing\Model2D.cs" />
+    <Compile Include="Engine\Drawing\PrimitiveRendererEngine.cs" />
     <Compile Include="Engine\Drawing\PrimitiveRendererImmediateMode.cs" />
     <Compile Include="Engine\Drawing\PrimitiveRenderer.cs" />
     <Compile Include="Engine\Drawing\Renderer.cs" />

@@ -167,7 +167,7 @@ namespace Epidesim.Simulation.Polygon
 			polygon.Speed.X = (float)(18 - random.NextDouble() * 240);
 			polygon.Speed.Y = -(float)(8 + random.NextDouble() * 320);
 			polygon.Radius = (float)(5 + random.NextDouble() * 15);
-			polygon.Edges = 3 + random.Next() % 6;
+			polygon.Edges = 30 + random.Next() % 60;
 			polygon.Rotation = (float)(random.NextDouble() * Math.PI);
 			polygon.RotationSpeed = 0.4f + (float)random.NextDouble() * 5.0f;
 			polygon.BorderColor = colors[random.Next() % colors.Length];

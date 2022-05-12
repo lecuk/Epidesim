@@ -27,11 +27,17 @@ namespace Epidesim.Simulation.Polygon
 
 			foreach (var polygon in simulation.Polygons)
 			{
-				renderer.AddPolygon(polygon.Position, polygon.ZIndex, polygon.Radius, polygon.Edges, polygon.Rotation, polygon.FillColor);
+				renderer.AddRightPolygon(polygon.Position, polygon.ZIndex, polygon.Radius, polygon.Edges, polygon.Rotation, polygon.FillColor);
 			}
-			renderer.AddPolygon(simulation.ActualDirection * new Vector2(10, -10), 998, 15, 3, (float)Math.Atan2(-simulation.ActualDirection.Y, simulation.ActualDirection.X), Color4.Red);
-			renderer.AddPolygon(simulation.TargetDirection * new Vector2(10, -10), 999, 20, 3, (float)Math.Atan2(-simulation.TargetDirection.Y, simulation.TargetDirection.X), Color4.Yellow);
-			renderer.DrawEverything();
+			renderer.AddRightPolygon(simulation.ActualDirection * new Vector2(10, -10), 998, 15, 3, (float)Math.Atan2(-simulation.ActualDirection.Y, simulation.ActualDirection.X), Color4.Red);
+			renderer.AddRightPolygon(simulation.TargetDirection * new Vector2(10, -10), 999, 20, 3, (float)Math.Atan2(-simulation.TargetDirection.Y, simulation.TargetDirection.X), Color4.Yellow);
+
+			renderer.AddRectangle(0, 0, 50, 150, 2, Color4.Black);
+			renderer.AddRectangle(0, 200, 50, 350, 2, Color4.Black);
+
+			renderer.AddTriangle(50, 50, 55, 55, 50, 60, 1, Color4.White);
+
+			renderer.DrawHollowElements();
 		}
 
 		public void Dispose()
