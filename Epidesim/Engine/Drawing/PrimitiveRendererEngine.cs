@@ -151,5 +151,10 @@ namespace Epidesim.Engine.Drawing
 		{
 			return verticesCount - 1;
 		}
+
+		public string GetDiagnosticDataString()
+		{
+			return String.Format("ver: {0}/{1}, tri: {2}/{3}, lin: {4}/{5}", verticesCount, maxVertices, trianglesCount, maxTriangles, linesCount, maxLines);
+		}
 	}
 }

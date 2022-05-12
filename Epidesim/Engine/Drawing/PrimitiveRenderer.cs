@@ -117,11 +117,13 @@ namespace Epidesim.Engine.Drawing
 		public void DrawFilledElements()
 		{
 			engine.DrawFilledElements();
+			System.Diagnostics.Debug.WriteLine(engine.GetDiagnosticDataString());
 		}
 
 		public void DrawHollowElements()
 		{
 			engine.DrawHollowElements();
+			System.Diagnostics.Debug.WriteLine(engine.GetDiagnosticDataString());
 		}
 
 		public void Reset()

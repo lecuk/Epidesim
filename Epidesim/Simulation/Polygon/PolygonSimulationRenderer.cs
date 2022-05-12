@@ -56,7 +56,7 @@ namespace Epidesim.Simulation.Polygon
 
 		public PolygonSimulationRenderer()
 		{
-			renderer = new PrimitiveRenderer(400000, 2000000, 2000000);
+			renderer = new PrimitiveRenderer(400000, 1000000, 1000000);
 			rendererImmediate = new PrimitiveRendererImmediateMode();
 			circleRenderer = new CircleRenderer();
 		}
