@@ -60,7 +60,8 @@ namespace Epidesim.Engine
 			base.OnLoad(e);
 
 			GL.Enable(EnableCap.DepthTest);
-			GL.DepthRange(0, 1);
+
+			SimulationToRun.Start();
 		}
 
 		protected override void OnUpdateFrame(FrameEventArgs e)

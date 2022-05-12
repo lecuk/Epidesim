@@ -55,7 +55,7 @@
     <Compile Include="Engine\Drawing\CircleRenderer.cs" />
     <Compile Include="Engine\Drawing\Model2D.cs" />
     <Compile Include="Engine\Drawing\PrimitiveRendererImmediateMode.cs" />
-    <Compile Include="Engine\Drawing\PolygonRenderer.cs" />
+    <Compile Include="Engine\Drawing\PrimitiveRenderer.cs" />
     <Compile Include="Engine\Drawing\Renderer.cs" />
     <Compile Include="Engine\Drawing\ISimulationRenderer.cs" />
     <Compile Include="Engine\Drawing\Types\ShaderProgram.cs" />

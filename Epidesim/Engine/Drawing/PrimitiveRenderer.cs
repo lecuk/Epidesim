@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace Epidesim.Engine.Drawing
 {
-	internal class PolygonRenderer : Renderer
+	internal class PrimitiveRenderer : Renderer
 	{
 		private ShaderProgram program;
 		protected readonly VertexArrayObject vao;
@@ -18,11 +18,11 @@ namespace Epidesim.Engine.Drawing
 		private readonly float[] vertexBuffer;
 		private readonly float[] colorBuffer;
 		private readonly int[] triangleIndexBuffer, lineIndexBuffer;
-		private readonly int maxVertices, maxTriangles;
+		private readonly int maxVertices, maxTriangles, maxLines;
 
-		private int verticesCount, trianglesCount;
+		private int verticesCount, trianglesCount, linesCount;
 
-		public PolygonRenderer(int maxVerticesCount, int maxTrianglesCount)
+		public PrimitiveRenderer(int maxVerticesCount, int maxTrianglesCount, int maxLinesCount)
 			: base()
 		{
 			this.maxVertices = maxVerticesCount;
@@ -35,7 +35,7 @@ namespace Epidesim.Engine.Drawing
 			vertexBuffer = new float[maxVerticesCount * 3];
 			colorBuffer = new float[maxVerticesCount * 4];
 			triangleIndexBuffer = new int[maxTrianglesCount * 3];
-			lineIndexBuffer = new int[maxVerticesCount * 2];
+			lineIndexBuffer = new int[maxLinesCount * 2];
 
 			vboVertices = new VertexBufferObject(VertexAttribPointerType.Float, sizeof(float), 3, false, BufferUsageHint.StaticDraw, BufferTarget.ArrayBuffer, GetPName.ArrayBufferBinding);
 			vboColors = new VertexBufferObject(VertexAttribPointerType.Float, sizeof(float), 4, false, BufferUsageHint.StaticDraw, BufferTarget.ArrayBuffer, GetPName.ArrayBufferBinding);
@@ -47,7 +47,7 @@ namespace Epidesim.Engine.Drawing
 			vao.Unbind();
 		}
 
-		public void AddPolygon(Vector2 center, float zIndex, double radius, int polygonVerticesCount, float rotation, Color4 color)
+		public void AddPolygon(Vector2 center, float z, float radius, int polygonVerticesCount, float rotation, Color4 color)
 		{
 			if (polygonVerticesCount < 3)
 			{
@@ -61,39 +61,78 @@ namespace Epidesim.Engine.Drawing
 
 			int polygonTrianglesCount = polygonVerticesCount - 2;
 
-			if (this.trianglesCount + polygonTrianglesCount >= this.maxTriangles)
-			{
-				throw new OverflowException("Max triangle count reached.");
-			}
-
 			int pivotVertex = this.verticesCount;
 			for (int i = 0; i < polygonVerticesCount; ++i)
 			{
 				double angle = Math.PI * 2 / polygonVerticesCount * i + rotation;
 
-				this.vertexBuffer[this.verticesCount * 3 + 0] = (float)(center.X + Math.Cos(angle) * radius);
-				this.vertexBuffer[this.verticesCount * 3 + 1] = (float)(center.Y + Math.Sin(angle) * radius);
-				this.vertexBuffer[this.verticesCount * 3 + 2] = zIndex;
+				float x = center.X + (float)Math.Cos(angle) * radius;
+				float y = center.Y + (float)Math.Sin(angle) * radius;
 
-				this.colorBuffer[this.verticesCount * 4 + 0] = color.R;
-				this.colorBuffer[this.verticesCount * 4 + 1] = color.G;
-				this.colorBuffer[this.verticesCount * 4 + 2] = color.B;
-				this.colorBuffer[this.verticesCount * 4 + 3] = color.A;
+				int i1 = pivotVertex + (i + 0) % polygonVerticesCount;
+				int i2 = pivotVertex + (i + 1) % polygonVerticesCount;
 
-				this.lineIndexBuffer[this.verticesCount * 2 + 0] = pivotVertex + (i + 0) % polygonVerticesCount;
-				this.lineIndexBuffer[this.verticesCount * 2 + 1] = pivotVertex + (i + 1) % polygonVerticesCount;
-
-				this.verticesCount++;
+				AddVertex(x, y, z, color.R, color.G, color.B, color.A);
+				AddLineIndices(i1, i2);
 			}
 
 			for (int i = 0; i < polygonTrianglesCount; ++i)
 			{
-				this.triangleIndexBuffer[this.trianglesCount * 3 + 0] = pivotVertex;
-				this.triangleIndexBuffer[this.trianglesCount * 3 + 1] = pivotVertex + i + 1;
-				this.triangleIndexBuffer[this.trianglesCount * 3 + 2] = pivotVertex + i + 2;
+				int i1 = pivotVertex;
+				int i2 = pivotVertex + i + 1;
+				int i3 = pivotVertex + i + 2;
 
-				this.trianglesCount++;
+				AddTriangleIndices(i1, i2, i3);
 			}
+		}
+
+		public void AddRectangle(float x1, float y1, float x2, float y2, Color4 color)
+		{
+		}
+
+		public void AddTriangle(float x1, float y1, float x2, float y2, float x3, float y3, Color4 color)
+		{
+			this.triangleIndexBuffer[this.trianglesCount * 3 + 0] = this.trianglesCount * 3 + 0;
+			this.triangleIndexBuffer[this.trianglesCount * 3 + 1] = this.trianglesCount * 3 + 1;
+			this.triangleIndexBuffer[this.trianglesCount * 3 + 2] = this.trianglesCount * 3 + 2;
+
+			this.trianglesCount++;
+		}
+
+		private void AddVertex(float x, float y, float z, float r, float g, float b, float a)
+		{
+			this.vertexBuffer[this.verticesCount * 3 + 0] = x;
+			this.vertexBuffer[this.verticesCount * 3 + 1] = y;
+			this.vertexBuffer[this.verticesCount * 3 + 2] = z;
+
+			this.colorBuffer[this.verticesCount * 4 + 0] = r;
+			this.colorBuffer[this.verticesCount * 4 + 1] = g;
+			this.colorBuffer[this.verticesCount * 4 + 2] = b;
+			this.colorBuffer[this.verticesCount * 4 + 3] = a;
+
+			this.verticesCount++;
+		}
+
+		private void AddLineIndices(int i1, int i2)
+		{
+			this.lineIndexBuffer[this.linesCount * 2 + 0] = i1;
+			this.lineIndexBuffer[this.linesCount * 2 + 1] = i2;
+
+			linesCount++;
+		}
+
+		private void AddTriangleIndices(int i1, int i2, int i3)
+		{
+			if (this.trianglesCount >= this.maxTriangles)
+			{
+				throw new OverflowException("Max triangle count reached.");
+			}
+
+			this.triangleIndexBuffer[this.trianglesCount * 3 + 0] = i1;
+			this.triangleIndexBuffer[this.trianglesCount * 3 + 1] = i2;
+			this.triangleIndexBuffer[this.trianglesCount * 3 + 2] = i3;
+
+			trianglesCount++;
 		}
 
 		public void DrawEverything()
@@ -125,7 +164,7 @@ namespace Epidesim.Engine.Drawing
 			trianglesCount = 0;
 		}
 
-		public void AddCircle(Vector2 center, float zIndex, double radius, Color4 color)
+		public void AddCircle(Vector2 center, float zIndex, float radius, Color4 color)
 		{
 			AddPolygon(center, zIndex, radius, 64, 0, color);
 		}

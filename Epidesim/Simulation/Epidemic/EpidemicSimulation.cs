@@ -12,16 +12,16 @@ namespace Epidesim.Simulation.Epidemic
 		public float Width { get; private set; }
 		public float Height { get; private set; }
 
-		public float Angle { get; private set; }
+		public void Start()
+		{
+		}
 
 		public void Update(double deltaTime)
 		{
-			Angle += 0.7f * (float)deltaTime;
 		}
 
-		public EpidemicSimulation(float startAngle)
+		public EpidemicSimulation()
 		{
-			Angle = startAngle;
 		}
 	}
 }

@@ -8,7 +8,7 @@ namespace Epidesim.Simulation.Polygon
 {
 	class PolygonSimulationRenderer : ISimulationRenderer<PolygonSimulation>, IDisposable
 	{
-		private readonly PolygonRenderer renderer;
+		private readonly PrimitiveRenderer renderer;
 		private readonly PrimitiveRendererImmediateMode rendererImmediate;
 		private readonly CircleRenderer circleRenderer;
 
@@ -41,7 +41,7 @@ namespace Epidesim.Simulation.Polygon
 
 		public PolygonSimulationRenderer()
 		{
-			renderer = new PolygonRenderer(400000, 2000000);
+			renderer = new PrimitiveRenderer(400000, 2000000, 2000000);
 			rendererImmediate = new PrimitiveRendererImmediateMode();
 			circleRenderer = new CircleRenderer();
 		}

@@ -31,25 +31,29 @@ namespace Epidesim.Simulation.Polygon
 		{
 			Width = width;
 			Height = height;
+			Polygons = new List<Polygon>();
+			random = new Random();
+			timeElapsed = 0;
+			timeLastPolygonAdded = 0;
+		}
+
+		private Color4[] colors = new Color4[] {
+			Color4.Red, Color4.Purple, Color4.Green, Color4.Yellow, Color4.Magenta, Color4.Blue, Color4.Cyan, Color4.Orange
+		};
+
+		public void Start()
+		{
+			TargetDirection = new Vector2();
+			ActualDirection = new Vector2();
 			OffsetX = 0;
 			OffsetY = 0;
 			Scale = 1;
-			Polygons = new List<Polygon>();
-			random = new Random();
-			TargetDirection = new Vector2();
-			ActualDirection = new Vector2();
-			timeElapsed = 0;
-			timeLastPolygonAdded = 0;
 
 			for (int i = 0; i < 100; ++i)
 			{
 				Polygons.Add(CreateRandomPolygon());
 			}
 		}
-
-		private Color4[] colors = new Color4[] {
-			Color4.Red, Color4.Purple, Color4.Green, Color4.Yellow, Color4.Magenta, Color4.Blue, Color4.Cyan, Color4.Orange
-		};
 
 		public void Update(double deltaTime)
 		{
@@ -72,12 +76,13 @@ namespace Epidesim.Simulation.Polygon
 				polygon.Position.Y = -position.Y * 2 / Scale - OffsetY + Height / Scale;
 				polygon.Speed.X = ActualDirection.X * 10 / Scale;
 				polygon.Speed.Y = -ActualDirection.Y * 10 / Scale;
+				polygon.Radius = 1 * (10 + polygon.Speed.Length);
 				Polygons.Add(polygon);
 			}
 
 			var mouseDelta = Input.GetMouseDelta();
 			TargetDirection = mouseDelta;
-			ActualDirection = ActualDirection + (TargetDirection - ActualDirection) * 0.1f;
+			ActualDirection = ActualDirection + (TargetDirection - ActualDirection) * 6f * fDeltaTime;
 
 			float wheelDelta = Input.GetMouseWheelDelta();
 			if (wheelDelta > 0)
@@ -90,7 +95,7 @@ namespace Epidesim.Simulation.Polygon
 				Scale /= 1.07f;
 			}
 
-			List<Polygon> toRemove = new List<Polygon>();
+			var toRemove = new List<Polygon>();
 
 			foreach (Polygon polygon in Polygons)
 			{
@@ -147,6 +152,7 @@ namespace Epidesim.Simulation.Polygon
 
 			polygon.Position.X = (float)(random.NextDouble() * Width * 2 - Width);
 			polygon.Position.Y = (float)(random.NextDouble() * Height * 2 - Height);
+			polygon.ZIndex = random.Next() % 1000;
 
 			bool top = random.Next() % 2 == 1;
 			if (top)
