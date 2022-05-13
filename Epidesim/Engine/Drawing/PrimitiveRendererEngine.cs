@@ -37,8 +37,8 @@ namespace Epidesim.Engine.Drawing
 			triangleIndexBuffer = new int[maxTrianglesCount * 3];
 			lineIndexBuffer = new int[maxLinesCount * 2];
 
-			vboVertices = new VertexBufferObject(VertexAttribPointerType.Float, sizeof(float), 3, false, BufferUsageHint.StaticDraw, BufferTarget.ArrayBuffer, GetPName.ArrayBufferBinding);
-			vboColors = new VertexBufferObject(VertexAttribPointerType.Float, sizeof(float), 4, false, BufferUsageHint.StaticDraw, BufferTarget.ArrayBuffer, GetPName.ArrayBufferBinding);
+			vboVertices = new DefaultVertexBufferObject(vertexBuffer.Length * sizeof(float), 3);
+			vboColors = new DefaultVertexBufferObject(colorBuffer.Length * sizeof(float), 4);
 
 			vao = new VertexArrayObject();
 			vao.Bind();

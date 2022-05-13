@@ -159,21 +159,10 @@ namespace Epidesim.Simulation.Polygon
 			polygon.Position.X = (float)(random.NextDouble() * Width * 2 - Width);
 			polygon.Position.Y = (float)(random.NextDouble() * Height * 2 - Height);
 			polygon.ZIndex = random.Next() % 1000;
-
-			bool top = random.Next() % 2 == 1;
-			if (top)
-			{
-				//polygon.Position.X = (float)(random.NextDouble() * 2.0 - 1.0);
-			}
-			else
-			{
-				//polygon.Position.Y = (float)(random.NextDouble() * 2.0 - 1.0);
-			}
-
-			polygon.Speed.X = (float)(18 - random.NextDouble() * 240);
-			polygon.Speed.Y = -(float)(8 + random.NextDouble() * 320);
+			polygon.Speed.X = (float)(18 - random.NextDouble() * 24);
+			polygon.Speed.Y = -(float)(8 + random.NextDouble() * 32);
 			polygon.Radius = (float)(5 + random.NextDouble() * 15);
-			polygon.Edges = 30 + random.Next() % 60;
+			polygon.Edges = 3 + random.Next() % 7;
 			polygon.Rotation = (float)(random.NextDouble() * Math.PI);
 			polygon.RotationSpeed = 0.4f + (float)random.NextDouble() * 5.0f;
 			polygon.BorderColor = colors[random.Next() % colors.Length];

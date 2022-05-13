@@ -25,9 +25,9 @@ namespace Epidesim.Engine.Drawing
 			fragmentShader = new FragmentShader(@"Shaders/Circle/FragmentShader.glsl");
 			shaderProgram = new ShaderProgram(vertexShader, fragmentShader);
 
-			VBO_Vertices = new VertexBufferObject(VertexAttribPointerType.Float, sizeof(float), 2, false, BufferUsageHint.StaticDraw, BufferTarget.ArrayBuffer, GetPName.ArrayBufferBinding);
-			VBO_Colors = new VertexBufferObject(VertexAttribPointerType.Float, sizeof(float), 4, false, BufferUsageHint.StaticDraw, BufferTarget.ArrayBuffer, GetPName.ArrayBufferBinding);
-			VBO_Radiuses = new VertexBufferObject(VertexAttribPointerType.Float, sizeof(float), 1, false, BufferUsageHint.StaticDraw, BufferTarget.ArrayBuffer, GetPName.ArrayBufferBinding);
+			VBO_Vertices = new DefaultVertexBufferObject(1000000, 2);
+			VBO_Colors = new DefaultVertexBufferObject(1000000, 4);
+			VBO_Radiuses = new DefaultVertexBufferObject(1000000, 1);
 
 			VAO = new VertexArrayObject();
 			VAO.SetVertexBuffer(VBO_Vertices, 0);

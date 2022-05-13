@@ -31,6 +31,7 @@ namespace Epidesim.Engine.Drawing.Types
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
 			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+			GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 		}
 
 		public static Texture2D Load(string path)

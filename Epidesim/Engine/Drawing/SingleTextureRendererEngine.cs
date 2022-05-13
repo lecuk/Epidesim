@@ -7,7 +7,7 @@ using System;
 
 namespace Epidesim.Engine.Drawing
 {
-	class SingleTextureRenderer : Renderer
+	class SingleTextureRendererEngine : Renderer
 	{
 		private ShaderProgram program;
 		protected readonly VertexArrayObject vao;
@@ -21,7 +21,7 @@ namespace Epidesim.Engine.Drawing
 		private Texture2D texture;
 		private int maxQuadsCount, quadsCount;
 		
-		public SingleTextureRenderer(Texture2D texture, int maxQuads)
+		public SingleTextureRendererEngine(Texture2D texture, int maxQuads)
 		{
 			this.texture = texture;
 			this.maxQuadsCount = maxQuads;
@@ -30,10 +30,6 @@ namespace Epidesim.Engine.Drawing
 			var fragmentShader = new FragmentShader(@"Shaders/Texture/FragmentShader.glsl");
 			this.program = new ShaderProgram(vertexShader, fragmentShader);
 
-			vboVertices = new VertexBufferObject(VertexAttribPointerType.Float, sizeof(float), 3, false, BufferUsageHint.StaticDraw, BufferTarget.ArrayBuffer, GetPName.ArrayBufferBinding);
-			vboColors = new VertexBufferObject(VertexAttribPointerType.Float, sizeof(float), 4, false, BufferUsageHint.StaticDraw, BufferTarget.ArrayBuffer, GetPName.ArrayBufferBinding);
-			vboTexCoords = new VertexBufferObject(VertexAttribPointerType.Float, sizeof(float), 2, false, BufferUsageHint.StaticDraw, BufferTarget.ArrayBuffer, GetPName.ArrayBufferBinding);
-
 			int maxVertices = maxQuads * 4;
 
 			// quad = 4 vertices
@@ -41,6 +37,10 @@ namespace Epidesim.Engine.Drawing
 			colorBuffer = new float[maxVertices * 4];
 			texCoordBuffer = new float[maxVertices * 2];
 			triangleIndexBuffer = new int[maxQuads * 6];
+
+			vboVertices = new DefaultVertexBufferObject(vertexBuffer.Length * sizeof(float), 3);
+			vboColors = new DefaultVertexBufferObject(colorBuffer.Length * sizeof(float), 4);
+			vboTexCoords = new DefaultVertexBufferObject(texCoordBuffer.Length * sizeof(float), 2);
 
 			vao = new VertexArrayObject();
 			vao.Bind();
@@ -53,10 +53,10 @@ namespace Epidesim.Engine.Drawing
 		public void AddTextureQuad(float x1, float y1, float x2, float y2, Color4 color)
 		{
 			int v = quadsCount * 4;
-			SetVertex(v + 0, x1, y1, 0, color.R, color.G, color.B, color.A, 0, 0);
-			SetVertex(v + 1, x1, y2, 0, color.R, color.G, color.B, color.A, 0, 1);
-			SetVertex(v + 2, x2, y2, 0, color.R, color.G, color.B, color.A, 1, 1);
-			SetVertex(v + 3, x2, y1, 0, color.R, color.G, color.B, color.A, 1, 0);
+			SetVertex(v + 0, x1, y1, 0, color.R, color.G, color.B, color.A, 0, 1);
+			SetVertex(v + 1, x1, y2, 0, color.R, color.G, color.B, color.A, 0, 0);
+			SetVertex(v + 2, x2, y2, 0, color.R, color.G, color.B, color.A, 1, 0);
+			SetVertex(v + 3, x2, y1, 0, color.R, color.G, color.B, color.A, 1, 1);
 
 			int t = quadsCount * 2;
 			SetTriangle(t + 0, v + 0, v + 1, v + 2);

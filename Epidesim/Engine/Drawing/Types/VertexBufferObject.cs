@@ -17,6 +17,7 @@ namespace Epidesim.Engine.Drawing.Types
 		public readonly bool IsNormalized;
 
 		public VertexBufferObject(
+			int bufferSize,
 			VertexAttribPointerType type,
 			int size,
 			int componentCount,
@@ -34,6 +35,7 @@ namespace Epidesim.Engine.Drawing.Types
 			this.target = target;
 			this.hint = hint;
 			this.targetBinding = targetBinding;
+			this.data = new byte[bufferSize];
 		}
 
 		public bool TryBind()
@@ -59,12 +61,6 @@ namespace Epidesim.Engine.Drawing.Types
 
 		public void SetData<T>(T[] data, int count)
 		{
-			if (this.data == null || this.data.Length != data.Length)
-			{
-				int size = data.Length * Size;
-				this.data = new byte[size];
-			}
-
 			int usedByteCount = count * Size;
 			System.Buffer.BlockCopy(data, 0, this.data, 0, usedByteCount);
 			GL.BufferData(target, usedByteCount, this.data, hint);
