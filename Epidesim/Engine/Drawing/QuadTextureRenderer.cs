@@ -32,12 +32,12 @@ namespace Epidesim.Engine.Drawing
 			}
 		}
 
-		public void AddQuad(Vector2 a, Vector2 b, Color4 color)
+		public void AddQuad(Rectangle rect, Color4 color)
 		{
-			engine.AddVertex(a.X, a.Y, 0, color.R, color.G, color.B, color.A, 0, 1);
-			engine.AddVertex(a.X, b.Y, 0, color.R, color.G, color.B, color.A, 0, 0);
-			engine.AddVertex(b.X, b.Y, 0, color.R, color.G, color.B, color.A, 1, 0);
-			engine.AddVertex(b.X, a.Y, 0, color.R, color.G, color.B, color.A, 1, 1);
+			engine.AddVertex(rect.Lft, rect.Bot, 0, color.R, color.G, color.B, color.A, 0, 1);
+			engine.AddVertex(rect.Lft, rect.Top, 0, color.R, color.G, color.B, color.A, 0, 0);
+			engine.AddVertex(rect.Rgt, rect.Top, 0, color.R, color.G, color.B, color.A, 1, 0);
+			engine.AddVertex(rect.Rgt, rect.Bot, 0, color.R, color.G, color.B, color.A, 1, 1);
 
 			int v = engine.Vertices;
 			engine.AddTriangle(v - 4, v - 3, v - 2);
@@ -45,19 +45,10 @@ namespace Epidesim.Engine.Drawing
 
 			Quads++;
 		}
-		
-		public void AddQuad(Vector2 center, float width, float height, Color4 color)
-		{
-			Vector2 half = new Vector2(width, height) / 2;
-
-			AddQuad(center - half, center + half, color);
-		}
 
 		public void AddRotatedQuad(Vector2 center, float width, float height, float rotation, Color4 color)
 		{
 			Vector2 half = new Vector2(width, height) / 2;
-
-			AddQuad(center - half, center + half, color);
 		}
 
 		public void Reset()

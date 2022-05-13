@@ -17,11 +17,23 @@ namespace Epidesim.Simulation.Polygon
 		public float ScreenWidth { get; set; }
 		public float ScreenHeight { get; set; }
 
+		public Vector2 MouseWorldPosition { get; set; }
 		public Vector2 TargetDirection { get; set; }
 		public Vector2 ActualDirection { get; set; }
-		public bool WireframeMode { get; set; }
+		public bool WireframeMode { get; private set; }
 
+		public bool CreateMode { get; private set; }
+		public bool SpamMode { get; private set; }
+		public bool IsSelecting { get; private set; }
+
+		public Polygon PolygonToCreate { get; private set; }
 		public List<Polygon> Polygons { get; private set; }
+
+		public List<Polygon> SelectedPolygons { get; private set; }
+		public List<Polygon> UnSelectedPolygons { get; private set; }
+
+		private Vector2 A, B;
+		public Rectangle SelectionRectangle { get; private set; }
 
 		public CoordinateSystem CurrentCoordinateSystem { get; set; }
 
@@ -34,6 +46,8 @@ namespace Epidesim.Simulation.Polygon
 		{
 			CameraRectangle = Rectangle.FromCenterAndSize(new Vector2(), new Vector2(width, height));
 			Polygons = new List<Polygon>();
+			SelectedPolygons = new List<Polygon>();
+			UnSelectedPolygons = new List<Polygon>();
 			random = new Random();
 			timeElapsed = 0;
 			timeLastPolygonAdded = 0;
@@ -50,8 +64,12 @@ namespace Epidesim.Simulation.Polygon
 
 			for (int i = 0; i < 100; ++i)
 			{
-				Polygons.Add(CreateRandomPolygon());
+				var polygon = CreateRandomPolygon();
+				Polygons.Add(polygon);
+				UnSelectedPolygons.Add(polygon);
 			}
+
+			PolygonToCreate = CreateSpawnedPolygon();
 		}
 
 		public void Update(double deltaTime)
@@ -62,6 +80,9 @@ namespace Epidesim.Simulation.Polygon
 				ScreenHeight = ScreenHeight,
 				ViewRectangle = CameraRectangle
 			};
+
+			var mousePosition = Input.GetMouseLocalPosition();
+			MouseWorldPosition = CurrentCoordinateSystem.ScreenCoordinateToWorldCoordinate(mousePosition);
 
 			timeElapsed += deltaTime;
 			float fDeltaTime = (float)deltaTime;
@@ -91,20 +112,92 @@ namespace Epidesim.Simulation.Polygon
 				CameraRectangle = CameraRectangle.Translate(TargetDirection);
 			}
 
-			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Left))
+			if (CreateMode)
 			{
-				var position = Input.GetMouseLocalPosition();
+				if (SpamMode)
+				{
+					if (timeElapsed - timeLastPolygonAdded > 0.05)
+					{
+						if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Left))
+						{
+							PolygonToCreate.Position = MouseWorldPosition;
+							PolygonToCreate.Speed = ActualDirection / fDeltaTime * 0.25f;
+							Polygons.Add(PolygonToCreate);
+							UnSelectedPolygons.Add(PolygonToCreate);
+						}
 
-				Polygon polygon = CreateSpawnedPolygon();
-				polygon.Position = CurrentCoordinateSystem.ScreenCoordinateToWorldCoordinate(position);
-				polygon.Speed.X = ActualDirection.X * 10;
-				polygon.Speed.Y = ActualDirection.Y * 10;
-				Polygons.Add(polygon);
+						timeLastPolygonAdded = timeElapsed;
+						PolygonToCreate = CreateSpawnedPolygon();
+					}
+				}
+				else
+				{
+					if (Input.WasMouseButtonJustPressed(OpenTK.Input.MouseButton.Left))
+					{
+						PolygonToCreate.Position = MouseWorldPosition;
+						PolygonToCreate.Speed = ActualDirection / fDeltaTime * 0.25f;
+						Polygons.Add(PolygonToCreate);
+						UnSelectedPolygons.Add(PolygonToCreate);
+						PolygonToCreate = CreateSpawnedPolygon();
+					}
+				}
+			}
+			else
+			{
+				if (Input.WasMouseButtonJustPressed(OpenTK.Input.MouseButton.Left))
+				{
+					IsSelecting = true;
+					A = MouseWorldPosition;
+				}
+
+				if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Left))
+				{
+					B = MouseWorldPosition;
+
+					SelectedPolygons.Clear();
+					UnSelectedPolygons.Clear();
+
+					foreach (Polygon polygon in Polygons)
+					{
+						if (SelectionRectangle.ContainsPoint(polygon.Position))
+						{
+							SelectedPolygons.Add(polygon);
+						}
+						else
+						{
+							UnSelectedPolygons.Add(polygon);
+						}
+					}
+				}
+
+				if (Input.WasMouseButtonJustReleased(OpenTK.Input.MouseButton.Left))
+				{
+					IsSelecting = false;
+				}
+
+				SelectionRectangle = Rectangle.FromTwoPoints(A, B);
 			}
 
 			if (Input.WasKeyJustPressed(OpenTK.Input.Key.W))
 			{
 				WireframeMode = !WireframeMode;
+			}
+
+			if (Input.WasKeyJustPressed(OpenTK.Input.Key.Q))
+			{
+				if (SpamMode)
+				{
+					SpamMode = false;
+					CreateMode = false;
+				}
+				else if (CreateMode)
+				{
+					SpamMode = true;
+				}
+				else
+				{
+					CreateMode = true;
+				}
 			}
 
 			var mouseDelta = Input.GetMouseDelta();
@@ -141,7 +234,9 @@ namespace Epidesim.Simulation.Polygon
 				{
 					for (int i = 0; i < 100; ++i)
 					{
-						Polygons.Add(CreateSpawnedPolygon());
+						var polygon = CreateSpawnedPolygon();
+						Polygons.Add(polygon);
+						UnSelectedPolygons.Add(polygon);
 						timeLastPolygonAdded = timeElapsed;
 					}
 				}

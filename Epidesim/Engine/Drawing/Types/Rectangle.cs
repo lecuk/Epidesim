@@ -8,15 +8,15 @@ namespace Epidesim.Engine.Drawing.Types
 		public Vector2 A;
 		public Vector2 B;
 
-		public float Left => Math.Min(A.X, B.X);
+		public float Lft => Math.Min(A.X, B.X);
 		public float Top => Math.Max(A.Y, B.Y);
-		public float Right => Math.Max(A.X, B.X);
-		public float Bottom => Math.Min(A.Y, B.Y);
+		public float Rgt => Math.Max(A.X, B.X);
+		public float Bot => Math.Min(A.Y, B.Y);
 
 		public Vector2 Center => (A + B) * 0.5f;
 
-		public float Width => Right - Left;
-		public float Height => Top - Bottom;
+		public float Width => Rgt - Lft;
+		public float Height => Top - Bot;
 		public Vector2 Size => new Vector2(Width, Height);
 
 		public Rectangle(Vector2 a, Vector2 b)
@@ -46,6 +46,12 @@ namespace Epidesim.Engine.Drawing.Types
 		public Rectangle Scale(Vector2 scale)
 		{
 			return Rectangle.FromCenterAndSize(Center, Size * scale);
+		}
+
+		public bool ContainsPoint(Vector2 point)
+		{
+			return Lft < point.X && point.X < Rgt
+				&& Bot < point.Y && point.Y < Top;
 		}
 	}
 }

@@ -17,16 +17,6 @@ namespace Epidesim.Simulation
 				* Matrix4.CreateScale(1.0f / ViewRectangle.Width, 1.0f / ViewRectangle.Height, 1);
 		}
 
-		public Vector2 WorldCoordinateToGLCoordinate(Vector2 world)
-		{
-			return Vector2.Divide(world - ViewRectangle.Center, ViewRectangle.Size) * 2.0f;
-		}
-
-		public Vector2 GLCoordinateToWorldCoordinate(Vector2 gl)
-		{
-			return gl * 0.5f * ViewRectangle.Size + ViewRectangle.Center;
-		}
-
 		public Vector2 WorldCoordinateToScreenCoordinate(Vector2 world)
 		{
 			Vector2 center = ViewRectangle.Center;
