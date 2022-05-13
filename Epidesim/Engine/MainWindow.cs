@@ -60,6 +60,8 @@ namespace Epidesim.Engine
 			base.OnLoad(e);
 
 			GL.Enable(EnableCap.DepthTest);
+			GL.Enable(EnableCap.Blend);
+			GL.Enable(EnableCap.Texture2D);
 
 			SimulationToRun.Start();
 		}

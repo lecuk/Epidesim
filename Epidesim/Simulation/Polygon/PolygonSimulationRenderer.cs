@@ -11,9 +11,13 @@ namespace Epidesim.Simulation.Polygon
 		private readonly PrimitiveRenderer renderer;
 		private readonly PrimitiveRendererImmediateMode rendererImmediate;
 		private readonly CircleRenderer circleRenderer;
+		private readonly TextureRenderer textureRenderer;
 
 		public float ScreenWidth { get; set; }
 		public float ScreenHeight { get; set; }
+
+		Texture2D osuTexture;
+		Texture2D prometheusTexture;
 
 		public void Render(PolygonSimulation simulation)
 		{
@@ -22,10 +26,13 @@ namespace Epidesim.Simulation.Polygon
 			renderer.WireframeMode = simulation.WireframeMode;
 			renderer.Reset();
 
-			renderer.TransformMatrix = Matrix4.Identity
+			var transformMatrix = Matrix4.Identity
 				* Matrix4.CreateTranslation(simulation.OffsetX, simulation.OffsetY, 0)
 				* Matrix4.CreateScale(simulation.Scale, simulation.Scale, 0)
 				* Matrix4.CreateScale(1.0f / ScreenWidth, 1.0f / ScreenHeight, 1.0f / 1000);
+
+			renderer.TransformMatrix = transformMatrix;
+			textureRenderer.TransformMatrix = transformMatrix;
 
 			foreach (var polygon in simulation.Polygons)
 			{
@@ -39,6 +46,8 @@ namespace Epidesim.Simulation.Polygon
 
 			renderer.AddTriangle(50, 50, 55, 55, 50, 60, 1, Color4.White);
 
+			textureRenderer.DrawTexture(prometheusTexture, 150, 0, 150 + prometheusTexture.Width, 0 + prometheusTexture.Height, 10);
+
 			if (simulation.WireframeMode)
 			{
 				renderer.DrawHollowElements();
@@ -47,6 +56,8 @@ namespace Epidesim.Simulation.Polygon
 			{
 				renderer.DrawFilledElements();
 			}
+
+			System.Diagnostics.Debug.WriteLine(String.Format("polygons: {0}", simulation.Polygons.Count));
 		}
 
 		public void Dispose()
@@ -56,9 +67,12 @@ namespace Epidesim.Simulation.Polygon
 
 		public PolygonSimulationRenderer()
 		{
-			renderer = new PrimitiveRenderer(400000, 1000000, 1000000);
+			renderer = new PrimitiveRenderer(600000, 1000000, 2000000);
 			rendererImmediate = new PrimitiveRendererImmediateMode();
 			circleRenderer = new CircleRenderer();
+			textureRenderer = new TextureRenderer(50000);
+			osuTexture = Texture2D.Load("Resources/osu.png");
+			prometheusTexture = Texture2D.Load("Resources/prometheus.jpg");
 		}
 	}
 }

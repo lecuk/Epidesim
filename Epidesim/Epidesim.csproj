@@ -59,7 +59,9 @@
     <Compile Include="Engine\Drawing\PrimitiveRenderer.cs" />
     <Compile Include="Engine\Drawing\Renderer.cs" />
     <Compile Include="Engine\Drawing\ISimulationRenderer.cs" />
+    <Compile Include="Engine\Drawing\TextureRenderer.cs" />
     <Compile Include="Engine\Drawing\Types\ShaderProgram.cs" />
+    <Compile Include="Engine\Drawing\Types\Texture2D.cs" />
     <Compile Include="Engine\Drawing\Types\VertexBufferObject.cs" />
     <Compile Include="Engine\Drawing\Types\Shaders\FragmentShader.cs" />
     <Compile Include="Engine\Drawing\Types\Shaders\Shader.cs" />
@@ -107,10 +109,23 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Shaders\Texture\FragmentShader.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\Texture\VertexShader.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Resources\osu.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\prometheus.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

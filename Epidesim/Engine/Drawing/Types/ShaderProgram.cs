@@ -2,6 +2,7 @@
 using OpenTK.Graphics.OpenGL;
 using Epidesim.Engine.Drawing.Types.Shaders;
 using System.Diagnostics;
+using OpenTK;
 
 namespace Epidesim.Engine.Drawing.Types
 {
@@ -45,6 +46,54 @@ namespace Epidesim.Engine.Drawing.Types
 		public int GetUniformIndex(string uniformName)
 		{
 			return GL.GetUniformLocation(this.handle, uniformName);
+		}
+
+		public void SetUniform(string uniformName, float value)
+		{
+			int index = GetUniformIndex(uniformName);
+			GL.Uniform1(index, value);
+		}
+
+		public void SetUniform(string uniformName, Vector2 value)
+		{
+			int index = GetUniformIndex(uniformName);
+			GL.Uniform2(index, value);
+		}
+
+		public void SetUniform(string uniformName, float value1, float value2)
+		{
+			int index = GetUniformIndex(uniformName);
+			GL.Uniform2(index, value1, value2);
+		}
+
+		public void SetUniform(string uniformName, Vector3 value)
+		{
+			int index = GetUniformIndex(uniformName);
+			GL.Uniform3(index, value);
+		}
+
+		public void SetUniform(string uniformName, float value1, float value2, float value3)
+		{
+			int index = GetUniformIndex(uniformName);
+			GL.Uniform3(index, value1, value2, value3);
+		}
+
+		public void SetUniform(string uniformName, Vector4 value)
+		{
+			int index = GetUniformIndex(uniformName);
+			GL.Uniform4(index, value);
+		}
+
+		public void SetUniform(string uniformName, float value1, float value2, float value3, float value4)
+		{
+			int index = GetUniformIndex(uniformName);
+			GL.Uniform4(index, value1, value2, value3, value4);
+		}
+
+		public void SetUniform(string uniformName, Matrix4 matrix)
+		{
+			int index = GetUniformIndex(uniformName);
+			GL.UniformMatrix4(index, false, ref matrix);
 		}
 	}
 }
