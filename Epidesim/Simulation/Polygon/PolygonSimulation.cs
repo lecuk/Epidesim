@@ -77,7 +77,6 @@ namespace Epidesim.Simulation.Polygon
 				polygon.Position.Y = -position.Y * 2 / Scale - OffsetY + Height / Scale;
 				polygon.Speed.X = ActualDirection.X * 10 / Scale;
 				polygon.Speed.Y = -ActualDirection.Y * 10 / Scale;
-				polygon.Radius = 1 * (10 + polygon.Speed.Length);
 				Polygons.Add(polygon);
 			}
 
@@ -108,7 +107,7 @@ namespace Epidesim.Simulation.Polygon
 				polygon.Position += polygon.Speed * fDeltaTime * 1.5f;
 				polygon.Rotation += polygon.RotationSpeed * fDeltaTime;
 				
-				if (Math.Abs(polygon.Position.X) > Width * 5 || Math.Abs(polygon.Position.Y) > Height * 5)
+				if (Math.Abs(polygon.Position.X) > Width * 100 || Math.Abs(polygon.Position.Y) > Height * 100)
 				{
 					toRemove.Add(polygon);
 				}

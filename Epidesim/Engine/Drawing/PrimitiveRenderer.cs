@@ -32,7 +32,7 @@ namespace Epidesim.Engine.Drawing
 				throw new ArgumentException("Invalid vertex count.");
 			}
 
-			int pivot = engine.GetNextVertexIndex();
+			int pivot = engine.Vertices;
 
 			for (int i = 0; i < polygonVerticesCount; ++i)
 			{
@@ -48,7 +48,7 @@ namespace Epidesim.Engine.Drawing
 
 				if (!WireframeMode)
 				{
-					engine.AddLineIndices(i0, i1);
+					engine.AddLine(i0, i1);
 				}
 			}
 
@@ -60,37 +60,37 @@ namespace Epidesim.Engine.Drawing
 				int i1 = pivot + i + 1;
 				int i2 = pivot + i + 2;
 
-				engine.AddTriangleIndices(i0, i1, i2);
+				engine.AddTriangle(i0, i1, i2);
 
 				if (WireframeMode)
 				{
-					engine.AddLineIndices(i0, i1);
-					engine.AddLineIndices(i1, i2);
-					engine.AddLineIndices(i2, i0);
+					engine.AddLine(i0, i1);
+					engine.AddLine(i1, i2);
+					engine.AddLine(i2, i0);
 				}
 			}
 		}
 
 		public void AddRectangle(Vector2 v1, Vector2 v2, Color4 color)
 		{
-			int p = engine.GetNextVertexIndex();
+			int p = engine.Vertices;
 
 			engine.AddVertex(v1.X, v1.Y, 0, color.R, color.G, color.B, color.A);
 			engine.AddVertex(v1.X, v2.Y, 0, color.R, color.G, color.B, color.A);
 			engine.AddVertex(v2.X, v2.Y, 0, color.R, color.G, color.B, color.A);
 			engine.AddVertex(v2.X, v1.Y, 0, color.R, color.G, color.B, color.A);
 
-			engine.AddTriangleIndices(p + 0, p + 1, p + 2);
-			engine.AddTriangleIndices(p + 0, p + 2, p + 3);
+			engine.AddTriangle(p + 0, p + 1, p + 2);
+			engine.AddTriangle(p + 0, p + 2, p + 3);
 			
-			engine.AddLineIndices(p + 0, p + 1);
-			engine.AddLineIndices(p + 1, p + 2);
-			engine.AddLineIndices(p + 2, p + 3);
-			engine.AddLineIndices(p + 3, p + 0);
+			engine.AddLine(p + 0, p + 1);
+			engine.AddLine(p + 1, p + 2);
+			engine.AddLine(p + 2, p + 3);
+			engine.AddLine(p + 3, p + 0);
 			
 			if (WireframeMode)
 			{
-				engine.AddLineIndices(p + 0, p + 2);
+				engine.AddLine(p + 0, p + 2);
 			}
 		}
 
@@ -104,17 +104,17 @@ namespace Epidesim.Engine.Drawing
 
 		public void AddTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color4 color)
 		{
-			int p = engine.GetNextVertexIndex();
+			int p = engine.Vertices;
 
 			engine.AddVertex(v1.X, v1.Y, 0, color.R, color.G, color.B, color.A);
 			engine.AddVertex(v2.X, v2.Y, 0, color.R, color.G, color.B, color.A);
 			engine.AddVertex(v3.X, v3.Y, 0, color.R, color.G, color.B, color.A);
 
-			engine.AddTriangleIndices(p + 0, p + 1, p + 2);
+			engine.AddTriangle(p + 0, p + 1, p + 2);
 
-			engine.AddLineIndices(p + 0, p + 1);
-			engine.AddLineIndices(p + 1, p + 2);
-			engine.AddLineIndices(p + 2, p + 0);
+			engine.AddLine(p + 0, p + 1);
+			engine.AddLine(p + 1, p + 2);
+			engine.AddLine(p + 2, p + 0);
 		}
 
 		public void AddCircle(Vector2 center, float radius, Color4 color)
@@ -124,14 +124,12 @@ namespace Epidesim.Engine.Drawing
 
 		public void DrawFilledElements()
 		{
-			engine.DrawFilledElements();
-			System.Diagnostics.Debug.WriteLine(engine.GetDiagnosticDataString());
+			engine.DrawTriangles();
 		}
 
 		public void DrawHollowElements()
 		{
-			engine.DrawHollowElements();
-			System.Diagnostics.Debug.WriteLine(engine.GetDiagnosticDataString());
+			engine.DrawLines();
 		}
 
 		public void Reset()

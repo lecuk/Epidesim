@@ -8,10 +8,11 @@ namespace Epidesim.Simulation.Polygon
 {
 	class PolygonSimulationRenderer : ISimulationRenderer<PolygonSimulation>, IDisposable
 	{
-		private readonly PrimitiveRenderer renderer;
+		private readonly PrimitiveRenderer primitiveRenderer;
+		private readonly PrimitiveRenderer wireframeRenderer;
 		private readonly PrimitiveRendererImmediateMode rendererImmediate;
 		private readonly CircleRenderer circleRenderer;
-		private readonly SingleTextureRendererEngine textureRenderer;
+		private readonly QuadTextureRenderer textureRenderer;
 
 		public float ScreenWidth { get; set; }
 		public float ScreenHeight { get; set; }
@@ -24,8 +25,9 @@ namespace Epidesim.Simulation.Polygon
 		{
 			float widthToHeight = ScreenWidth / ScreenHeight;
 
-			renderer.WireframeMode = simulation.WireframeMode;
-			renderer.Reset();
+			primitiveRenderer.WireframeMode = simulation.WireframeMode;
+			wireframeRenderer.Reset();
+			primitiveRenderer.Reset();
 			textureRenderer.Reset();
 
 			var transformMatrix = Matrix4.Identity
@@ -33,52 +35,55 @@ namespace Epidesim.Simulation.Polygon
 				* Matrix4.CreateScale(simulation.Scale, simulation.Scale, 0)
 				* Matrix4.CreateScale(1.0f / ScreenWidth, 1.0f / ScreenHeight, 1.0f / 1000);
 
-			renderer.TransformMatrix = transformMatrix;
+			primitiveRenderer.TransformMatrix = transformMatrix;
 			textureRenderer.TransformMatrix = transformMatrix;
+			wireframeRenderer.TransformMatrix = transformMatrix;
 
 			foreach (var polygon in simulation.Polygons)
 			{
-				renderer.AddRightPolygon(polygon.Position, polygon.Radius, polygon.Edges, polygon.Rotation, polygon.FillColor);
+				primitiveRenderer.AddRightPolygon(polygon.Position, polygon.Radius, polygon.Edges, polygon.Rotation, polygon.FillColor);
 				Vector2 a = polygon.Position - new Vector2(polygon.Radius, polygon.Radius) * 2;
 				Vector2 b = polygon.Position + new Vector2(polygon.Radius, polygon.Radius) * 2;
-				textureRenderer.AddTextureQuad(a.X, a.Y, b.X, b.Y, polygon.BorderColor);
+				textureRenderer.AddQuad(a, b, polygon.BorderColor);
+				wireframeRenderer.AddRectangle(a, b, polygon.BorderColor);
 			}
-			renderer.AddRightPolygon(simulation.ActualDirection * new Vector2(10, -10), 15, 3, (float)Math.Atan2(-simulation.ActualDirection.Y, simulation.ActualDirection.X), Color4.Red);
-			renderer.AddRightPolygon(simulation.TargetDirection * new Vector2(10, -10), 20, 3, (float)Math.Atan2(-simulation.TargetDirection.Y, simulation.TargetDirection.X), Color4.Yellow);
+			primitiveRenderer.AddRightPolygon(simulation.ActualDirection * new Vector2(10, -10), 15, 3, (float)Math.Atan2(-simulation.ActualDirection.Y, simulation.ActualDirection.X), Color4.Red);
+			primitiveRenderer.AddRightPolygon(simulation.TargetDirection * new Vector2(10, -10), 20, 3, (float)Math.Atan2(-simulation.TargetDirection.Y, simulation.TargetDirection.X), Color4.Yellow);
 
-			renderer.AddRectangle(new Vector2(0, 0), new Vector2(50, 150), Color4.Black);
-			renderer.AddRectangle(new Vector2(0, 200), new Vector2(50, 350), Color4.Black);
+			primitiveRenderer.AddRectangle(new Vector2(0, 0), new Vector2(50, 150), Color4.Black);
+			primitiveRenderer.AddRectangle(new Vector2(0, 200), new Vector2(50, 350), Color4.Black);
 
-			renderer.AddTriangle(new Vector2(50, 50), new Vector2(55, 55), new Vector2(50, 60), Color4.White);
-
-			textureRenderer.DrawAll();
+			primitiveRenderer.AddTriangle(new Vector2(50, 50), new Vector2(55, 55), new Vector2(50, 60), Color4.White);
 
 			if (simulation.WireframeMode)
 			{
-				renderer.DrawHollowElements();
+				wireframeRenderer.DrawHollowElements();
+				primitiveRenderer.DrawHollowElements();
 			}
 			else
 			{
-				renderer.DrawFilledElements();
+				textureRenderer.DrawTexture(haloTexture);
+				primitiveRenderer.DrawFilledElements();
 			}
-			
-			System.Diagnostics.Debug.WriteLine(String.Format("polygons: {0}", simulation.Polygons.Count));
 		}
 
 		public void Dispose()
 		{
-			renderer.Dispose();
+			primitiveRenderer.Dispose();
+			textureRenderer.Dispose();
+			wireframeRenderer.Dispose();
 		}
 
 		public PolygonSimulationRenderer()
 		{
-			renderer = new PrimitiveRenderer(600000, 1000000, 2000000);
+			primitiveRenderer = new PrimitiveRenderer(600000, 1000000, 2000000) { WireframeMode = false };
+			wireframeRenderer = new PrimitiveRenderer(600000, 1000000, 2000000) { WireframeMode = true };
 			rendererImmediate = new PrimitiveRendererImmediateMode();
 			circleRenderer = new CircleRenderer();
 			osuTexture = Texture2D.Load("Resources/osu.png");
 			prometheusTexture = Texture2D.Load("Resources/prometheus.jpg");
 			haloTexture = Texture2D.Load("Resources/halo.png");
-			textureRenderer = new SingleTextureRendererEngine(haloTexture, 40000);
+			textureRenderer = new QuadTextureRenderer(60000);
 		}
 	}
 }

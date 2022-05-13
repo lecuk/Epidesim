@@ -1,13 +1,11 @@
 ﻿using Epidesim.Engine.Drawing.Types;
 using Epidesim.Engine.Drawing.Types.Shaders;
-using System;
 using OpenTK.Graphics.OpenGL;
-using OpenTK;
-using OpenTK.Graphics;
+using System;
 
 namespace Epidesim.Engine.Drawing
 {
-	class PrimitiveRendererEngine : Renderer
+	internal class PrimitiveRendererEngine : Renderer
 	{
 		private ShaderProgram program;
 		protected readonly VertexArrayObject vao;
@@ -17,16 +15,21 @@ namespace Epidesim.Engine.Drawing
 		private readonly float[] vertexBuffer;
 		private readonly float[] colorBuffer;
 		private readonly int[] triangleIndexBuffer, lineIndexBuffer;
-		private readonly int maxVertices, maxTriangles, maxLines;
 
-		private int verticesCount, trianglesCount, linesCount;
+		public int MaxVertices { get; private set; }
+		public int MaxTriangles { get; private set; }
+		public int MaxLines { get; private set; }
+
+		public int Vertices { get; private set; }
+		public int Triangles { get; private set; }
+		public int Lines { get; private set; }
 
 		public PrimitiveRendererEngine(int maxVerticesCount, int maxTrianglesCount, int maxLinesCount)
 			: base()
 		{
-			this.maxVertices = maxVerticesCount;
-			this.maxTriangles = maxTrianglesCount;
-			this.maxLines = maxLinesCount;
+			MaxVertices = maxVerticesCount;
+			MaxTriangles = maxTrianglesCount;
+			MaxLines = maxLinesCount;
 
 			var vertexShader = new VertexShader(@"Shaders/Simple/VertexShader.glsl");
 			var fragmentShader = new FragmentShader(@"Shaders/Simple/FragmentShader.glsl");
@@ -45,93 +48,102 @@ namespace Epidesim.Engine.Drawing
 			vao.SetVertexBuffer(vboVertices, 0);
 			vao.SetVertexBuffer(vboColors, 1);
 			vao.Unbind();
+
+			Reset();
 		}
-		
+
+		public void SetVertex(int index, float x, float y, float z, float r, float g, float b, float a)
+		{
+			this.vertexBuffer[index * 3 + 0] = x;
+			this.vertexBuffer[index * 3 + 1] = y;
+			this.vertexBuffer[index * 3 + 2] = z;
+
+			this.colorBuffer[index * 4 + 0] = r;
+			this.colorBuffer[index * 4 + 1] = g;
+			this.colorBuffer[index * 4 + 2] = b;
+			this.colorBuffer[index * 4 + 3] = a;
+		}
+
 		public void AddVertex(float x, float y, float z, float r, float g, float b, float a)
 		{
-			this.vertexBuffer[this.verticesCount * 3 + 0] = x;
-			this.vertexBuffer[this.verticesCount * 3 + 1] = y;
-			this.vertexBuffer[this.verticesCount * 3 + 2] = z;
-
-			this.colorBuffer[this.verticesCount * 4 + 0] = r;
-			this.colorBuffer[this.verticesCount * 4 + 1] = g;
-			this.colorBuffer[this.verticesCount * 4 + 2] = b;
-			this.colorBuffer[this.verticesCount * 4 + 3] = a;
-
-			this.verticesCount++;
+			SetVertex(this.Vertices, x, y, z, r, g, b, a);
+			this.Vertices++;
 		}
 
-		public void AddLineIndices(int i1, int i2)
+		public void SetTriangle(int index, int i1, int i2, int i3)
 		{
-			this.lineIndexBuffer[this.linesCount * 2 + 0] = i1;
-			this.lineIndexBuffer[this.linesCount * 2 + 1] = i2;
-
-			linesCount++;
+			this.triangleIndexBuffer[index * 3 + 0] = i1;
+			this.triangleIndexBuffer[index * 3 + 1] = i2;
+			this.triangleIndexBuffer[index * 3 + 2] = i3;
 		}
 
-		public void AddTriangleIndices(int i1, int i2, int i3)
+		public void AddTriangle(int i1, int i2, int i3)
 		{
-			if (this.trianglesCount >= this.maxTriangles)
-			{
-				throw new OverflowException("Max triangle count reached.");
-			}
-
-			this.triangleIndexBuffer[this.trianglesCount * 3 + 0] = i1;
-			this.triangleIndexBuffer[this.trianglesCount * 3 + 1] = i2;
-			this.triangleIndexBuffer[this.trianglesCount * 3 + 2] = i3;
-
-			trianglesCount++;
+			SetTriangle(this.Triangles, i1, i2, i3);
+			Triangles++;
 		}
 
-		public void DrawFilledElements()
+		public void SetLine(int index, int i1, int i2)
 		{
-			program.UseProgram();
+			this.lineIndexBuffer[this.Lines * 2 + 0] = i1;
+			this.lineIndexBuffer[this.Lines * 2 + 1] = i2;
+		}
 
+		public void AddLine(int i1, int i2)
+		{
+			SetLine(this.Lines, i1, i2);
+			this.Lines++;
+		}
+
+		public void DrawTriangles()
+		{
 			vao.Bind();
 
 			vboVertices.Bind();
-			vboVertices.SetData(vertexBuffer, verticesCount * 3);
+			vboVertices.SetData(vertexBuffer, Vertices * 3);
 			vao.EnableVertexBuffer(0);
 			vboVertices.Unbind();
 
 			vboColors.Bind();
-			vboColors.SetData(colorBuffer, verticesCount * 4);
+			vboColors.SetData(colorBuffer, Vertices * 4);
 			vao.EnableVertexBuffer(1);
 			vboColors.Unbind();
-			
+
+			program.UseProgram();
 			program.SetUniform("transform", TransformMatrix);
-			GL.DrawElements(PrimitiveType.Triangles, trianglesCount * 3, DrawElementsType.UnsignedInt, triangleIndexBuffer);
+
+			GL.DrawElements(PrimitiveType.Triangles, Triangles * 3, DrawElementsType.UnsignedInt, triangleIndexBuffer);
 
 			vao.Unbind();
 		}
 
-		public void DrawHollowElements()
+		public void DrawLines()
 		{
-			program.UseProgram();
-
 			vao.Bind();
 
 			vboVertices.Bind();
-			vboVertices.SetData(vertexBuffer, verticesCount * 3);
+			vboVertices.SetData(vertexBuffer, Vertices * 3);
 			vao.EnableVertexBuffer(0);
 			vboVertices.Unbind();
 
 			vboColors.Bind();
-			vboColors.SetData(colorBuffer, verticesCount * 4);
+			vboColors.SetData(colorBuffer, Vertices * 4);
 			vao.EnableVertexBuffer(1);
 			vboColors.Unbind();
 
-			var transform = TransformMatrix;
-			GL.UniformMatrix4(program.GetUniformIndex("transform"), false, ref transform);
-			GL.DrawElements(PrimitiveType.Lines, linesCount * 2, DrawElementsType.UnsignedInt, lineIndexBuffer);
+			program.UseProgram();
+			program.SetUniform("transform", TransformMatrix);
+
+			GL.DrawElements(PrimitiveType.Lines, Lines * 2, DrawElementsType.UnsignedInt, lineIndexBuffer);
+
 			vao.Unbind();
 		}
 
 		public void Reset()
 		{
-			verticesCount = 0;
-			trianglesCount = 0;
-			linesCount = 0;
+			Vertices = 0;
+			Triangles = 0;
+			Lines = 0;
 		}
 
 		public override void Dispose()
@@ -139,21 +151,6 @@ namespace Epidesim.Engine.Drawing
 			base.Dispose();
 
 			program.Dispose();
-		}
-
-		public int GetNextVertexIndex()
-		{
-			return verticesCount;
-		}
-
-		public int GetLastVertexIndex()
-		{
-			return verticesCount - 1;
-		}
-
-		public string GetDiagnosticDataString()
-		{
-			return String.Format("ver: {0}/{1}, tri: {2}/{3}, lin: {4}/{5}", verticesCount, maxVertices, trianglesCount, maxTriangles, linesCount, maxLines);
 		}
 	}
 }

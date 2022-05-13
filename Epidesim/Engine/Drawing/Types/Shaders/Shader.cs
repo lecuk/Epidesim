@@ -20,7 +20,11 @@ namespace Epidesim.Engine.Drawing.Types.Shaders
 			GL.CompileShader(handle);
 			GL.GetShader(handle, ShaderParameter.CompileStatus, out int statusCode);
 			GL.GetShaderInfoLog(handle, out string info);
-			Debug.WriteLine(String.Format("Shader: ", info));
+			
+			Debug.WriteLine(String.Format("Shader #{0} ({1}) compile info: {2}",
+				handle,
+				Type.ToString(),
+				String.IsNullOrWhiteSpace(info) ? "<no info>" : info));
 
 			if (statusCode != (int)All.True)
 			{

@@ -7,7 +7,7 @@ using System;
 
 namespace Epidesim.Engine.Drawing
 {
-	class SingleTextureRendererEngine : Renderer
+	class TextureRendererEngine : Renderer
 	{
 		private ShaderProgram program;
 		protected readonly VertexArrayObject vao;
@@ -18,25 +18,26 @@ namespace Epidesim.Engine.Drawing
 		private float[] vertexBuffer, colorBuffer, texCoordBuffer;
 		private int[] triangleIndexBuffer;
 
-		private Texture2D texture;
-		private int maxQuadsCount, quadsCount;
-		
-		public SingleTextureRendererEngine(Texture2D texture, int maxQuads)
+		public int MaxVertices { get; private set; }
+		public int MaxTriangles { get; private set; }
+
+		public int Vertices { get; private set; }
+		public int Triangles { get; private set; }
+
+		public TextureRendererEngine(int maxVertices, int maxTriangles)
 		{
-			this.texture = texture;
-			this.maxQuadsCount = maxQuads;
+			MaxVertices = maxVertices;
+			MaxTriangles = maxTriangles;
 
 			var vertexShader = new VertexShader(@"Shaders/Texture/VertexShader.glsl");
 			var fragmentShader = new FragmentShader(@"Shaders/Texture/FragmentShader.glsl");
 			this.program = new ShaderProgram(vertexShader, fragmentShader);
-
-			int maxVertices = maxQuads * 4;
-
+			
 			// quad = 4 vertices
 			vertexBuffer = new float[maxVertices * 3];
 			colorBuffer = new float[maxVertices * 4];
 			texCoordBuffer = new float[maxVertices * 2];
-			triangleIndexBuffer = new int[maxQuads * 6];
+			triangleIndexBuffer = new int[maxTriangles * 3];
 
 			vboVertices = new DefaultVertexBufferObject(vertexBuffer.Length * sizeof(float), 3);
 			vboColors = new DefaultVertexBufferObject(colorBuffer.Length * sizeof(float), 4);
@@ -50,22 +51,7 @@ namespace Epidesim.Engine.Drawing
 			vao.Unbind();
 		}
 
-		public void AddTextureQuad(float x1, float y1, float x2, float y2, Color4 color)
-		{
-			int v = quadsCount * 4;
-			SetVertex(v + 0, x1, y1, 0, color.R, color.G, color.B, color.A, 0, 1);
-			SetVertex(v + 1, x1, y2, 0, color.R, color.G, color.B, color.A, 0, 0);
-			SetVertex(v + 2, x2, y2, 0, color.R, color.G, color.B, color.A, 1, 0);
-			SetVertex(v + 3, x2, y1, 0, color.R, color.G, color.B, color.A, 1, 1);
-
-			int t = quadsCount * 2;
-			SetTriangle(t + 0, v + 0, v + 1, v + 2);
-			SetTriangle(t + 1, v + 0, v + 2, v + 3);
-
-			quadsCount++;
-		}
-
-		private void SetVertex(int index, float x, float y, float z, float r, float g, float b, float a, float tx, float ty)
+		public void SetVertex(int index, float x, float y, float z, float r, float g, float b, float a, float tx, float ty)
 		{
 			vertexBuffer[index * 3 + 0] = x;
 			vertexBuffer[index * 3 + 1] = y;
@@ -80,45 +66,55 @@ namespace Epidesim.Engine.Drawing
 			texCoordBuffer[index * 2 + 1] = ty;
 		}
 
-		private void SetTriangle(int index, int i1, int i2, int i3)
+		public void AddVertex(float x, float y, float z, float r, float g, float b, float a, float tx, float ty)
+		{
+			SetVertex(Vertices, x, y, z, r, g, b, a, tx, ty);
+			Vertices++;
+		}
+
+		public void SetTriangle(int index, int i1, int i2, int i3)
 		{
 			triangleIndexBuffer[index * 3 + 0] = i1;
 			triangleIndexBuffer[index * 3 + 1] = i2;
 			triangleIndexBuffer[index * 3 + 2] = i3;
 		}
 
-		public void Reset()
+		public void AddTriangle(int i1, int i2, int i3)
 		{
-			quadsCount = 0;
+			SetTriangle(Triangles, i1, i2, i3);
+			Triangles++;
 		}
 
-		public void DrawAll()
+		public void Reset()
+		{
+			Vertices = 0;
+			Triangles = 0;
+		}
+
+		public void DrawTexture(Texture2D texture)
 		{
 			vao.Bind();
 			texture.Use(TextureUnit.Texture0);
 
-			int verticesCount = quadsCount * 4;
-			int indicesCount = quadsCount * 2 * 3;
-
 			vboVertices.Bind();
-			vboVertices.SetData(vertexBuffer, verticesCount * 3);
+			vboVertices.SetData(vertexBuffer, Vertices * 3);
 			vao.EnableVertexBuffer(0);
 			vboVertices.Unbind();
 
 			vboColors.Bind();
-			vboColors.SetData(colorBuffer, verticesCount * 4);
+			vboColors.SetData(colorBuffer, Vertices * 4);
 			vao.EnableVertexBuffer(1);
 			vboColors.Unbind();
 
 			vboTexCoords.Bind();
-			vboTexCoords.SetData(texCoordBuffer, verticesCount * 2);
+			vboTexCoords.SetData(texCoordBuffer, Vertices * 2);
 			vao.EnableVertexBuffer(2);
 			vboTexCoords.Unbind();
 
 			program.UseProgram();
 			program.SetUniform("texture0", 0);
 			program.SetUniform("transform", TransformMatrix);
-			GL.DrawElements(PrimitiveType.Triangles, indicesCount, DrawElementsType.UnsignedInt, triangleIndexBuffer);
+			GL.DrawElements(PrimitiveType.Triangles, Triangles * 3, DrawElementsType.UnsignedInt, triangleIndexBuffer);
 
 			vao.Unbind();
 		}

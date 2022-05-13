@@ -21,14 +21,16 @@ namespace Epidesim.Engine.Drawing.Types
 			vertexShader.AttachToProgram(this.handle);
 			fragmentShader.AttachToProgram(this.handle);
 			GL.LinkProgram(this.handle);
-			
+
 			GL.GetProgramInfoLog(handle, out string info);
+			Debug.WriteLine(String.Format("Shader program #{0} compile info: {1}",
+				handle,
+				String.IsNullOrWhiteSpace(info) ? "<no info>" : info));
 		}
 
 		public void UseProgram()
 		{
 			GL.UseProgram(this.handle);
-			GL.GetProgramInfoLog(this.handle, out string info);
 		}
 
 		public void Dispose()
