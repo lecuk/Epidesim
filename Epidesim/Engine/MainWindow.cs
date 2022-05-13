@@ -59,8 +59,11 @@ namespace Epidesim.Engine
 		{
 			base.OnLoad(e);
 
-			GL.Enable(EnableCap.DepthTest);
+			// depth doesn't seem to work with blending
+			//GL.Enable(EnableCap.DepthTest);
+
 			GL.Enable(EnableCap.Blend);
+			GL.Enable(EnableCap.AlphaTest);
 			GL.Enable(EnableCap.Texture2D);
 
 			SimulationToRun.Start();

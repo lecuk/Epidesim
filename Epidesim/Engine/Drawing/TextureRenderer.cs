@@ -13,20 +13,12 @@ namespace Epidesim.Engine.Drawing
 		protected readonly VertexArrayObject vao;
 		protected readonly VertexBufferObject vboVertices;
 		protected readonly VertexBufferObject vboTexCoords;
-
-		private readonly float[] vertexBuffer, texCoordBuffer;
-		private readonly int maxVertices;
-
-		public TextureRenderer(int maxVerticesCount)
+		
+		public TextureRenderer()
 		{
-			this.maxVertices = maxVerticesCount;
-
 			var vertexShader = new VertexShader(@"Shaders/Texture/VertexShader.glsl");
 			var fragmentShader = new FragmentShader(@"Shaders/Texture/FragmentShader.glsl");
 			this.program = new ShaderProgram(vertexShader, fragmentShader);
-
-			vertexBuffer = new float[maxVerticesCount * 3];
-			texCoordBuffer = new float[maxVerticesCount * 2];
 
 			vboVertices = new VertexBufferObject(VertexAttribPointerType.Float, sizeof(float), 3, false, BufferUsageHint.StaticDraw, BufferTarget.ArrayBuffer, GetPName.ArrayBufferBinding);
 			vboTexCoords = new VertexBufferObject(VertexAttribPointerType.Float, sizeof(float), 2, false, BufferUsageHint.StaticDraw, BufferTarget.ArrayBuffer, GetPName.ArrayBufferBinding);
@@ -38,14 +30,14 @@ namespace Epidesim.Engine.Drawing
 			vao.Unbind();
 		}
 
-		public void DrawTexture(Texture2D texture, float x1, float y1, float x2, float y2, float z)
+		public void DrawTexture(Texture2D texture, Vector2 v1, Vector2 v2)
 		{
 			float[] vertices = new float[]
 			{
-				x1, y1, z,
-				x1, y2,	z,
-				x2, y2,	z,
-				x2, y1,	z,
+				v1.X, v1.Y, 0,
+				v1.X, v2.Y, 0,
+				v2.X, v2.Y, 0,
+				v2.X, v1.Y, 0,
 			};
 
 			float[] texCoords = new float[]
@@ -81,6 +73,14 @@ namespace Epidesim.Engine.Drawing
 			GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, indices);
 			
 			vao.Unbind();
+		}
+
+		public void DrawTexture(Texture2D texture, Vector2 center, float width, float height)
+		{
+			Vector2 half = new Vector2(width, height) / 2;
+			Vector2 v1 = center - half;
+			Vector2 v2 = center + half;
+			DrawTexture(texture, v1, v2);
 		}
 	}
 }
