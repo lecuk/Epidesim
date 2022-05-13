@@ -45,7 +45,7 @@ namespace Epidesim.Engine.Drawing.Types
 				}
 
 				var bitmapData = bitmap.LockBits(
-					new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+					new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
 					System.Drawing.Imaging.ImageLockMode.ReadOnly,
 					System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 				

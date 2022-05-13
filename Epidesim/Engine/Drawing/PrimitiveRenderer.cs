@@ -34,12 +34,16 @@ namespace Epidesim.Engine.Drawing
 
 			int pivot = engine.Vertices;
 
+			double anglePerVertex = Math.PI * 2 / polygonVerticesCount;
 			for (int i = 0; i < polygonVerticesCount; ++i)
 			{
-				double angle = Math.PI * 2 / polygonVerticesCount * i + rotation;
+				double angle = anglePerVertex * i + rotation;
 
-				float x = center.X + (float)Math.Cos(angle) * radius;
-				float y = center.Y + (float)Math.Sin(angle) * radius;
+				float sin = (float)Math.Sin(angle);
+				float cos = (float)Math.Cos(angle);
+
+				float x = center.X + cos * radius;
+				float y = center.Y + sin * radius;
 
 				int i0 = pivot + (i + 0) % polygonVerticesCount;
 				int i1 = pivot + (i + 1) % polygonVerticesCount;

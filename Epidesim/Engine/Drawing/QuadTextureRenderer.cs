@@ -45,6 +45,20 @@ namespace Epidesim.Engine.Drawing
 
 			Quads++;
 		}
+		
+		public void AddQuad(Vector2 center, float width, float height, Color4 color)
+		{
+			Vector2 half = new Vector2(width, height) / 2;
+
+			AddQuad(center - half, center + half, color);
+		}
+
+		public void AddRotatedQuad(Vector2 center, float width, float height, float rotation, Color4 color)
+		{
+			Vector2 half = new Vector2(width, height) / 2;
+
+			AddQuad(center - half, center + half, color);
+		}
 
 		public void Reset()
 		{

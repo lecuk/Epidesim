@@ -43,8 +43,6 @@ namespace Epidesim.Engine
 			SimulationRenderer = new PolygonSimulationRenderer();
 			SimulationToRun = new PolygonSimulation(width, height);
 			BackgroundColor = Color.MidnightBlue;
-			SimulationRenderer.ScreenWidth = Width;
-			SimulationRenderer.ScreenHeight = Height;
 		}
 
 		~MainWindow()
@@ -97,10 +95,10 @@ namespace Epidesim.Engine
 		protected override void OnResize(EventArgs e)
 		{
 			GL.Viewport(0, 0, Width, Height);
-			SimulationToRun.Width = (float)Width;
-			SimulationToRun.Height = (float)Height;
-			SimulationRenderer.ScreenWidth = Width;
-			SimulationRenderer.ScreenHeight = Height;
+			SimulationToRun.ScreenWidth = Width;
+			SimulationToRun.ScreenHeight = Height;
+			SimulationToRun.CameraRectangle = 
+				Drawing.Types.Rectangle.FromCenterAndSize(SimulationToRun.CameraRectangle.Center, new Vector2(Width, Height));
 			base.OnResize(e);
 		}
 

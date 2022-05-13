@@ -74,7 +74,7 @@ namespace Epidesim.Engine
 
 		public static Vector2 GetMouseDelta()
 		{
-			return new Vector2(MouseState.X - PreviousMouseState.X, MouseState.Y - PreviousMouseState.Y);
+			return new Vector2(MouseState.X - PreviousMouseState.X, -(MouseState.Y - PreviousMouseState.Y));
 		}
 
 		public static float GetMouseWheelDelta()
@@ -90,7 +90,7 @@ namespace Epidesim.Engine
 		public static Vector2 GetMouseLocalPosition()
 		{
 			var point = Window.PointToClient(new System.Drawing.Point(MouseState.X, MouseState.Y));
-			return new Vector2(point.X, point.Y);
+			return new Vector2(point.X, Window.Height - point.Y);
 		}
 	}
 }

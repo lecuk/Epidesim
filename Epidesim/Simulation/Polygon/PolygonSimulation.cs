@@ -1,4 +1,5 @@
 ﻿using Epidesim.Engine;
+using Epidesim.Engine.Drawing.Types;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
@@ -11,17 +12,18 @@ namespace Epidesim.Simulation.Polygon
 {
 	class PolygonSimulation : ISimulation
 	{
-		public float Width { get; set; }
-		public float Height { get; set; }
+		public Rectangle CameraRectangle { get; set; }
 
-		public float OffsetX { get; set; }
-		public float OffsetY { get; set; }
-		public float Scale { get; set; }
+		public float ScreenWidth { get; set; }
+		public float ScreenHeight { get; set; }
+
 		public Vector2 TargetDirection { get; set; }
 		public Vector2 ActualDirection { get; set; }
 		public bool WireframeMode { get; set; }
 
 		public List<Polygon> Polygons { get; private set; }
+
+		public CoordinateSystem CurrentCoordinateSystem { get; set; }
 
 		private double timeElapsed;
 		private double timeLastPolygonAdded;
@@ -30,8 +32,7 @@ namespace Epidesim.Simulation.Polygon
 
 		public PolygonSimulation(float width, float height)
 		{
-			Width = width;
-			Height = height;
+			CameraRectangle = Rectangle.FromCenterAndSize(new Vector2(), new Vector2(width, height));
 			Polygons = new List<Polygon>();
 			random = new Random();
 			timeElapsed = 0;
@@ -46,9 +47,6 @@ namespace Epidesim.Simulation.Polygon
 		{
 			TargetDirection = new Vector2();
 			ActualDirection = new Vector2();
-			OffsetX = 0;
-			OffsetY = 0;
-			Scale = 1;
 
 			for (int i = 0; i < 100; ++i)
 			{
@@ -58,14 +56,39 @@ namespace Epidesim.Simulation.Polygon
 
 		public void Update(double deltaTime)
 		{
+			CurrentCoordinateSystem = new CoordinateSystem()
+			{
+				ScreenWidth = ScreenWidth,
+				ScreenHeight = ScreenHeight,
+				ViewRectangle = CameraRectangle
+			};
+
 			timeElapsed += deltaTime;
 			float fDeltaTime = (float)deltaTime;
 
+			if (Input.IsKeyDown(OpenTK.Input.Key.Up))
+			{
+				CameraRectangle = CameraRectangle.Translate(new Vector2(0, -CameraRectangle.Height * fDeltaTime));
+			}
+
+			if (Input.IsKeyDown(OpenTK.Input.Key.Down))
+			{
+				CameraRectangle = CameraRectangle.Translate(new Vector2(0, CameraRectangle.Height * fDeltaTime));
+			}
+
+			if (Input.IsKeyDown(OpenTK.Input.Key.Left))
+			{
+				CameraRectangle = CameraRectangle.Translate(new Vector2(CameraRectangle.Width * fDeltaTime, 0));
+			}
+
+			if (Input.IsKeyDown(OpenTK.Input.Key.Right))
+			{
+				CameraRectangle = CameraRectangle.Translate(new Vector2(-CameraRectangle.Width * fDeltaTime, 0));
+			}
+
 			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Right))
 			{
-				var delta = Input.GetMouseDelta();
-				OffsetX += delta.X / Scale * 2;
-				OffsetY -= delta.Y / Scale * 2;
+				CameraRectangle = CameraRectangle.Translate(TargetDirection);
 			}
 
 			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Left))
@@ -73,10 +96,9 @@ namespace Epidesim.Simulation.Polygon
 				var position = Input.GetMouseLocalPosition();
 
 				Polygon polygon = CreateSpawnedPolygon();
-				polygon.Position.X = position.X * 2 / Scale - OffsetX - Width / Scale;
-				polygon.Position.Y = -position.Y * 2 / Scale - OffsetY + Height / Scale;
-				polygon.Speed.X = ActualDirection.X * 10 / Scale;
-				polygon.Speed.Y = -ActualDirection.Y * 10 / Scale;
+				polygon.Position = CurrentCoordinateSystem.ScreenCoordinateToWorldCoordinate(position);
+				polygon.Speed.X = ActualDirection.X * 10;
+				polygon.Speed.Y = ActualDirection.Y * 10;
 				Polygons.Add(polygon);
 			}
 
@@ -86,18 +108,18 @@ namespace Epidesim.Simulation.Polygon
 			}
 
 			var mouseDelta = Input.GetMouseDelta();
-			TargetDirection = mouseDelta;
+			TargetDirection = 2 * mouseDelta * new Vector2(CameraRectangle.Width / ScreenWidth, CameraRectangle.Height / ScreenHeight);
 			ActualDirection = ActualDirection + (TargetDirection - ActualDirection) * 6f * fDeltaTime;
 
 			float wheelDelta = Input.GetMouseWheelDelta();
 			if (wheelDelta > 0)
 			{
-				Scale *= 1.07f;
+				CameraRectangle = CameraRectangle.Scale(new Vector2(1 / 1.07f));
 			}
 
 			if (wheelDelta < 0)
 			{
-				Scale /= 1.07f;
+				CameraRectangle = CameraRectangle.Scale(new Vector2(1.07f));
 			}
 
 			var toRemove = new List<Polygon>();
@@ -107,7 +129,7 @@ namespace Epidesim.Simulation.Polygon
 				polygon.Position += polygon.Speed * fDeltaTime * 1.5f;
 				polygon.Rotation += polygon.RotationSpeed * fDeltaTime;
 				
-				if (Math.Abs(polygon.Position.X) > Width * 100 || Math.Abs(polygon.Position.Y) > Height * 100)
+				if (Math.Abs(polygon.Position.X) > 50000 || Math.Abs(polygon.Position.Y) > 50000)
 				{
 					toRemove.Add(polygon);
 				}
@@ -135,8 +157,8 @@ namespace Epidesim.Simulation.Polygon
 		{
 			Polygon polygon = new Polygon();
 
-			polygon.Position.X = (float)(random.NextDouble() * Width * 2 - Width);
-			polygon.Position.Y = (float)(random.NextDouble() * Height * 2 - Height);
+			polygon.Position.X = (float)(random.NextDouble() * 1000);
+			polygon.Position.Y = (float)(random.NextDouble() * 1000);
 			polygon.ZIndex = random.Next() % 1000;
 			polygon.Speed.X = (float)(0);
 			polygon.Speed.Y = -(float)(0);
@@ -155,8 +177,8 @@ namespace Epidesim.Simulation.Polygon
 		{
 			Polygon polygon = new Polygon();
 
-			polygon.Position.X = (float)(random.NextDouble() * Width * 2 - Width);
-			polygon.Position.Y = (float)(random.NextDouble() * Height * 2 - Height);
+			polygon.Position.X = (float)(random.NextDouble() * 1000);
+			polygon.Position.Y = (float)(random.NextDouble() * 1000);
 			polygon.ZIndex = random.Next() % 1000;
 			polygon.Speed.X = (float)(18 - random.NextDouble() * 24);
 			polygon.Speed.Y = -(float)(8 + random.NextDouble() * 32);
