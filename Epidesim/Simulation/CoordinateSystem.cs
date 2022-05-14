@@ -13,8 +13,8 @@ namespace Epidesim.Simulation
 		public Matrix4 GetTransformationMatrix()
 		{
 			return Matrix4.Identity
-				* Matrix4.CreateTranslation(ViewRectangle.Center.X, ViewRectangle.Center.Y, 0)
-				* Matrix4.CreateScale(1.0f / ViewRectangle.Width, 1.0f / ViewRectangle.Height, 1);
+				* Matrix4.CreateTranslation(-ViewRectangle.Center.X, -ViewRectangle.Center.Y, 0)
+				* Matrix4.CreateScale(2.0f / ViewRectangle.Width, 2.0f / ViewRectangle.Height, 1);
 		}
 
 		public Vector2 WorldCoordinateToScreenCoordinate(Vector2 world)

@@ -81,9 +81,15 @@
     <Compile Include="Engine\Input.cs" />
     <Compile Include="Engine\ISimulation.cs" />
     <Compile Include="Engine\MainWindow.cs" />
+    <Compile Include="Simulation\Epidemic\Creature.cs" />
     <Compile Include="Simulation\Epidemic\EpidemicSimulation.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Simulation\Epidemic\EpidemicSimulationRenderer.cs" />
+    <Compile Include="Simulation\Epidemic\Illness.cs" />
+    <Compile Include="Simulation\Epidemic\IllnessStage.cs" />
+    <Compile Include="Simulation\Epidemic\ProbabilityTable.cs" />
+    <Compile Include="Simulation\Epidemic\GaussianDistribution.cs" />
     <Compile Include="Simulation\Polygon\PolygonSimulationRenderer.cs" />
     <Compile Include="Simulation\Polygon\Polygon.cs" />
     <Compile Include="Simulation\Polygon\PolygonSimulation.cs" />
