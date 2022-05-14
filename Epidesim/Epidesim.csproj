@@ -62,10 +62,11 @@
     <Compile Include="Engine\Drawing\Renderer.cs" />
     <Compile Include="Engine\Drawing\ISimulationRenderer.cs" />
     <Compile Include="Engine\Drawing\QuadTextureRenderer.cs" />
+    <Compile Include="Engine\ResourceStorage.cs" />
     <Compile Include="Engine\Drawing\TextRenderer.cs" />
     <Compile Include="Engine\Drawing\TextureFontGenerator.cs" />
     <Compile Include="Engine\Drawing\Texture2DLoader.cs" />
-    <Compile Include="Engine\Drawing\Types\ShaderProgramManager.cs" />
+    <Compile Include="Engine\ResourceManager.cs" />
     <Compile Include="Engine\Drawing\Types\TextureFont.cs" />
     <Compile Include="Engine\Drawing\TextureRendererEngine.cs" />
     <Compile Include="Engine\Drawing\Types\DefaultVertexBufferObject.cs" />

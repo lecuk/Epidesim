@@ -1,4 +1,5 @@
-﻿using Epidesim.Engine.Drawing;
+﻿using Epidesim.Engine;
+using Epidesim.Engine.Drawing;
 using Epidesim.Engine.Drawing.Types;
 using Epidesim.Engine.Drawing.Types.Shaders;
 using OpenTK;
@@ -15,8 +16,6 @@ namespace Epidesim.Simulation.Polygon
 		private readonly PrimitiveRenderer wireframeRenderer;
 		private readonly QuadTextureRenderer textureRenderer;
 		private readonly TextRenderer textRenderer;
-
-		Texture2D haloTexture;
 
 		public void Render(PolygonSimulation simulation)
 		{
@@ -98,7 +97,7 @@ namespace Epidesim.Simulation.Polygon
 			}
 			else
 			{
-				textureRenderer.DrawTexture(haloTexture);
+				textureRenderer.DrawTexture(ResourceManager.GetTexture("halo"));
 				primitiveRenderer.DrawFilledElements();
 				textRenderer.DrawAll();
 			}
@@ -115,33 +114,78 @@ namespace Epidesim.Simulation.Polygon
 
 		public PolygonSimulationRenderer()
 		{
-			InitShaders();
+			InitResources();
 
 			primitiveRenderer = new PrimitiveRenderer(600000, 1000000, 2000000) { WireframeMode = false };
 			wireframeRenderer = new PrimitiveRenderer(200000, 400000, 600000) { WireframeMode = true };
 			selectionRectangleRenderer = new PrimitiveRenderer(4, 2, 4) { WireframeMode = false };
-			haloTexture = Texture2DLoader.LoadFromFile("Resources/halo.png");
-			textureRenderer = new QuadTextureRenderer(60000, ShaderProgramManager.GetProgram("textureDefault"));
+			textureRenderer = new QuadTextureRenderer(60000, ResourceManager.GetProgram("textureDefault"));
 			textRenderer = new TextRenderer();
+			textRenderer.LoadFont(ResourceManager.GetTextureFont("consolas"));
+		}
 
-			string alphabet = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,;/\\()<>{}[]+-=|!?\"\'";
-			var font = TextureFontGenerator.Generate("Resources/consolas.ttf", alphabet.ToCharArray());
-			textRenderer.LoadFont(font);
+		private void InitResources()
+		{
+			InitShaders();
+			InitShaderPrograms();
+			InitTextures();
+			InitFonts();
 		}
 
 		private void InitShaders()
 		{
-			ShaderProgramManager.AddProgram("primitive", new ShaderProgram(
-				VertexShader.Load("Shaders/Simple/VertexShader.glsl"),
-				FragmentShader.Load("Shaders/Simple/FragmentShader.glsl")));
+			ResourceManager.AddShader("simpleVertex",
+				VertexShader.Load("Shaders/Simple/VertexShader.glsl"));
+			ResourceManager.AddShader("simpleFragment",
+				FragmentShader.Load("Shaders/Simple/FragmentShader.glsl"));
 
-			ShaderProgramManager.AddProgram("textureDefault", new ShaderProgram(
-				VertexShader.Load("Shaders/Texture/VertexShader.glsl"),
-				FragmentShader.Load("Shaders/Texture/FragmentShader.glsl")));
+			ResourceManager.AddShader("textureVertex",
+				VertexShader.Load("Shaders/Texture/VertexShader.glsl"));
+			ResourceManager.AddShader("textureFragment",
+				FragmentShader.Load("Shaders/Texture/FragmentShader.glsl"));
 
-			ShaderProgramManager.AddProgram("textureText", new ShaderProgram(
-				VertexShader.Load("Shaders/Text/VertexShader.glsl"),
-				FragmentShader.Load("Shaders/Text/FragmentShader.glsl")));
+			ResourceManager.AddShader("textVertex",
+				VertexShader.Load("Shaders/Text/VertexShader.glsl"));
+			ResourceManager.AddShader("textFragment",
+				FragmentShader.Load("Shaders/Text/FragmentShader.glsl"));
+		}
+
+		private void InitShaderPrograms()
+		{
+			ResourceManager.AddProgram("primitive", new ShaderProgram(
+				ResourceManager.GetShader("simpleVertex") as VertexShader,
+				ResourceManager.GetShader("simpleFragment") as FragmentShader));
+			
+			ResourceManager.AddProgram("textureDefault", new ShaderProgram(
+				ResourceManager.GetShader("textureVertex") as VertexShader,
+				ResourceManager.GetShader("textureFragment") as FragmentShader));
+
+			ResourceManager.AddProgram("textureText", new ShaderProgram(
+				ResourceManager.GetShader("textVertex") as VertexShader,
+				ResourceManager.GetShader("textFragment") as FragmentShader));
+		}
+
+		private void InitTextures()
+		{
+			ResourceManager.AddTexture("halo",
+				Texture2DLoader.LoadFromFile("Resources/halo.png"));
+
+			ResourceManager.AddTexture("osu", 
+				Texture2DLoader.LoadFromFile("Resources/osu.png"));
+
+			ResourceManager.AddTexture("prometheus",
+				Texture2DLoader.LoadFromFile("Resources/prometheus.jpg"));
+		}
+
+		private void InitFonts()
+		{
+			string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,;/\\()<>{}[]+-=|!?\"\'";
+			
+			ResourceManager.AddTextureFont("arial",
+				TextureFontGenerator.Generate("Resources/arial.ttf", alphabet.ToCharArray()));
+
+			ResourceManager.AddTextureFont("consolas",
+				TextureFontGenerator.Generate("Resources/consolas.ttf", alphabet.ToCharArray()));
 		}
 	}
 }

@@ -31,7 +31,7 @@ namespace Epidesim.Engine.Drawing
 			MaxTriangles = maxTrianglesCount;
 			MaxLines = maxLinesCount;
 
-			this.program = ShaderProgramManager.GetProgram("primitive");
+			this.program = ResourceManager.GetProgram("primitive");
 
 			vertexBuffer = new float[maxVerticesCount * 3];
 			colorBuffer = new float[maxVerticesCount * 4];

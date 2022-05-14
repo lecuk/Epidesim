@@ -50,7 +50,7 @@ namespace Epidesim.Engine.Drawing
 				{
 					Character = glyph.Character,
 					Glyph = glyph,
-					Renderer = new QuadTextureRenderer(1000, ShaderProgramManager.GetProgram("textureText")),
+					Renderer = new QuadTextureRenderer(1000, ResourceManager.GetProgram("textureText")),
 					PRenderer = new PrimitiveRenderer(2000, 2000, 2000) { WireframeMode = true }
 				};
 
