@@ -1,5 +1,6 @@
 ﻿using Epidesim.Engine.Drawing;
 using Epidesim.Engine.Drawing.Types;
+using Epidesim.Engine.Drawing.Types.Shaders;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
@@ -12,12 +13,9 @@ namespace Epidesim.Simulation.Polygon
 		private readonly PrimitiveRenderer primitiveRenderer;
 		private readonly PrimitiveRenderer selectionRectangleRenderer;
 		private readonly PrimitiveRenderer wireframeRenderer;
-		private readonly PrimitiveRendererImmediateMode rendererImmediate;
-		private readonly CircleRenderer circleRenderer;
 		private readonly QuadTextureRenderer textureRenderer;
+		private readonly TextRenderer textRenderer;
 
-		Texture2D osuTexture;
-		Texture2D prometheusTexture;
 		Texture2D haloTexture;
 
 		public void Render(PolygonSimulation simulation)
@@ -27,6 +25,7 @@ namespace Epidesim.Simulation.Polygon
 			primitiveRenderer.Reset();
 			textureRenderer.Reset();
 			selectionRectangleRenderer.Reset();
+			textRenderer.Reset();
 
 			var transformMatrix = simulation.CurrentCoordinateSystem.GetTransformationMatrix();
 
@@ -34,6 +33,7 @@ namespace Epidesim.Simulation.Polygon
 			textureRenderer.TransformMatrix = transformMatrix;
 			wireframeRenderer.TransformMatrix = transformMatrix;
 			selectionRectangleRenderer.TransformMatrix = transformMatrix;
+			textRenderer.TransformMatrix = transformMatrix;
 
 			foreach (var polygon in simulation.UnSelectedPolygons)
 			{
@@ -66,15 +66,41 @@ namespace Epidesim.Simulation.Polygon
 					Color4.White);
 			}
 
+			var v2 = new Vector2();
+
+			primitiveRenderer.AddRightPolygon(v2,
+				simulation.PolygonToCreate.Radius,
+				simulation.PolygonToCreate.Edges,
+				simulation.PolygonToCreate.Rotation,
+				Color4.White);
+
+			textRenderer.AddString("hello world!", ref v2, Color4.White);
+
+			primitiveRenderer.AddRightPolygon(v2,
+				simulation.PolygonToCreate.Radius,
+				simulation.PolygonToCreate.Edges,
+				simulation.PolygonToCreate.Rotation,
+				Color4.White);
+
+			textRenderer.AddString("abcd\nefghijkl\nmnopqrstuvw\nxyz", ref v2, Color4.Lime);
+
+			primitiveRenderer.AddRightPolygon(v2,
+				simulation.PolygonToCreate.Radius,
+				simulation.PolygonToCreate.Edges,
+				simulation.PolygonToCreate.Rotation,
+				Color4.White);
+
 			if (simulation.WireframeMode)
 			{
 				wireframeRenderer.DrawHollowElements();
 				primitiveRenderer.DrawHollowElements();
+				textRenderer.DrawWireframe();
 			}
 			else
 			{
 				textureRenderer.DrawTexture(haloTexture);
 				primitiveRenderer.DrawFilledElements();
+				textRenderer.DrawAll();
 			}
 
 			selectionRectangleRenderer.DrawHollowElements();
@@ -89,15 +115,33 @@ namespace Epidesim.Simulation.Polygon
 
 		public PolygonSimulationRenderer()
 		{
+			InitShaders();
+
 			primitiveRenderer = new PrimitiveRenderer(600000, 1000000, 2000000) { WireframeMode = false };
-			wireframeRenderer = new PrimitiveRenderer(600000, 1000000, 2000000) { WireframeMode = true };
+			wireframeRenderer = new PrimitiveRenderer(200000, 400000, 600000) { WireframeMode = true };
 			selectionRectangleRenderer = new PrimitiveRenderer(4, 2, 4) { WireframeMode = false };
-			rendererImmediate = new PrimitiveRendererImmediateMode();
-			circleRenderer = new CircleRenderer();
-			osuTexture = Texture2D.Load("Resources/osu.png");
-			prometheusTexture = Texture2D.Load("Resources/prometheus.jpg");
-			haloTexture = Texture2D.Load("Resources/halo.png");
-			textureRenderer = new QuadTextureRenderer(60000);
+			haloTexture = Texture2DLoader.LoadFromFile("Resources/halo.png");
+			textureRenderer = new QuadTextureRenderer(60000, ShaderProgramManager.GetProgram("textureDefault"));
+			textRenderer = new TextRenderer();
+
+			string alphabet = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,;/\\()<>{}[]+-=|!?\"\'";
+			var font = TextureFontGenerator.Generate("Resources/consolas.ttf", alphabet.ToCharArray());
+			textRenderer.LoadFont(font);
+		}
+
+		private void InitShaders()
+		{
+			ShaderProgramManager.AddProgram("primitive", new ShaderProgram(
+				VertexShader.Load("Shaders/Simple/VertexShader.glsl"),
+				FragmentShader.Load("Shaders/Simple/FragmentShader.glsl")));
+
+			ShaderProgramManager.AddProgram("textureDefault", new ShaderProgram(
+				VertexShader.Load("Shaders/Texture/VertexShader.glsl"),
+				FragmentShader.Load("Shaders/Texture/FragmentShader.glsl")));
+
+			ShaderProgramManager.AddProgram("textureText", new ShaderProgram(
+				VertexShader.Load("Shaders/Text/VertexShader.glsl"),
+				FragmentShader.Load("Shaders/Text/FragmentShader.glsl")));
 		}
 	}
 }

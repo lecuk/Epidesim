@@ -31,9 +31,7 @@ namespace Epidesim.Engine.Drawing
 			MaxTriangles = maxTrianglesCount;
 			MaxLines = maxLinesCount;
 
-			var vertexShader = new VertexShader(@"Shaders/Simple/VertexShader.glsl");
-			var fragmentShader = new FragmentShader(@"Shaders/Simple/FragmentShader.glsl");
-			this.program = new ShaderProgram(vertexShader, fragmentShader);
+			this.program = ShaderProgramManager.GetProgram("primitive");
 
 			vertexBuffer = new float[maxVerticesCount * 3];
 			colorBuffer = new float[maxVerticesCount * 4];

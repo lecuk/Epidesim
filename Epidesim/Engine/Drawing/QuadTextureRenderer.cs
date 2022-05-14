@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Epidesim.Engine.Drawing.Types;
+﻿using Epidesim.Engine.Drawing.Types;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -16,11 +11,11 @@ namespace Epidesim.Engine.Drawing
 		public int Quads { get; private set; }
 		public int MaxQuads { get; private set; }
 
-		public QuadTextureRenderer(int maxQuads)
+		public QuadTextureRenderer(int maxQuads, ShaderProgram program)
 		{
 			MaxQuads = maxQuads;
 
-			engine = new TextureRendererEngine(maxQuads * 4, maxQuads * 2);
+			engine = new TextureRendererEngine(maxQuads * 4, maxQuads * 2, program);
 		}
 
 		public override Matrix4 TransformMatrix

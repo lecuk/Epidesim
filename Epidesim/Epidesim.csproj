@@ -39,6 +39,9 @@
     <Reference Include="OpenTK, Version=3.3.2.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.3.2\lib\net20\OpenTK.dll</HintPath>
     </Reference>
+    <Reference Include="SharpFont, Version=2.5.3.0, Culture=neutral, PublicKeyToken=48add4c483071cdf, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpFont.2.5.3.0\lib\net20\SharpFont.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -59,6 +62,11 @@
     <Compile Include="Engine\Drawing\Renderer.cs" />
     <Compile Include="Engine\Drawing\ISimulationRenderer.cs" />
     <Compile Include="Engine\Drawing\QuadTextureRenderer.cs" />
+    <Compile Include="Engine\Drawing\TextRenderer.cs" />
+    <Compile Include="Engine\Drawing\TextureFontGenerator.cs" />
+    <Compile Include="Engine\Drawing\Texture2DLoader.cs" />
+    <Compile Include="Engine\Drawing\Types\ShaderProgramManager.cs" />
+    <Compile Include="Engine\Drawing\Types\TextureFont.cs" />
     <Compile Include="Engine\Drawing\TextureRendererEngine.cs" />
     <Compile Include="Engine\Drawing\Types\DefaultVertexBufferObject.cs" />
     <Compile Include="Engine\Drawing\Types\Rectangle.cs" />
@@ -88,6 +96,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="Resources\arial.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\consolas.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Shaders\Circle\FragmentShader.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -117,11 +131,23 @@
     <None Include="Shaders\Texture\VertexShader.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Shaders\Text\FragmentShader.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\Text\VertexShader.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SharpFont.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="freetype6.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\halo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

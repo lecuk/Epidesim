@@ -24,16 +24,12 @@ namespace Epidesim.Engine.Drawing
 		public int Vertices { get; private set; }
 		public int Triangles { get; private set; }
 
-		public TextureRendererEngine(int maxVertices, int maxTriangles)
+		public TextureRendererEngine(int maxVertices, int maxTriangles, ShaderProgram program)
 		{
 			MaxVertices = maxVertices;
 			MaxTriangles = maxTriangles;
-
-			var vertexShader = new VertexShader(@"Shaders/Texture/VertexShader.glsl");
-			var fragmentShader = new FragmentShader(@"Shaders/Texture/FragmentShader.glsl");
-			this.program = new ShaderProgram(vertexShader, fragmentShader);
+			this.program = program;
 			
-			// quad = 4 vertices
 			vertexBuffer = new float[maxVertices * 3];
 			colorBuffer = new float[maxVertices * 4];
 			texCoordBuffer = new float[maxVertices * 2];

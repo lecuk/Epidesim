@@ -70,6 +70,13 @@ namespace Epidesim.Simulation.Polygon
 			}
 
 			PolygonToCreate = CreateSpawnedPolygon();
+
+			CurrentCoordinateSystem = new CoordinateSystem()
+			{
+				ScreenWidth = ScreenWidth,
+				ScreenHeight = ScreenHeight,
+				ViewRectangle = CameraRectangle
+			};
 		}
 
 		public void Update(double deltaTime)
@@ -173,6 +180,21 @@ namespace Epidesim.Simulation.Polygon
 				if (Input.WasMouseButtonJustReleased(OpenTK.Input.MouseButton.Left))
 				{
 					IsSelecting = false;
+
+					SelectedPolygons.Clear();
+					UnSelectedPolygons.Clear();
+
+					foreach (Polygon polygon in Polygons)
+					{
+						if (SelectionRectangle.ContainsPoint(polygon.Position))
+						{
+							SelectedPolygons.Add(polygon);
+						}
+						else
+						{
+							UnSelectedPolygons.Add(polygon);
+						}
+					}
 				}
 
 				SelectionRectangle = Rectangle.FromTwoPoints(A, B);

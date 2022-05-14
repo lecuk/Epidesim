@@ -64,6 +64,8 @@ namespace Epidesim.Engine
 			GL.Enable(EnableCap.AlphaTest);
 			GL.Enable(EnableCap.Texture2D);
 
+			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
 			SimulationToRun.Start();
 		}
 

@@ -10,11 +10,9 @@ namespace Epidesim.Engine.Drawing.Types.Shaders
 		private readonly int handle;
 		public readonly ShaderType Type;
 
-		public Shader(string path, ShaderType type)
+		public Shader(string source, ShaderType type)
 		{
 			int handle = GL.CreateShader(type);
-			
-			string source = File.ReadAllText(path);
 
 			GL.ShaderSource(handle, source);
 			GL.CompileShader(handle);
