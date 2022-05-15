@@ -10,9 +10,7 @@ namespace Epidesim.Simulation.Epidemic
 	class EpidemicSimulation : ISimulation
 	{
 		public float WorldSize { get; private set; }
-
-		float a = 0;
-
+		
 		public List<Creature> Creatures { get; private set; }
 		public LinkedList<Creature> HealthyCreatures { get; private set; }
 		public LinkedList<Creature> IllCreatures { get; private set; }
@@ -21,6 +19,9 @@ namespace Epidesim.Simulation.Epidemic
 
 		public Vector2 MousePosition { get; private set; }
 		public Vector2 WorldMousePosition { get; private set; }
+
+		public Vector2 MouseDelta { get; private set; }
+		public Vector2 WorldMouseDelta { get; private set; }
 
 		public GaussianDistribution positionDistribution;
 
@@ -43,7 +44,7 @@ namespace Epidesim.Simulation.Epidemic
 				AddCreature(new Creature()
 				{
 					Name = String.Format("Creature {0}", i + 1),
-					Position = new OpenTK.Vector2((float)positionDistribution.GetRandomValue(), (float)positionDistribution.GetRandomValue()),
+					Position = new Vector2((float)positionDistribution.GetRandomValue(), (float)positionDistribution.GetRandomValue()),
 					IsIll = false
 				});
 			}
@@ -77,10 +78,6 @@ namespace Epidesim.Simulation.Epidemic
 		{
 			float fDeltaTime = (float)deltaTime;
 
-			MousePosition = Input.GetMouseLocalPosition();
-			WorldMousePosition = CoordinateSystem.ScreenCoordinateToWorldCoordinate(MousePosition);
-			Debug.WriteLine(CoordinateSystem.WorldCoordinateToScreenCoordinate(Vector2.Zero));
-
 			if (Input.IsKeyDown(OpenTK.Input.Key.Up))
 			{
 				CoordinateSystem.ViewRectangle = CoordinateSystem.ViewRectangle.Translate(
@@ -104,6 +101,34 @@ namespace Epidesim.Simulation.Epidemic
 				CoordinateSystem.ViewRectangle = CoordinateSystem.ViewRectangle.Translate(
 					new Vector2(CoordinateSystem.ViewRectangle.Width * fDeltaTime, 0));
 			}
+
+			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Right))
+			{
+				CoordinateSystem.ViewRectangle = CoordinateSystem.ViewRectangle.Translate(-WorldMouseDelta);
+			}
+
+			if (Input.GetMouseWheelDelta() > 0)
+			{
+				CoordinateSystem.ViewRectangle = CoordinateSystem.ViewRectangle.Scale(new Vector2(1 / 1.08f));
+			}
+
+			if (Input.GetMouseWheelDelta() < 0)
+			{
+				CoordinateSystem.ViewRectangle = CoordinateSystem.ViewRectangle.Scale(new Vector2(1.08f));
+			}
+
+			MousePosition = Input.GetMouseLocalPosition();
+			WorldMousePosition = CoordinateSystem.ScreenCoordinateToWorldCoordinate(MousePosition);
+
+			MouseDelta = Input.GetMouseDelta();
+			WorldMouseDelta = CoordinateSystem.ScreenDeltaToWorldDelta(MouseDelta);
+
+			AddCreature(new Creature()
+			{
+				Name = String.Format("Creature {0}", Creatures.Count),
+				Position = new Vector2((float)positionDistribution.GetRandomValue(), (float)positionDistribution.GetRandomValue()),
+				IsIll = false
+			});
 		}
 
 		void AddCreature(Creature creature)

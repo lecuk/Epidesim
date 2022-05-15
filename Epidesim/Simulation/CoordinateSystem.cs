@@ -32,5 +32,19 @@ namespace Epidesim.Simulation
 			Vector2 screenPos = Vector2.Divide(screen, screenSize);
 			return screenPos * ViewRectangle.Size + leftBottom;
 		}
+
+		public Vector2 WorldDeltaScreenDelta(Vector2 world)
+		{
+			Vector2 screenSize = new Vector2(ScreenWidth, ScreenHeight);
+			Vector2 screenPos = Vector2.Divide(world, ViewRectangle.Size);
+			return screenPos * screenSize;
+		}
+
+		public Vector2 ScreenDeltaToWorldDelta(Vector2 screen)
+		{
+			Vector2 screenSize = new Vector2(ScreenWidth, ScreenHeight);
+			Vector2 screenPos = Vector2.Divide(screen, screenSize);
+			return screenPos * ViewRectangle.Size;
+		}
 	}
 }
