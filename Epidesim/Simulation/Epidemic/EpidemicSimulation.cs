@@ -9,11 +9,7 @@ namespace Epidesim.Simulation.Epidemic
 {
 	class EpidemicSimulation : ISimulation
 	{
-		public float WorldSize { get; private set; }
-		
-		public List<Creature> Creatures { get; private set; }
-		public LinkedList<Creature> HealthyCreatures { get; private set; }
-		public LinkedList<Creature> IllCreatures { get; private set; }
+		public City City { get; private set; }
 
 		public CoordinateSystem CoordinateSystem { get; private set; }
 		public Rectangle Camera
@@ -32,28 +28,38 @@ namespace Epidesim.Simulation.Epidemic
 		public Vector2 WorldMouseDelta { get; private set; }
 
 		public GaussianDistribution positionDistribution;
+		private Random random;
 
-		public EpidemicSimulation(float worldSize, int numberOfCreatures)
+		public EpidemicSimulation(City city, int numberOfCreatures)
 		{
-			Creatures = new List<Creature>();
-			HealthyCreatures = new LinkedList<Creature>();
-			IllCreatures = new LinkedList<Creature>();
-			positionDistribution = new GaussianDistribution(worldSize / 2, worldSize / 5);
-
-			WorldSize = worldSize;
+			City = city;
+			
+			positionDistribution = new GaussianDistribution()
+			{
+				Mean = 0,
+				Deviation = City.SectorSize / 4,
+				Min = City.RoadWidth / 2 - City.SectorSize / 2,
+				Max = City.SectorSize / 2 - City.RoadWidth / 2
+			};
+			random = new Random();
 
 			CoordinateSystem = new CoordinateSystem()
 			{
-				ViewRectangle = Rectangle.FromTwoPoints(Vector2.Zero, new Vector2(WorldSize, WorldSize))
+				ViewRectangle = City.Bounds
 			};
 
 			for (int i = 0; i < numberOfCreatures; ++i)
 			{
-				AddCreature(new Creature()
+				int randomCol = random.Next(city.Cols);
+				int randomRow = random.Next(city.Rows);
+				Sector sector = city[randomCol, randomRow];
+
+				city.CreateCreature(new Creature()
 				{
 					Name = String.Format("Creature {0}", i + 1),
-					Position = new Vector2((float)positionDistribution.GetRandomValue(), (float)positionDistribution.GetRandomValue()),
-					IsIll = false
+					Position = sector.Bounds.Center + new Vector2((float)positionDistribution.GetRandomValue(), (float)positionDistribution.GetRandomValue()),
+					IsIll = false,
+					MoveSpeed = 3f
 				});
 			}
 		}
@@ -78,8 +84,13 @@ namespace Epidesim.Simulation.Epidemic
 
 		public void Start()
 		{
-			// patient zero
-			MakeIll(Creatures[0]);
+			foreach (var creature in City)
+			{
+				if (random.NextDouble() < 0.02)
+				{
+					creature.IsIll = true;
+				}
+			}
 		}
 
 		public void Update(double deltaTime)
@@ -126,13 +137,6 @@ namespace Epidesim.Simulation.Epidemic
 
 			MouseDelta = Input.GetMouseDelta();
 			WorldMouseDelta = CoordinateSystem.ScreenDeltaToWorldDelta(MouseDelta);
-
-			AddCreature(new Creature()
-			{
-				Name = String.Format("Creature {0}", Creatures.Count),
-				Position = new Vector2((float)positionDistribution.GetRandomValue(), (float)positionDistribution.GetRandomValue()),
-				IsIll = false
-			});
 		}
 
 		void TranslateCamera(float offsetX, float offsetY)
@@ -144,9 +148,9 @@ namespace Epidesim.Simulation.Epidemic
 		{
 			Vector2 limitedOffset = offset;
 
-			if (Camera.Center.X + offset.X > WorldSize)
+			if (Camera.Center.X + offset.X > City.Bounds.Width)
 			{
-				limitedOffset.X = WorldSize - Camera.Center.X;
+				limitedOffset.X = City.Bounds.Width - Camera.Center.X;
 			}
 
 			if (Camera.Center.X + offset.X < 0)
@@ -154,9 +158,9 @@ namespace Epidesim.Simulation.Epidemic
 				limitedOffset.X = -Camera.Center.X;
 			}
 
-			if (Camera.Center.Y + offset.Y > WorldSize)
+			if (Camera.Center.Y + offset.Y > City.Bounds.Height)
 			{
-				limitedOffset.Y = WorldSize - Camera.Center.Y;
+				limitedOffset.Y = City.Bounds.Height - Camera.Center.Y;
 			}
 
 			if (Camera.Center.Y + offset.Y < 0)
@@ -181,24 +185,16 @@ namespace Epidesim.Simulation.Epidemic
 		{
 			float cameraLimit = 1.25f;
 
-			if (Camera.Height * scale.Y < WorldSize * cameraLimit || 
-				Camera.Width * scale.X < WorldSize * cameraLimit)
+			if (Camera.Width * scale.X < City.Bounds.Width * cameraLimit ||
+				Camera.Height * scale.Y < City.Bounds.Height * cameraLimit)
 			{
 				Camera = Camera.Scale(scale);
 			}
 		}
 
-		void AddCreature(Creature creature)
-		{
-			Creatures.Add(creature);
-			HealthyCreatures.AddLast(creature);
-		}
-
 		void MakeIll(Creature creature)
 		{
 			creature.IsIll = true;
-			HealthyCreatures.Remove(creature);
-			IllCreatures.AddLast(creature);
 		}
 	}
 }

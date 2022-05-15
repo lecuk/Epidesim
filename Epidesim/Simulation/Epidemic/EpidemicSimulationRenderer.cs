@@ -9,41 +9,53 @@ namespace Epidesim.Simulation.Epidemic
 	class EpidemicSimulationRenderer : ISimulationRenderer<EpidemicSimulation>
 	{
 		private readonly PrimitiveRenderer creatureRenderer;
+		private readonly PrimitiveRenderer cityRenderer;
+		private readonly PrimitiveRenderer thingRenderer;
 
 		public EpidemicSimulationRenderer()
 		{
+			this.cityRenderer = new PrimitiveRenderer(100000, 100000, 100000);
 			this.creatureRenderer = new PrimitiveRenderer(100000, 100000, 100000);
+			this.thingRenderer = new PrimitiveRenderer(4000, 4000, 4000);
 		}
 
 		public void Render(EpidemicSimulation simulation)
 		{
+			cityRenderer.Reset();
 			creatureRenderer.Reset();
 
 			var transformMatrix = simulation.CoordinateSystem.GetTransformationMatrix();
+			cityRenderer.TransformMatrix = transformMatrix;
 			creatureRenderer.TransformMatrix = transformMatrix;
 
-			foreach (var creature in simulation.HealthyCreatures)
+			var city = simulation.City;
+			var cityBounds = city.Bounds;
+
+			cityRenderer.AddRectangle(cityBounds, Color4.DimGray);
+
+			for (int r = 0; r < city.Rows; ++r)
 			{
-				creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(creature.Position, new Vector2(1)), Color4.White);
+				for (int c = 0; c < city.Cols; ++c)
+				{
+					Sector sector = city[c, r];
+					var sectorBounds = sector.Bounds;
+					if (sector.Name.StartsWith("Sector Living"))
+					{
+						cityRenderer.AddRectangle(sectorBounds, Color4.DarkGreen);
+					}
+				}
 			}
 
-			foreach (var creature in simulation.IllCreatures)
+			foreach (var creature in city)
 			{
-				creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(creature.Position, new Vector2(1)), Color4.Red);
+				creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(creature.Position, new Vector2(1)),
+					creature.IsIll
+					? Color4.Red
+					: Color4.White);
 			}
 
-			creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(new Vector2(0), new Vector2(1)), Color4.Yellow);
-			creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(new Vector2(simulation.WorldSize, 0), new Vector2(1)), Color4.Yellow);
-			creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(new Vector2(0, simulation.WorldSize), new Vector2(1)), Color4.Yellow);
-			creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(new Vector2(simulation.WorldSize), new Vector2(1)), Color4.Yellow);
-
-			creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(simulation.WorldMousePosition, new Vector2(1)), Color4.Lime);
-
+			cityRenderer.DrawFilledElements();
 			creatureRenderer.DrawFilledElements();
-
-			creatureRenderer.Reset();
-			creatureRenderer.AddRectangle(Rectangle.FromTwoPoints(new Vector2(0), new Vector2(simulation.WorldSize)), Color4.Yellow);
-			creatureRenderer.DrawHollowElements();
 		}
 	}
 }
