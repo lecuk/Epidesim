@@ -37,6 +37,8 @@ namespace Epidesim.Simulation.Epidemic
 			creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(new Vector2(0, simulation.WorldSize), new Vector2(1)), Color4.Yellow);
 			creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(new Vector2(simulation.WorldSize), new Vector2(1)), Color4.Yellow);
 
+			creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(simulation.WorldMousePosition, new Vector2(1)), Color4.Lime);
+
 			creatureRenderer.DrawFilledElements();
 
 			creatureRenderer.Reset();

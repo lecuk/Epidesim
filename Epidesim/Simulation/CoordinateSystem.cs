@@ -19,18 +19,18 @@ namespace Epidesim.Simulation
 
 		public Vector2 WorldCoordinateToScreenCoordinate(Vector2 world)
 		{
-			Vector2 center = ViewRectangle.Center;
+			Vector2 leftBottom = new Vector2(ViewRectangle.Lft, ViewRectangle.Bot);
 			Vector2 screenSize = new Vector2(ScreenWidth, ScreenHeight);
-			Vector2 screenPos = Vector2.Divide(center - world, ViewRectangle.Size);
-			return (screenPos + Vector2.One) / 2 * screenSize;
+			Vector2 screenPos = Vector2.Divide(world - leftBottom, ViewRectangle.Size);
+			return screenPos * screenSize;
 		}
 
 		public Vector2 ScreenCoordinateToWorldCoordinate(Vector2 screen)
 		{
-			Vector2 center = ViewRectangle.Center;
+			Vector2 leftBottom = new Vector2(ViewRectangle.Lft, ViewRectangle.Bot);
 			Vector2 screenSize = new Vector2(ScreenWidth, ScreenHeight);
-			Vector2 screenPos = Vector2.Divide(screen, screenSize) * 2 - Vector2.One;
-			return screenPos * ViewRectangle.Size - center;
+			Vector2 screenPos = Vector2.Divide(screen, screenSize);
+			return screenPos * ViewRectangle.Size + leftBottom;
 		}
 	}
 }

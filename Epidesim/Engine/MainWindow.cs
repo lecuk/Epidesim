@@ -100,10 +100,7 @@ namespace Epidesim.Engine
 		protected override void OnResize(EventArgs e)
 		{
 			GL.Viewport(0, 0, Width, Height);
-			SimulationToRun.ScreenWidth = Width;
-			SimulationToRun.ScreenHeight = Height;
-			//SimulationToRun.CameraRectangle = 
-			//	Drawing.Types.Rectangle.FromCenterAndSize(SimulationToRun.CameraRectangle.Center, new Vector2(Width, Height));
+			SimulationToRun.SetScreenSize(Width, Height);
 			base.OnResize(e);
 		}
 
