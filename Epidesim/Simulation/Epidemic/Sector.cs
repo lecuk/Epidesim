@@ -7,8 +7,13 @@ namespace Epidesim.Simulation.Epidemic
 	class Sector : IEnumerable<Creature>
 	{
 		public string Name { get; set; }
+		public int Col { get; set; }
+		public int Row { get; set; }
 		public int MaxCreatures { get; set; }
 		public Rectangle Bounds { get; set; }
+		public GaussianDistribution IdleTime { get; set; }
+		public GaussianDistribution PositionDistribution { get; set; }
+		public IReadOnlyList<Sector> NeighbourSectors { get; set; }
 
 		public readonly LinkedList<Creature> Creatures;
 

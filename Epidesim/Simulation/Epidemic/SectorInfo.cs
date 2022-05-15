@@ -10,6 +10,6 @@ namespace Epidesim.Simulation.Epidemic
 	{
 		public abstract string Name { get; }
 		public abstract GaussianDistribution MaxCreatures { get; }
-		public abstract GaussianDistribution TimeSpent { get; }
+		public abstract GaussianDistribution IdleTime { get; }
 	}
 }

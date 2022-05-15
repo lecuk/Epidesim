@@ -17,7 +17,7 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 			Min = 0
 		};
 
-		public override GaussianDistribution TimeSpent => new GaussianDistribution()
+		public override GaussianDistribution IdleTime => new GaussianDistribution()
 		{
 			Mean = 60,
 			Deviation = 30,

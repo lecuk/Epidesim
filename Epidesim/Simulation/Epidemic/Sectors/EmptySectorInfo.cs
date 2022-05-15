@@ -11,7 +11,7 @@
 			Min = 0
 		};
 
-		public override GaussianDistribution TimeSpent => new GaussianDistribution()
+		public override GaussianDistribution IdleTime => new GaussianDistribution()
 		{
 			Mean = 20,
 			Deviation = 20,

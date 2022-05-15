@@ -42,15 +42,9 @@ namespace Epidesim.Engine
 			: base(width, height, GraphicsMode.Default, title)
 		{
 			InitResources();
-
-			var cityBuilder = new CityBuilder()
-			{
-				SectorSize = 40f,
-				RoadWidth = 5f
-			};
-
+			
 			SimulationRenderer = new EpidemicSimulationRenderer();
-			SimulationToRun = new EpidemicSimulation(cityBuilder.Build(20, 15), 5000);
+			SimulationToRun = new EpidemicSimulation();
 			BackgroundColor = Color.MidnightBlue;
 		}
 

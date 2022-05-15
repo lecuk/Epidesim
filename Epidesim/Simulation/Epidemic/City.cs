@@ -49,12 +49,10 @@ namespace Epidesim.Simulation.Epidemic
 			UpdateCreatureSectorFromPosition(creature);
 		}
 
-		public void UpdateCreatureSectorFromPosition(Creature creature)
+		public Sector GetSectorAtLocation(Vector2 location)
 		{
-			Vector2 position = creature.Position;
-
-			int col = (int)Math.Round(position.X / SectorSize);
-			int row = (int)Math.Round(position.Y / SectorSize);
+			int col = (int)Math.Round(location.X / SectorSize);
+			int row = (int)Math.Round(location.Y / SectorSize);
 
 			if (col == Cols) col = Cols - 1;
 			if (col < 0) col = 0;
@@ -62,7 +60,13 @@ namespace Epidesim.Simulation.Epidemic
 			if (row == Rows) row = Rows - 1;
 			if (row < 0) row = 0;
 
-			var sector = GetSector(col, row);
+			return GetSector(col, row);
+		}
+
+		public void UpdateCreatureSectorFromPosition(Creature creature)
+		{
+			Vector2 position = creature.Position;
+			var sector = GetSectorAtLocation(position);
 			SetCreatureSector(creature, sector);
 		}
 
@@ -75,8 +79,9 @@ namespace Epidesim.Simulation.Epidemic
 				{
 					oldSector.Creatures.Remove(creature);
 				}
-
+				
 				newSector.Creatures.AddLast(creature);
+				creature.CurrentSector = newSector;
 			}
 		}
 

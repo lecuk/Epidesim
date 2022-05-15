@@ -10,6 +10,7 @@ namespace Epidesim.Simulation.Epidemic
 	class EpidemicSimulation : ISimulation
 	{
 		public City City { get; private set; }
+		public int NumberOfCreatures { get; private set; }
 
 		public CoordinateSystem CoordinateSystem { get; private set; }
 		public Rectangle Camera
@@ -27,41 +28,25 @@ namespace Epidesim.Simulation.Epidemic
 		public Vector2 MouseDelta { get; private set; }
 		public Vector2 WorldMouseDelta { get; private set; }
 
-		public GaussianDistribution positionDistribution;
 		private Random random;
 
-		public EpidemicSimulation(City city, int numberOfCreatures)
+		public EpidemicSimulation()
 		{
-			City = city;
-			
-			positionDistribution = new GaussianDistribution()
+			var builder = new CityBuilder()
 			{
-				Mean = 0,
-				Deviation = City.SectorSize / 4,
-				Min = City.RoadWidth / 2 - City.SectorSize / 2,
-				Max = City.SectorSize / 2 - City.RoadWidth / 2
+				SectorSize = 40f,
+				RoadWidth = 5f
 			};
-			random = new Random();
+
+			City = builder.Build(12, 8);
+			NumberOfCreatures = 12000;
 
 			CoordinateSystem = new CoordinateSystem()
 			{
 				ViewRectangle = City.Bounds
 			};
 
-			for (int i = 0; i < numberOfCreatures; ++i)
-			{
-				int randomCol = random.Next(city.Cols);
-				int randomRow = random.Next(city.Rows);
-				Sector sector = city[randomCol, randomRow];
-
-				city.CreateCreature(new Creature()
-				{
-					Name = String.Format("Creature {0}", i + 1),
-					Position = sector.Bounds.Center + new Vector2((float)positionDistribution.GetRandomValue(), (float)positionDistribution.GetRandomValue()),
-					IsIll = false,
-					MoveSpeed = 3f
-				});
-			}
+			random = new Random();
 		}
 
 		public void SetScreenSize(float screenWidth, float screenHeight)
@@ -84,6 +69,43 @@ namespace Epidesim.Simulation.Epidemic
 
 		public void Start()
 		{
+			var startIdleDeviation = new GaussianDistribution(random)
+			{
+				Mean = 60,
+				Deviation = 60,
+				Min = 0
+			};
+
+			var speedDeviation = new GaussianDistribution(random)
+			{
+				Mean = 7,
+				Deviation = 3,
+				Min = 4
+			};
+
+			for (int i = 0; i < NumberOfCreatures; ++i)
+			{
+				int randomCol = random.Next(City.Cols);
+				int randomRow = random.Next(City.Rows);
+				Sector sector = City[randomCol, randomRow];
+
+				var name = String.Format("Creature {0}", i + 1);
+				var position = GetRandomPointInSector(sector);
+
+				City.CreateCreature(new Creature()
+				{
+					Name = name,
+					Position = position,
+					CurrentSector = sector,
+					TargetPoint = position,
+					TargetSector = sector,
+					IsIll = false,
+					IsIdle = true,
+					MoveSpeed = (float)speedDeviation.GetRandomValue(),
+					IdleTime = (float)startIdleDeviation.GetRandomValue(),
+				});
+			}
+
 			foreach (var creature in City)
 			{
 				if (random.NextDouble() < 0.02)
@@ -137,6 +159,56 @@ namespace Epidesim.Simulation.Epidemic
 
 			MouseDelta = Input.GetMouseDelta();
 			WorldMouseDelta = CoordinateSystem.ScreenDeltaToWorldDelta(MouseDelta);
+			
+			foreach (var creature in City)
+			{
+				if (creature.IsIdle)
+				{
+					creature.IdleTime -= fDeltaTime;
+
+					if (creature.IdleTime <= 0)
+					{
+						SetNextRandomTargetForCreature(creature);
+						creature.IsIdle = false;
+					}
+				}
+				else
+				{
+					float distanceToMove = creature.MoveSpeed * fDeltaTime;
+
+					if (Vector2.DistanceSquared(creature.TargetPoint, creature.Position) < distanceToMove * distanceToMove)
+					{
+						creature.Position = creature.TargetPoint;
+						creature.IdleTime = (float)creature.TargetSector.IdleTime.GetRandomValue();
+						creature.IsIdle = true;
+					}
+					else
+					{
+						Vector2 direction = creature.TargetPoint - creature.Position;
+						direction.NormalizeFast();
+						creature.Position += direction * distanceToMove;
+					}
+
+					City.UpdateCreatureSectorFromPosition(creature);
+				}
+			}
+		}
+
+		void SetNextRandomTargetForCreature(Creature creature)
+		{
+			var neighbours = creature.CurrentSector.NeighbourSectors;
+			int targetSectorIndex = random.Next(neighbours.Count);
+			var targetSector = neighbours[targetSectorIndex];
+
+			creature.TargetPoint = GetRandomPointInSector(targetSector);
+			creature.TargetSector = targetSector;
+		}
+
+		Vector2 GetRandomPointInSector(Sector sector)
+		{
+			return sector.Bounds.Center + new Vector2(
+				(float)sector.PositionDistribution.GetRandomValue(), 
+				(float)sector.PositionDistribution.GetRandomValue());
 		}
 
 		void TranslateCamera(float offsetX, float offsetY)
