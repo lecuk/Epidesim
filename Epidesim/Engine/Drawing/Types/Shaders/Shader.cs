@@ -12,7 +12,8 @@ namespace Epidesim.Engine.Drawing.Types.Shaders
 
 		public Shader(string source, ShaderType type)
 		{
-			int handle = GL.CreateShader(type);
+			this.handle = GL.CreateShader(type);
+			this.Type = type;
 
 			GL.ShaderSource(handle, source);
 			GL.CompileShader(handle);
@@ -20,7 +21,7 @@ namespace Epidesim.Engine.Drawing.Types.Shaders
 			GL.GetShaderInfoLog(handle, out string info);
 			
 			Debug.WriteLine(String.Format("Shader #{0} ({1}) compile info: {2}",
-				handle,
+				this.handle,
 				Type.ToString(),
 				String.IsNullOrWhiteSpace(info) ? "<no info>" : info));
 
@@ -28,9 +29,6 @@ namespace Epidesim.Engine.Drawing.Types.Shaders
 			{
 				throw new Exception(info);
 			}
-
-			this.handle = handle;
-			this.Type = type;
 		}
 
 		public void AttachToProgram(int programHandle)

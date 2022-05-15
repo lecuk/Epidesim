@@ -23,7 +23,7 @@ namespace Epidesim.Engine.Drawing.Types
 			GL.LinkProgram(this.handle);
 
 			GL.GetProgramInfoLog(handle, out string info);
-			Debug.WriteLine(String.Format("Shader program #{0} compile info: {1}",
+			Debug.WriteLine(String.Format("Shader program #{0} link info: {1}",
 				handle,
 				String.IsNullOrWhiteSpace(info) ? "<no info>" : info));
 		}

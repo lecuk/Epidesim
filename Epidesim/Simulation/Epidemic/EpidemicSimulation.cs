@@ -16,6 +16,14 @@ namespace Epidesim.Simulation.Epidemic
 		public LinkedList<Creature> IllCreatures { get; private set; }
 
 		public CoordinateSystem CoordinateSystem { get; private set; }
+		public Rectangle Camera
+		{
+			get => CoordinateSystem.ViewRectangle;
+			set
+			{
+				CoordinateSystem.ViewRectangle = value;
+			}
+		}
 
 		public Vector2 MousePosition { get; private set; }
 		public Vector2 WorldMousePosition { get; private set; }
@@ -57,11 +65,11 @@ namespace Epidesim.Simulation.Epidemic
 
 			if (screenWidth > screenHeight)
 			{
-				CoordinateSystem.ViewRectangle = CoordinateSystem.ViewRectangle.Scale(new Vector2(1, curRatio / targetRatio));
+				ScaleCamera(1, curRatio / targetRatio);
 			}
 			else
 			{
-				CoordinateSystem.ViewRectangle = CoordinateSystem.ViewRectangle.Scale(new Vector2(targetRatio / curRatio, 1));
+				ScaleCamera(targetRatio / curRatio, 1);
 			}
 
 			CoordinateSystem.ScreenWidth = screenWidth;
@@ -80,41 +88,37 @@ namespace Epidesim.Simulation.Epidemic
 
 			if (Input.IsKeyDown(OpenTK.Input.Key.Up))
 			{
-				CoordinateSystem.ViewRectangle = CoordinateSystem.ViewRectangle.Translate(
-					new Vector2(0, CoordinateSystem.ViewRectangle.Height * fDeltaTime));
+				TranslateCamera(0, Camera.Height * fDeltaTime);
 			}
 
 			if (Input.IsKeyDown(OpenTK.Input.Key.Down))
 			{
-				CoordinateSystem.ViewRectangle = CoordinateSystem.ViewRectangle.Translate(
-					new Vector2(0, -CoordinateSystem.ViewRectangle.Height * fDeltaTime));
+				TranslateCamera(0, -Camera.Height * fDeltaTime);
 			}
 
 			if (Input.IsKeyDown(OpenTK.Input.Key.Left))
 			{
-				CoordinateSystem.ViewRectangle = CoordinateSystem.ViewRectangle.Translate(
-					new Vector2(-CoordinateSystem.ViewRectangle.Width * fDeltaTime, 0));
+				TranslateCamera(-Camera.Width * fDeltaTime, 0);
 			}
 
 			if (Input.IsKeyDown(OpenTK.Input.Key.Right))
 			{
-				CoordinateSystem.ViewRectangle = CoordinateSystem.ViewRectangle.Translate(
-					new Vector2(CoordinateSystem.ViewRectangle.Width * fDeltaTime, 0));
+				TranslateCamera(Camera.Width * fDeltaTime, 0);
 			}
 
 			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Right))
 			{
-				CoordinateSystem.ViewRectangle = CoordinateSystem.ViewRectangle.Translate(-WorldMouseDelta);
+				TranslateCamera(-WorldMouseDelta);
 			}
 
 			if (Input.GetMouseWheelDelta() > 0)
 			{
-				CoordinateSystem.ViewRectangle = CoordinateSystem.ViewRectangle.Scale(new Vector2(1 / 1.08f));
+				ScaleCamera(1 / 1.1f);
 			}
 
 			if (Input.GetMouseWheelDelta() < 0)
 			{
-				CoordinateSystem.ViewRectangle = CoordinateSystem.ViewRectangle.Scale(new Vector2(1.08f));
+				ScaleCamera(1.1f);
 			}
 
 			MousePosition = Input.GetMouseLocalPosition();
@@ -129,6 +133,59 @@ namespace Epidesim.Simulation.Epidemic
 				Position = new Vector2((float)positionDistribution.GetRandomValue(), (float)positionDistribution.GetRandomValue()),
 				IsIll = false
 			});
+		}
+
+		void TranslateCamera(float offsetX, float offsetY)
+		{
+			TranslateCamera(new Vector2(offsetX, offsetY));
+		}
+
+		void TranslateCamera(Vector2 offset)
+		{
+			Vector2 limitedOffset = offset;
+
+			if (Camera.Center.X + offset.X > WorldSize)
+			{
+				limitedOffset.X = WorldSize - Camera.Center.X;
+			}
+
+			if (Camera.Center.X + offset.X < 0)
+			{
+				limitedOffset.X = -Camera.Center.X;
+			}
+
+			if (Camera.Center.Y + offset.Y > WorldSize)
+			{
+				limitedOffset.Y = WorldSize - Camera.Center.Y;
+			}
+
+			if (Camera.Center.Y + offset.Y < 0)
+			{
+				limitedOffset.Y = -Camera.Center.Y;
+			}
+
+			Camera = Camera.Translate(limitedOffset);
+		}
+
+		void ScaleCamera(float scale)
+		{
+			ScaleCamera(new Vector2(scale));
+		}
+
+		void ScaleCamera(float scaleX, float scaleY)
+		{
+			ScaleCamera(new Vector2(scaleX, scaleY));
+		}
+
+		void ScaleCamera(Vector2 scale)
+		{
+			float cameraLimit = 1.25f;
+
+			if (Camera.Height * scale.Y < WorldSize * cameraLimit || 
+				Camera.Width * scale.X < WorldSize * cameraLimit)
+			{
+				Camera = Camera.Scale(scale);
+			}
 		}
 
 		void AddCreature(Creature creature)
