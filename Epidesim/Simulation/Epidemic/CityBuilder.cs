@@ -28,6 +28,10 @@ namespace Epidesim.Simulation.Epidemic
 					{
 						info = new LivingSectorInfo();
 					}
+					else if (random.Next() % 16 == 0)
+					{
+						info = new HospitalSectorInfo();
+					}
 					else
 					{
 						info = new EmptySectorInfo();

@@ -20,5 +20,10 @@ namespace Epidesim.Simulation.Epidemic.Distributions
 			double temp2 = 2 * Math.PI * u2;
 			return Mean + Deviation * (temp1 * Math.Cos(temp2));
 		}
+
+		protected override double CumulativeFunc(double x)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

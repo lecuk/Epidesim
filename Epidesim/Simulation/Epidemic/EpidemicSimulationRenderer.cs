@@ -50,6 +50,10 @@ namespace Epidesim.Simulation.Epidemic
 					{
 						cityRenderer.AddRectangle(sectorBounds, Color4.DarkGreen);
 					}
+					else if (sector.Name.StartsWith("Sector Hospital"))
+					{
+						cityRenderer.AddRectangle(sectorBounds, Color4.DarkSlateGray);
+					}
 
 					if (sector.Creatures.Ill.Count > 0)
 					{
@@ -73,8 +77,8 @@ namespace Epidesim.Simulation.Epidemic
 				{
 					creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(creature.Position, new Vector2(1)),
 					creature.IsIll
-					? Color4.Red
-					: Color4.White);
+						? Color4.Red
+						: Color4.White);
 
 					if (creature.IsImmune)
 					{

@@ -25,6 +25,10 @@ namespace Epidesim.Simulation.Epidemic
 				Col = col,
 				Row = row,
 
+				PreferenceHealthy = info.AllowHealthyCreatures,
+				PreferenceIll = info.AllowIllCreatures,
+				PreferenceImmune = info.AllowImmuneCreatures,
+
 				MaxCreatures = (int)Math.Round(city.SectorSize * city.SectorSize / sqrMetersPerCreature),
 
 				Bounds = Rectangle.FromTwoPoints(
@@ -49,9 +53,6 @@ namespace Epidesim.Simulation.Epidemic
 			int width = toCol - fromCol + 1;
 			int height = toRow - fromRow + 1;
 
-			System.Diagnostics.Debug.WriteLine(String.Format("col={0} row={1} fc={2} tc={3} fr={4} tr={5} w={6} h={7}",
-				col, row, fromCol, toCol, fromRow, toRow, width, height));
-
 			var neighbours = new Sector[width * height - 1];
 
 			int i = 0;
@@ -60,9 +61,7 @@ namespace Epidesim.Simulation.Epidemic
 				for (int c = fromCol; c <= toCol; ++c)
 				{
 					if (r == row && c == col) continue;
-
-					System.Diagnostics.Debug.WriteLine(String.Format("neighbour at c{0} r{1}", c, r));
-
+					
 					neighbours[i] = city[c, r];
 					i++;
 				}

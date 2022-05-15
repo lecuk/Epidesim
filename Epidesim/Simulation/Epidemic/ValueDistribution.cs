@@ -21,6 +21,12 @@ namespace Epidesim.Simulation.Epidemic
 			return MathHelper.Clamp(value, Min, Max);
 		}
 
+		public double GetProbabilityBetweenValues(double from, double to)
+		{
+			return Math.Abs(CumulativeFunc(to) - CumulativeFunc(from));
+		}
+
 		protected abstract double ValueFunc();
+		protected abstract double CumulativeFunc(double x);
 	}
 }

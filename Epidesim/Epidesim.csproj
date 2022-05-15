@@ -98,6 +98,7 @@
     <Compile Include="Simulation\Epidemic\SectorBuilder.cs" />
     <Compile Include="Simulation\Epidemic\SectorInfo.cs" />
     <Compile Include="Simulation\Epidemic\Sectors\EmptySectorInfo.cs" />
+    <Compile Include="Simulation\Epidemic\Sectors\HospitalSectorInfo.cs" />
     <Compile Include="Simulation\Epidemic\Sectors\LivingSectorInfo.cs" />
     <Compile Include="Simulation\Epidemic\ValueDistribution.cs" />
     <Compile Include="Simulation\Polygon\PolygonSimulationRenderer.cs" />

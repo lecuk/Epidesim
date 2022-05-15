@@ -13,7 +13,7 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 
 		public override ValueDistribution SquareMetersPerCreature => new GaussianDistribution()
 		{
-			Mean = 6,
+			Mean = 12,
 			Deviation = 2,
 			Min = 2
 		};
@@ -32,5 +32,9 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 			Mean = 0,
 			Deviation = 0.333
 		};
+
+		public override float AllowHealthyCreatures => 1f;
+		public override float AllowIllCreatures => 0.033f;
+		public override float AllowImmuneCreatures => 0.75f;
 	}
 }

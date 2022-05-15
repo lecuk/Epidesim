@@ -11,5 +11,10 @@ namespace Epidesim.Simulation.Epidemic.Distributions
 		{
 			return Min + (Max - Min) * random.NextDouble();
 		}
+
+		protected override double CumulativeFunc(double x)
+		{
+			return Min + x * (Max - Min);
+		}
 	}
 }

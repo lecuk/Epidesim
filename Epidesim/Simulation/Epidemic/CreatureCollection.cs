@@ -40,11 +40,25 @@ namespace Epidesim.Simulation.Epidemic
 
 		public void UpdateCreatureSubCollections(Creature creature)
 		{
-			UpdateCreatureIsHealthy(creature);
+			UpdateCreatureIsAlive(creature);
 
-			if (!creature.IsIll)
+			if (!creature.IsDead)
 			{
-				UpdateCreatureIsImmune(creature);
+				UpdateCreatureIsHealthy(creature);
+
+				if (!creature.IsIll)
+				{
+					UpdateCreatureIsImmune(creature);
+				}
+			}
+		}
+
+		private void UpdateCreatureIsAlive(Creature creature)
+		{
+			if (creature.IsDead)
+			{
+				illCreatures.Remove(creature);
+				vulnerableCreatures.Remove(creature);
 			}
 		}
 

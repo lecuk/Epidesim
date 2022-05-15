@@ -16,6 +16,10 @@ namespace Epidesim.Simulation.Epidemic
 		public ValueDistribution PositionDistribution { get; set; }
 		public IReadOnlyList<Sector> NeighbourSectors { get; set; }
 
+		public float PreferenceHealthy { get; set; }
+		public float PreferenceIll { get; set; }
+		public float PreferenceImmune { get; set; }
+
 		public readonly CreatureCollection Creatures;
 
 		public Sector()
@@ -44,6 +48,13 @@ namespace Epidesim.Simulation.Epidemic
 			float b = (float)PositionDistribution.GetRandomValue();
 
 			return Bounds.Center + new Vector2(a, b) * new Vector2(Bounds.Width, Bounds.Height) / 2;
+		}
+
+		public float SectorCreaturePreference(Creature creature)
+		{
+			return (creature.IsIll) ? PreferenceIll
+				: (creature.IsImmune) ? PreferenceImmune
+				: PreferenceHealthy;
 		}
 	}
 }

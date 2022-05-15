@@ -39,12 +39,12 @@ namespace Epidesim.Simulation.Epidemic
 		{
 			var builder = new CityBuilder()
 			{
-				SectorSize = 40f,
-				RoadWidth = 5f
+				SectorSize = 25f,
+				RoadWidth = 4f
 			};
 
-			City = builder.Build(12, 8);
-			NumberOfCreatures = 5000;
+			City = builder.Build(40, 25);
+			NumberOfCreatures = 15000;
 			TimeScale = 1f;
 
 			CoordinateSystem = new CoordinateSystem()
@@ -275,8 +275,8 @@ namespace Epidesim.Simulation.Epidemic
 					foreach (var possibleIllCreature in possibleIllCreatures)
 					{
 						float distance = Vector2.DistanceSquared(creature.Position, possibleIllCreature.Position);
-						float maxContagiousDistance = 5.0f;
-						float spreadProbabilityPerSecond = 0.01f;
+						float maxContagiousDistance = 4.0f;
+						float spreadProbabilityPerSecond = 0.005f;
 
 						if (distance < maxContagiousDistance * maxContagiousDistance)
 						{
@@ -305,7 +305,7 @@ namespace Epidesim.Simulation.Epidemic
 			var neighbours = creature.CurrentSector.NeighbourSectors;
 
 			var possibleTargets = new ProbabilityTable<Sector>();
-			possibleTargets.AddOutcome(creature.CurrentSector, 350);
+			possibleTargets.AddOutcome(creature.CurrentSector, creature.CurrentSector.SectorCreaturePreference(creature));
 
 			foreach (var sector in neighbours)
 			{
@@ -314,14 +314,8 @@ namespace Epidesim.Simulation.Epidemic
 					continue;
 				}
 
-				if (sector.Name.StartsWith("Sector Living"))
-				{
-					possibleTargets.AddOutcome(sector, 100 * sector.MaxCreatures / (5 + sector.Creatures.Count));
-				}
-				else
-				{
-					possibleTargets.AddOutcome(sector, 40 * sector.MaxCreatures / (5 + sector.Creatures.Count));
-				}
+				float preferenceCoefficient = sector.SectorCreaturePreference(creature);
+				possibleTargets.AddOutcome(sector, preferenceCoefficient);
 			}
 
 			var targetSector = possibleTargets.GetRandomOutcome();
