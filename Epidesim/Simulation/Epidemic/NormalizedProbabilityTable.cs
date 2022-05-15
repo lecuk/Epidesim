@@ -3,44 +3,47 @@ using System.Collections.Generic;
 
 namespace Epidesim.Simulation.Epidemic
 {
-	class ProbabilityTable<T>
+	class NormalizedProbabilityTable<T>
 	{
 		class Outcome<T>
 		{
 			public double Probability { get; set; }
 			public T Thing { get; set; }
 		}
-		
+
+		private T defaultOutcome;
 		private List<Outcome<T>> possibleOutcomes;
 		private Random random;
-		private double probabilitySum;
+		double probabilityOfDefaultOutcome;
 
-		public ProbabilityTable()
+		public NormalizedProbabilityTable(T defaultOutcome = default(T))
 		{
+			this.defaultOutcome = defaultOutcome;
+
 			possibleOutcomes = new List<Outcome<T>>();
 			random = new Random();
-			probabilitySum = 0;
+			probabilityOfDefaultOutcome = 1.0;
 		}
 
 		public void AddOutcome(T thing, double probability)
 		{
+			if (probability > probabilityOfDefaultOutcome)
+			{
+				throw new Exception("Total probability is more than 1.0");
+			}
+
+			probabilityOfDefaultOutcome -= probability;
+
 			possibleOutcomes.Add(new Outcome<T>()
 			{
 				Probability = probability,
 				Thing = thing
 			});
-
-			probabilitySum += probability;
 		}
 
 		public T GetRandomOutcome()
 		{
-			if (possibleOutcomes.Count == 0)
-			{
-				throw new Exception("No outcomes");
-			}
-
-			double prediction = random.NextDouble() * probabilitySum;
+			double prediction = random.NextDouble();
 			double probability = 0;
 
 			foreach (Outcome<T> outcome in possibleOutcomes)
@@ -53,7 +56,7 @@ namespace Epidesim.Simulation.Epidemic
 				}
 			}
 
-			return possibleOutcomes[0].Thing;
+			return defaultOutcome;
 		}
 	}
 }

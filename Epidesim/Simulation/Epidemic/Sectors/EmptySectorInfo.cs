@@ -1,21 +1,29 @@
-﻿namespace Epidesim.Simulation.Epidemic.Sectors
+﻿using Epidesim.Simulation.Epidemic.Distributions;
+
+namespace Epidesim.Simulation.Epidemic.Sectors
 {
 	class EmptySectorInfo : SectorInfo
 	{
 		public override string Name => "Empty";
 
-		public override GaussianDistribution MaxCreatures => new GaussianDistribution()
+		public override ValueDistribution SquareMetersPerCreature => new GaussianDistribution()
 		{
-			Mean = 100,
-			Deviation = 40,
-			Min = 0
+			Mean = 20,
+			Deviation = 10,
+			Min = 5
 		};
 
-		public override GaussianDistribution IdleTime => new GaussianDistribution()
+		public override ValueDistribution IdleTime => new GaussianDistribution()
 		{
 			Mean = 20,
 			Deviation = 20,
 			Min = 5
+		};
+
+		public override ValueDistribution PositionDistribution => new FixedDistribution()
+		{
+			Min = -1,
+			Max = 1
 		};
 	}
 }

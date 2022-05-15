@@ -3,6 +3,7 @@ using Epidesim.Engine.Drawing.Types;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
+using System.Linq;
 
 namespace Epidesim.Simulation.Epidemic
 {
@@ -11,12 +12,14 @@ namespace Epidesim.Simulation.Epidemic
 		private readonly PrimitiveRenderer creatureRenderer;
 		private readonly PrimitiveRenderer cityRenderer;
 		private readonly PrimitiveRenderer selectionRenderer;
+		private readonly PrimitiveRenderer sectorBoundsRenderer;
 
 		public EpidemicSimulationRenderer()
 		{
-			this.cityRenderer = new PrimitiveRenderer(100000, 100000, 100000);
+			this.cityRenderer = new PrimitiveRenderer(10000, 10000, 10000);
 			this.creatureRenderer = new PrimitiveRenderer(100000, 100000, 100000);
-			this.selectionRenderer = new PrimitiveRenderer(10, 10, 10);
+			this.selectionRenderer = new PrimitiveRenderer(100000, 100000, 100000);
+			this.sectorBoundsRenderer = new PrimitiveRenderer(10000, 10000, 10000);
 		}
 
 		public void Render(EpidemicSimulation simulation)
@@ -24,11 +27,13 @@ namespace Epidesim.Simulation.Epidemic
 			cityRenderer.Reset();
 			creatureRenderer.Reset();
 			selectionRenderer.Reset();
+			sectorBoundsRenderer.Reset();
 
 			var transformMatrix = simulation.CoordinateSystem.GetTransformationMatrix();
 			cityRenderer.TransformMatrix = transformMatrix;
 			creatureRenderer.TransformMatrix = transformMatrix;
 			selectionRenderer.TransformMatrix = transformMatrix;
+			sectorBoundsRenderer.TransformMatrix = transformMatrix;
 
 			var city = simulation.City;
 			var cityBounds = city.Bounds;
@@ -45,26 +50,63 @@ namespace Epidesim.Simulation.Epidemic
 					{
 						cityRenderer.AddRectangle(sectorBounds, Color4.DarkGreen);
 					}
+
+					if (sector.Creatures.Ill.Count > 0)
+					{
+						sectorBoundsRenderer.AddRectangle(sectorBounds, Color4.Red);
+					}
 				}
 			}
 
 			foreach (var creature in city)
 			{
-				creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(creature.Position, new Vector2(1)),
+				if (creature.IsDead)
+				{
+					creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(creature.Position, new Vector2(1)),
+						Color4.Black);
+				}
+			}
+
+			foreach (var creature in city)
+			{
+				if (!creature.IsDead)
+				{
+					creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(creature.Position, new Vector2(1)),
 					creature.IsIll
 					? Color4.Red
 					: Color4.White);
+
+					if (creature.IsImmune)
+					{
+						selectionRenderer.AddRectangle(Rectangle.FromCenterAndSize(creature.Position, new Vector2(2f)),
+							Color4.GreenYellow);
+					}
+				}
 			}
 
 			if (simulation.SelectedCreature != null)
 			{
-				selectionRenderer.AddRectangle(Rectangle.FromCenterAndSize(simulation.SelectedCreature.Position, new Vector2(2.5f)),
-					simulation.SelectedCreature.IsIll
-					? Color4.Orange
-					: Color4.Yellow);
+				var selectedCreature = simulation.SelectedCreature;
+				selectionRenderer.AddRectangle(Rectangle.FromCenterAndSize(selectedCreature.Position, new Vector2(3f)),
+					Color4.Cyan);
+
+				var sector = selectedCreature.CurrentSector;
+				sectorBoundsRenderer.AddRectangle(sector.Bounds, Color4.Yellow);
+
+				foreach (var creature in sector)
+				{
+					if (!creature.IsDead)
+					{
+						creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(creature.Position, new Vector2(1.5f)),
+							creature.IsIll
+							? Color4.Red
+							: Color4.Lime);
+					}
+				}
 			}
 
 			cityRenderer.DrawFilledElements();
+			sectorBoundsRenderer.DrawHollowElements();
 			creatureRenderer.DrawFilledElements();
 			selectionRenderer.DrawHollowElements();
 		}

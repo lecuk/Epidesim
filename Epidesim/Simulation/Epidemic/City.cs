@@ -17,7 +17,7 @@ namespace Epidesim.Simulation.Epidemic
 		public readonly int Cols, Rows;
 
 		private readonly Sector[,] sectors;
-		private readonly LinkedList<Creature> allCreatures;
+		private readonly List<Creature> allCreatures;
 
 		public Rectangle Bounds => Rectangle.FromTwoPoints(Vector2.Zero, new Vector2(Cols, Rows) * SectorSize);
 
@@ -28,7 +28,7 @@ namespace Epidesim.Simulation.Epidemic
 			this.Cols = sectorCols;
 			this.Rows = sectorRows;
 			this.sectors = new Sector[sectorRows, sectorCols];
-			this.allCreatures = new LinkedList<Creature>();
+			this.allCreatures = new List<Creature>();
 		}
 
 		public void SetSector(int col, int row, Sector sector)
@@ -45,10 +45,12 @@ namespace Epidesim.Simulation.Epidemic
 
 		public void CreateCreature(Creature creature)
 		{
-			allCreatures.AddLast(creature);
-			UpdateCreatureSectorFromPosition(creature);
-		}
+			allCreatures.Add(creature);
 
+			var sector = creature.CurrentSector;
+			sector.Creatures.Add(creature);
+		}
+		
 		public Sector GetSectorAtLocation(Vector2 location)
 		{
 			int col = (int)Math.Floor(location.X / SectorSize);
@@ -70,6 +72,11 @@ namespace Epidesim.Simulation.Epidemic
 			SetCreatureSector(creature, sector);
 		}
 
+		public void UpdateCreature(Creature creature)
+		{
+			creature.CurrentSector.Creatures.UpdateCreatureSubCollections(creature);
+		}
+
 		private void SetCreatureSector(Creature creature, Sector newSector)
 		{
 			var oldSector = creature.CurrentSector;
@@ -79,9 +86,10 @@ namespace Epidesim.Simulation.Epidemic
 				{
 					oldSector.Creatures.Remove(creature);
 				}
-				
-				newSector.Creatures.AddLast(creature);
+
 				creature.CurrentSector = newSector;
+				newSector.Creatures.Add(creature);
+				UpdateCreature(creature);
 			}
 		}
 

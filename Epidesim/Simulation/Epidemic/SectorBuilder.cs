@@ -16,6 +16,7 @@ namespace Epidesim.Simulation.Epidemic
 		public Sector Build(int col, int row, SectorInfo info)
 		{
 			Vector2 bottomLeftOfSector = new Vector2(col, row) * city.SectorSize;
+			double sqrMetersPerCreature = info.SquareMetersPerCreature.GetRandomValue();
 
 			return new Sector()
 			{
@@ -24,7 +25,7 @@ namespace Epidesim.Simulation.Epidemic
 				Col = col,
 				Row = row,
 
-				MaxCreatures = (int)Math.Round(info.MaxCreatures.GetRandomValue()),
+				MaxCreatures = (int)Math.Round(city.SectorSize * city.SectorSize / sqrMetersPerCreature),
 
 				Bounds = Rectangle.FromTwoPoints(
 					bottomLeftOfSector + new Vector2(city.RoadWidth / 2),
@@ -32,13 +33,7 @@ namespace Epidesim.Simulation.Epidemic
 
 				IdleTime = info.IdleTime,
 
-				PositionDistribution = new GaussianDistribution()
-				{
-					Mean = 0,
-					Deviation = city.SectorSize / 5,
-					Min = city.RoadWidth / 2 - city.SectorSize / 2,
-					Max = city.SectorSize / 2 - city.RoadWidth / 2
-				}
+				PositionDistribution = info.PositionDistribution
 			};
 		}
 

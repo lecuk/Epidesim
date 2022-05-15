@@ -1,4 +1,5 @@
 ﻿using Epidesim.Engine.Drawing.Types;
+using OpenTK;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -11,15 +12,15 @@ namespace Epidesim.Simulation.Epidemic
 		public int Row { get; set; }
 		public int MaxCreatures { get; set; }
 		public Rectangle Bounds { get; set; }
-		public GaussianDistribution IdleTime { get; set; }
-		public GaussianDistribution PositionDistribution { get; set; }
+		public ValueDistribution IdleTime { get; set; }
+		public ValueDistribution PositionDistribution { get; set; }
 		public IReadOnlyList<Sector> NeighbourSectors { get; set; }
 
-		public readonly LinkedList<Creature> Creatures;
+		public readonly CreatureCollection Creatures;
 
 		public Sector()
 		{
-			Creatures = new LinkedList<Creature>();
+			Creatures = new CreatureCollection();
 		}
 
 		public IEnumerator<Creature> GetEnumerator()
@@ -35,6 +36,14 @@ namespace Epidesim.Simulation.Epidemic
 		public bool IsFull()
 		{
 			return Creatures.Count >= MaxCreatures;
+		}
+		
+		public Vector2 GetRandomPoint()
+		{
+			float a = (float)PositionDistribution.GetRandomValue();
+			float b = (float)PositionDistribution.GetRandomValue();
+
+			return Bounds.Center + new Vector2(a, b) * new Vector2(Bounds.Width, Bounds.Height) / 2;
 		}
 	}
 }

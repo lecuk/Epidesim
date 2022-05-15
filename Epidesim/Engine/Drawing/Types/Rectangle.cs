@@ -48,6 +48,11 @@ namespace Epidesim.Engine.Drawing.Types
 			return Rectangle.FromCenterAndSize(Center, Size * scale);
 		}
 
+		public Rectangle AddToScale(Vector2 additionalSize)
+		{
+			return Rectangle.FromCenterAndSize(Center, Size + additionalSize);
+		}
+
 		public bool ContainsPoint(Vector2 point)
 		{
 			return Lft < point.X && point.X < Rgt

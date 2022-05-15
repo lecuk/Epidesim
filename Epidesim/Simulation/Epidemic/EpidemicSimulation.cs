@@ -1,5 +1,6 @@
 ﻿using Epidesim.Engine;
 using Epidesim.Engine.Drawing.Types;
+using Epidesim.Simulation.Epidemic.Distributions;
 using OpenTK;
 using System;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ namespace Epidesim.Simulation.Epidemic
 			};
 
 			City = builder.Build(12, 8);
-			NumberOfCreatures = 12000;
+			NumberOfCreatures = 5000;
 			TimeScale = 1f;
 
 			CoordinateSystem = new CoordinateSystem()
@@ -95,9 +96,9 @@ namespace Epidesim.Simulation.Epidemic
 				Sector sector = City[randomCol, randomRow];
 
 				var name = String.Format("Creature {0}", i + 1);
-				var position = GetRandomPointInSector(sector);
+				var position = sector.GetRandomPoint();
 
-				City.CreateCreature(new Creature()
+				var creature = new Creature()
 				{
 					Name = name,
 					Position = position,
@@ -108,15 +109,16 @@ namespace Epidesim.Simulation.Epidemic
 					IsIdle = true,
 					MoveSpeed = (float)speedDeviation.GetRandomValue(),
 					IdleTime = (float)startIdleDeviation.GetRandomValue(),
-				});
-			}
+				};
 
+				City.CreateCreature(creature);
+			}
+			
 			foreach (var creature in City)
 			{
-				if (random.NextDouble() < 0.02)
-				{
-					creature.IsIll = true;
-				}
+				//patient zero
+				MakeIll(creature);
+				break;
 			}
 		}
 
@@ -182,6 +184,61 @@ namespace Epidesim.Simulation.Epidemic
 
 			foreach (var creature in City)
 			{
+				if (Input.WasMouseButtonJustPressed(OpenTK.Input.MouseButton.Left))
+				{
+					float sqrDistance = Vector2.DistanceSquared(WorldMousePosition, creature.Position);
+
+					if (sqrDistance < 2f)
+					{
+						if (SelectedCreature == null)
+						{
+							SelectedCreature = creature;
+						}
+						else
+						{
+							float curSqrDistance = Vector2.DistanceSquared(WorldMousePosition, SelectedCreature.Position);
+
+							if (sqrDistance < curSqrDistance)
+							{
+								SelectedCreature = creature;
+							}
+						}
+					}
+				}
+
+				if (creature.IsDead)
+				{
+					continue;
+				}
+
+				if (creature.IsIll)
+				{
+					creature.TimeSpentIll += scaledDeltaTime;
+
+					double deathPossibility = random.NextDouble();
+					double deathProbabilityPerSecond = 0.001;
+
+					if (deathPossibility < deathProbabilityPerSecond * scaledDeltaTime)
+					{
+						Kill(creature);
+					}
+
+					double recoverPossibility = random.NextDouble();
+					double recoverProbabilityPerSecond = 0.0033;
+
+					if (recoverPossibility < recoverProbabilityPerSecond * scaledDeltaTime)
+					{
+						MakeHealthyAgain(creature);
+
+						double immunityPossibility = random.NextDouble();
+						double immunityProbability = 0.25;
+						if (immunityPossibility < immunityProbability)
+						{
+							creature.IsImmune = true;
+						}
+					}
+				}
+
 				if (creature.IsIdle)
 				{
 					creature.IdleTime -= scaledDeltaTime;
@@ -212,23 +269,22 @@ namespace Epidesim.Simulation.Epidemic
 					City.UpdateCreatureSectorFromPosition(creature);
 				}
 
-				if (Input.WasMouseButtonJustPressed(OpenTK.Input.MouseButton.Left))
+				if (creature.IsIll)
 				{
-					float sqrDistance = Vector2.DistanceSquared(WorldMousePosition, creature.Position);
-
-					if (sqrDistance < 2f)
+					List<Creature> possibleIllCreatures = FindNeighbouringVulnerableCreatures(creature);
+					foreach (var possibleIllCreature in possibleIllCreatures)
 					{
-						if (SelectedCreature == null)
-						{
-							SelectedCreature = creature;
-						}
-						else
-						{
-							float curSqrDistance = Vector2.DistanceSquared(WorldMousePosition, SelectedCreature.Position);
+						float distance = Vector2.DistanceSquared(creature.Position, possibleIllCreature.Position);
+						float maxContagiousDistance = 5.0f;
+						float spreadProbabilityPerSecond = 0.01f;
 
-							if (sqrDistance < curSqrDistance)
+						if (distance < maxContagiousDistance * maxContagiousDistance)
+						{
+							float randomPossibility = (float)random.NextDouble();
+
+							if (randomPossibility < spreadProbabilityPerSecond * scaledDeltaTime)
 							{
-								SelectedCreature = creature;
+								MakeIll(possibleIllCreature);
 							}
 						}
 					}
@@ -236,21 +292,41 @@ namespace Epidesim.Simulation.Epidemic
 			}
 		}
 
+		List<Creature> FindNeighbouringVulnerableCreatures(Creature creature)
+		{
+			var sector = creature.CurrentSector;
+			var neighbourSectors = sector.NeighbourSectors;
+			List<Creature> neighbours = new List<Creature>(sector.Creatures.Vulnerable);
+			return neighbours;
+		}
+
 		void SetNextRandomTargetForCreature(Creature creature)
 		{
 			var neighbours = creature.CurrentSector.NeighbourSectors;
-			int targetSectorIndex = random.Next(neighbours.Count);
-			var targetSector = neighbours[targetSectorIndex];
 
-			creature.TargetPoint = GetRandomPointInSector(targetSector);
+			var possibleTargets = new ProbabilityTable<Sector>();
+			possibleTargets.AddOutcome(creature.CurrentSector, 350);
+
+			foreach (var sector in neighbours)
+			{
+				if (sector.Creatures.Count > sector.MaxCreatures)
+				{
+					continue;
+				}
+
+				if (sector.Name.StartsWith("Sector Living"))
+				{
+					possibleTargets.AddOutcome(sector, 100 * sector.MaxCreatures / (5 + sector.Creatures.Count));
+				}
+				else
+				{
+					possibleTargets.AddOutcome(sector, 40 * sector.MaxCreatures / (5 + sector.Creatures.Count));
+				}
+			}
+
+			var targetSector = possibleTargets.GetRandomOutcome();
+			creature.TargetPoint = targetSector.GetRandomPoint();
 			creature.TargetSector = targetSector;
-		}
-
-		Vector2 GetRandomPointInSector(Sector sector)
-		{
-			return sector.Bounds.Center + new Vector2(
-				(float)sector.PositionDistribution.GetRandomValue(), 
-				(float)sector.PositionDistribution.GetRandomValue());
 		}
 
 		void TranslateCamera(float offsetX, float offsetY)
@@ -306,9 +382,29 @@ namespace Epidesim.Simulation.Epidemic
 			}
 		}
 
-		void MakeIll(Creature creature)
+		private void MakeIll(Creature creature)
 		{
 			creature.IsIll = true;
+			City.UpdateCreature(creature);
+		}
+		
+		private void MakeHealthyAgain(Creature creature)
+		{
+			creature.IsIll = false;
+			City.UpdateCreature(creature);
+		}
+
+		private void MakeImmune(Creature creature)
+		{
+			creature.IsIll = false;
+			creature.IsImmune = true;
+			City.UpdateCreature(creature);
+		}
+		
+		private void Kill(Creature creature)
+		{
+			creature.IsDead = true;
+			City.UpdateCreature(creature);
 		}
 	}
 }
