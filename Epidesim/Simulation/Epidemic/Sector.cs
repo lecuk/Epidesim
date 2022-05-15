@@ -12,7 +12,7 @@ namespace Epidesim.Simulation.Epidemic
 		public int Row { get; set; }
 		public int MaxCreatures { get; set; }
 		public Rectangle Bounds { get; set; }
-		public ValueDistribution IdleTime { get; set; }
+		public ValueDistribution IdleTimeDistribution { get; set; }
 		public ValueDistribution PositionDistribution { get; set; }
 		public IReadOnlyList<Sector> NeighbourSectors { get; set; }
 

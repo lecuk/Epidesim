@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Epidesim.Simulation.Epidemic
 {
-	class City : IEnumerable<Creature>
+	class City : IReadOnlyCollection<Creature>
 	{
 		public readonly float SectorSize;
 		public readonly float RoadWidth;
@@ -20,6 +20,8 @@ namespace Epidesim.Simulation.Epidemic
 		private readonly List<Creature> allCreatures;
 
 		public Rectangle Bounds => Rectangle.FromTwoPoints(Vector2.Zero, new Vector2(Cols, Rows) * SectorSize);
+
+		public int Count => this.allCreatures.Count;
 
 		public City(float sectorSize, float roadWidth, int sectorCols, int sectorRows)
 		{

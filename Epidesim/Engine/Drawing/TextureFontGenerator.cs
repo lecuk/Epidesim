@@ -8,11 +8,11 @@ namespace Epidesim.Engine.Drawing
 {
 	static class TextureFontGenerator
 	{
-		public static TextureFont Generate(string fontPath, IList<char> characters)
+		public static TextureFont Generate(string fontPath, uint pixelSize, IList<char> characters)
 		{
 			var lib = new Library();
 			var face = new Face(lib, fontPath);
-			face.SetPixelSizes(0, 256);
+			face.SetPixelSizes(0, pixelSize);
 
 			// set 1 byte pixel alignment 
 			GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
@@ -51,8 +51,8 @@ namespace Epidesim.Engine.Drawing
 					System.Diagnostics.Debug.WriteLine(ex);
 				}
 			}
-			
-			return new TextureFont(alphabet);
+
+			return new TextureFont(alphabet, (float)pixelSize);
 		}
 	}
 }

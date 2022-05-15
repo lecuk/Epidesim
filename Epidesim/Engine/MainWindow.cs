@@ -169,13 +169,13 @@ namespace Epidesim.Engine
 
 		private void InitFonts()
 		{
-			string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,;/\\()<>{}[]+-=|!?\"\'";
+			string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,;:/\\()<>{}[]+-=|!?\"\'";
 
 			ResourceManager.AddTextureFont("arial",
-				TextureFontGenerator.Generate("Resources/arial.ttf", alphabet.ToCharArray()));
+				TextureFontGenerator.Generate("Resources/arial.ttf", 128, alphabet.ToCharArray()));
 
 			ResourceManager.AddTextureFont("consolas",
-				TextureFontGenerator.Generate("Resources/consolas.ttf", alphabet.ToCharArray()));
+				TextureFontGenerator.Generate("Resources/consolas.ttf", 128, alphabet.ToCharArray()));
 		}
 
 		#endregion

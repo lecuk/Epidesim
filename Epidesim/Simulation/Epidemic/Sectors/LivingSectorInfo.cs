@@ -9,32 +9,30 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 {
 	class LivingSectorInfo : SectorInfo
 	{
-		public override string Name => "Living";
-
-		public override ValueDistribution SquareMetersPerCreature => new GaussianDistribution()
+		public LivingSectorInfo()
 		{
-			Mean = 12,
-			Deviation = 2,
-			Min = 2
-		};
+			Name = "Living";
 
-		public override ValueDistribution IdleTime => new GaussianDistribution()
-		{
-			Mean = 60,
-			Deviation = 30,
-			Min = 20
-		};
-		
-		public override ValueDistribution PositionDistribution => new GaussianDistribution()
-		{
-			Min = -1,
-			Max = 1,
-			Mean = 0,
-			Deviation = 0.333
-		};
+			SquareMetersPerCreature = 20f;
 
-		public override float AllowHealthyCreatures => 1f;
-		public override float AllowIllCreatures => 0.033f;
-		public override float AllowImmuneCreatures => 0.75f;
+			IdleTimeDistribution = new GaussianDistribution()
+			{
+				Mean = 60,
+				Deviation = 30,
+				Min = 10
+			};
+
+			PositionDistribution = new GaussianDistribution()
+			{
+				Min = -1,
+				Max = 1,
+				Mean = 0,
+				Deviation = 0.333
+			};
+
+			PreferenceHealthyCreatures = 1f;
+			PreferenceIllCreatures = 0.033f;
+			PreferenceImmuneCreatures = 0.75f;
+		}
 	}
 }

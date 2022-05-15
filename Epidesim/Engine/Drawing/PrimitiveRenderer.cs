@@ -26,6 +26,16 @@ namespace Epidesim.Engine.Drawing
 			}
 		}
 
+		public void AddLine(Vector2 a, Vector2 b, Color4 color)
+		{
+			int p = engine.Vertices;
+
+			engine.AddVertex(a.X, a.Y, 0, color.R, color.G, color.B, color.A);
+			engine.AddVertex(b.X, b.Y, 0, color.R, color.G, color.B, color.A);
+
+			engine.AddLine(p, p + 1);
+		}
+
 		public void AddRightPolygon(Vector2 center, float radius, int polygonVerticesCount, float rotation, Color4 color)
 		{
 			if (polygonVerticesCount < 3)

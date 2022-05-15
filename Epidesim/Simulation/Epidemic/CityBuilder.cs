@@ -12,6 +12,10 @@ namespace Epidesim.Simulation.Epidemic
 		public float SectorSize { get; set; }
 		public float RoadWidth { get; set; }
 
+		private SectorInfo emptySector = new EmptySectorInfo();
+		private SectorInfo livingSector = new LivingSectorInfo();
+		private SectorInfo hospitalSector = new HospitalSectorInfo();
+
 		public City Build(int cols, int rows)
 		{
 			var city = new City(SectorSize, RoadWidth, cols, rows);
@@ -26,15 +30,15 @@ namespace Epidesim.Simulation.Epidemic
 
 					if (random.Next() % 3 == 0)
 					{
-						info = new LivingSectorInfo();
+						info = livingSector;
 					}
 					else if (random.Next() % 16 == 0)
 					{
-						info = new HospitalSectorInfo();
+						info = hospitalSector;
 					}
 					else
 					{
-						info = new EmptySectorInfo();
+						info = emptySector;
 					}
 
 					var sector = builder.Build(c, r, info);

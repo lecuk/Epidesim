@@ -23,9 +23,12 @@ namespace Epidesim.Engine.Drawing.Types
 		public IReadOnlyDictionary<char, Glyph> Alphabet => alphabet;
 		public IEnumerable<char> SupportedChars => alphabet.Keys;
 
-		public TextureFont(Dictionary<char, Glyph> alphabet)
+		public readonly float PixelSize;
+
+		public TextureFont(Dictionary<char, Glyph> alphabet, float pixelSize)
 		{
 			this.alphabet = alphabet;
+			this.PixelSize = pixelSize;
 		}
 	}
 }

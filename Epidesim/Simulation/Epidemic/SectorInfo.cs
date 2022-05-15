@@ -2,13 +2,13 @@
 {
 	abstract class SectorInfo
 	{
-		public abstract string Name { get; }
-		public abstract ValueDistribution SquareMetersPerCreature { get; }
-		public abstract ValueDistribution IdleTime { get; }
-		public abstract ValueDistribution PositionDistribution { get; }
+		public string Name { get; protected set; }
+		public ValueDistribution IdleTimeDistribution { get; protected set; }
+		public ValueDistribution PositionDistribution { get; protected set; }
 
-		public abstract float AllowHealthyCreatures { get; }
-		public abstract float AllowIllCreatures { get; }
-		public abstract float AllowImmuneCreatures { get; }
+		public float SquareMetersPerCreature { get; protected set; }
+		public float PreferenceHealthyCreatures { get; protected set; }
+		public float PreferenceIllCreatures { get; protected set; }
+		public float PreferenceImmuneCreatures { get; protected set; }
 	}
 }

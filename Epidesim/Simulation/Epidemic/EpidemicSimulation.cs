@@ -113,12 +113,14 @@ namespace Epidesim.Simulation.Epidemic
 
 				City.CreateCreature(creature);
 			}
-			
+
+			int firstIllCreatures = 5;
 			foreach (var creature in City)
 			{
 				//patient zero
 				MakeIll(creature);
-				break;
+				--firstIllCreatures;
+				if (firstIllCreatures <= 0) break;
 			}
 		}
 
@@ -216,7 +218,7 @@ namespace Epidesim.Simulation.Epidemic
 					creature.TimeSpentIll += scaledDeltaTime;
 
 					double deathPossibility = random.NextDouble();
-					double deathProbabilityPerSecond = 0.001;
+					double deathProbabilityPerSecond = 0.0002;
 
 					if (deathPossibility < deathProbabilityPerSecond * scaledDeltaTime)
 					{
@@ -224,14 +226,14 @@ namespace Epidesim.Simulation.Epidemic
 					}
 
 					double recoverPossibility = random.NextDouble();
-					double recoverProbabilityPerSecond = 0.0033;
+					double recoverProbabilityPerSecond = 0.01;
 
 					if (recoverPossibility < recoverProbabilityPerSecond * scaledDeltaTime)
 					{
 						MakeHealthyAgain(creature);
 
 						double immunityPossibility = random.NextDouble();
-						double immunityProbability = 0.25;
+						double immunityProbability = 0.33;
 						if (immunityPossibility < immunityProbability)
 						{
 							creature.IsImmune = true;
@@ -256,7 +258,7 @@ namespace Epidesim.Simulation.Epidemic
 					if (Vector2.DistanceSquared(creature.TargetPoint, creature.Position) < distanceToMove * distanceToMove)
 					{
 						creature.Position = creature.TargetPoint;
-						creature.IdleTime = (float)creature.TargetSector.IdleTime.GetRandomValue();
+						creature.IdleTime = (float)creature.TargetSector.IdleTimeDistribution.GetRandomValue();
 						creature.IsIdle = true;
 					}
 					else
@@ -276,7 +278,7 @@ namespace Epidesim.Simulation.Epidemic
 					{
 						float distance = Vector2.DistanceSquared(creature.Position, possibleIllCreature.Position);
 						float maxContagiousDistance = 4.0f;
-						float spreadProbabilityPerSecond = 0.005f;
+						float spreadProbabilityPerSecond = 0.01f;
 
 						if (distance < maxContagiousDistance * maxContagiousDistance)
 						{

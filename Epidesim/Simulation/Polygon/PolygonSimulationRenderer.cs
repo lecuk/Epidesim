@@ -73,7 +73,7 @@ namespace Epidesim.Simulation.Polygon
 				simulation.PolygonToCreate.Rotation,
 				Color4.White);
 
-			textRenderer.AddString("hello world!", ref v2, Color4.White);
+			textRenderer.AddString("hello world!", 8, v2, Color4.White);
 
 			primitiveRenderer.AddRightPolygon(v2,
 				simulation.PolygonToCreate.Radius,
@@ -81,7 +81,7 @@ namespace Epidesim.Simulation.Polygon
 				simulation.PolygonToCreate.Rotation,
 				Color4.White);
 
-			textRenderer.AddString("abcd\nefghijkl\nmnopqrstuvw\nxyz", ref v2, Color4.Lime);
+			textRenderer.AddString("abcd\nefghijkl\nmnopqrstuvw\nxyz", 8, v2, Color4.Lime);
 
 			primitiveRenderer.AddRightPolygon(v2,
 				simulation.PolygonToCreate.Radius,
@@ -118,7 +118,7 @@ namespace Epidesim.Simulation.Polygon
 			wireframeRenderer = new PrimitiveRenderer(200000, 400000, 600000) { WireframeMode = true };
 			selectionRectangleRenderer = new PrimitiveRenderer(4, 2, 4) { WireframeMode = false };
 			textureRenderer = new QuadTextureRenderer(60000, ResourceManager.GetProgram("textureDefault"));
-			textRenderer = new TextRenderer();
+			textRenderer = new TextRenderer(1000);
 			textRenderer.LoadFont(ResourceManager.GetTextureFont("consolas"));
 		}
 	}
