@@ -10,23 +10,25 @@ namespace Epidesim.Simulation.Epidemic
 	{
 		private readonly PrimitiveRenderer creatureRenderer;
 		private readonly PrimitiveRenderer cityRenderer;
-		private readonly PrimitiveRenderer thingRenderer;
+		private readonly PrimitiveRenderer selectionRenderer;
 
 		public EpidemicSimulationRenderer()
 		{
 			this.cityRenderer = new PrimitiveRenderer(100000, 100000, 100000);
 			this.creatureRenderer = new PrimitiveRenderer(100000, 100000, 100000);
-			this.thingRenderer = new PrimitiveRenderer(4000, 4000, 4000);
+			this.selectionRenderer = new PrimitiveRenderer(10, 10, 10);
 		}
 
 		public void Render(EpidemicSimulation simulation)
 		{
 			cityRenderer.Reset();
 			creatureRenderer.Reset();
+			selectionRenderer.Reset();
 
 			var transformMatrix = simulation.CoordinateSystem.GetTransformationMatrix();
 			cityRenderer.TransformMatrix = transformMatrix;
 			creatureRenderer.TransformMatrix = transformMatrix;
+			selectionRenderer.TransformMatrix = transformMatrix;
 
 			var city = simulation.City;
 			var cityBounds = city.Bounds;
@@ -54,8 +56,17 @@ namespace Epidesim.Simulation.Epidemic
 					: Color4.White);
 			}
 
+			if (simulation.SelectedCreature != null)
+			{
+				selectionRenderer.AddRectangle(Rectangle.FromCenterAndSize(simulation.SelectedCreature.Position, new Vector2(2.5f)),
+					simulation.SelectedCreature.IsIll
+					? Color4.Orange
+					: Color4.Yellow);
+			}
+
 			cityRenderer.DrawFilledElements();
 			creatureRenderer.DrawFilledElements();
+			selectionRenderer.DrawHollowElements();
 		}
 	}
 }

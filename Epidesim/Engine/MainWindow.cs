@@ -99,9 +99,15 @@ namespace Epidesim.Engine
 
 		protected override void OnResize(EventArgs e)
 		{
+			base.OnResize(e);
+			if (Width == 0 && Height == 0)
+			{
+				// ignore minimize;
+				return;
+			}
+
 			GL.Viewport(0, 0, Width, Height);
 			SimulationToRun.SetScreenSize(Width, Height);
-			base.OnResize(e);
 		}
 
 		protected override void OnUnload(EventArgs e)

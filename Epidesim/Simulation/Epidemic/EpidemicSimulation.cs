@@ -28,6 +28,10 @@ namespace Epidesim.Simulation.Epidemic
 		public Vector2 MouseDelta { get; private set; }
 		public Vector2 WorldMouseDelta { get; private set; }
 
+		public float TimeScale { get; set; }
+
+		public Creature SelectedCreature { get; private set; }
+
 		private Random random;
 
 		public EpidemicSimulation()
@@ -40,6 +44,7 @@ namespace Epidesim.Simulation.Epidemic
 
 			City = builder.Build(12, 8);
 			NumberOfCreatures = 12000;
+			TimeScale = 1f;
 
 			CoordinateSystem = new CoordinateSystem()
 			{
@@ -117,26 +122,26 @@ namespace Epidesim.Simulation.Epidemic
 
 		public void Update(double deltaTime)
 		{
-			float fDeltaTime = (float)deltaTime;
+			float scaledDeltaTime = (float)deltaTime * TimeScale;
 
 			if (Input.IsKeyDown(OpenTK.Input.Key.Up))
 			{
-				TranslateCamera(0, Camera.Height * fDeltaTime);
+				TranslateCamera(0, Camera.Height * scaledDeltaTime);
 			}
 
 			if (Input.IsKeyDown(OpenTK.Input.Key.Down))
 			{
-				TranslateCamera(0, -Camera.Height * fDeltaTime);
+				TranslateCamera(0, -Camera.Height * scaledDeltaTime);
 			}
 
 			if (Input.IsKeyDown(OpenTK.Input.Key.Left))
 			{
-				TranslateCamera(-Camera.Width * fDeltaTime, 0);
+				TranslateCamera(-Camera.Width * scaledDeltaTime, 0);
 			}
 
 			if (Input.IsKeyDown(OpenTK.Input.Key.Right))
 			{
-				TranslateCamera(Camera.Width * fDeltaTime, 0);
+				TranslateCamera(Camera.Width * scaledDeltaTime, 0);
 			}
 
 			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Right))
@@ -154,17 +159,32 @@ namespace Epidesim.Simulation.Epidemic
 				ScaleCamera(1.1f);
 			}
 
+			if (Input.IsKeyDown(OpenTK.Input.Key.Plus))
+			{
+				TimeScale *= MathHelper.Clamp(1.0f + (float)deltaTime * 2.5f, 0.1f, 2f);
+			}
+
+			if (Input.IsKeyDown(OpenTK.Input.Key.Minus))
+			{
+				TimeScale /= MathHelper.Clamp(1.0f + (float)deltaTime * 2.5f, 0.1f, 2f);
+			}
+
 			MousePosition = Input.GetMouseLocalPosition();
 			WorldMousePosition = CoordinateSystem.ScreenCoordinateToWorldCoordinate(MousePosition);
 
 			MouseDelta = Input.GetMouseDelta();
 			WorldMouseDelta = CoordinateSystem.ScreenDeltaToWorldDelta(MouseDelta);
-			
+
+			if (Input.WasMouseButtonJustPressed(OpenTK.Input.MouseButton.Left))
+			{
+				SelectedCreature = null;
+			}
+
 			foreach (var creature in City)
 			{
 				if (creature.IsIdle)
 				{
-					creature.IdleTime -= fDeltaTime;
+					creature.IdleTime -= scaledDeltaTime;
 
 					if (creature.IdleTime <= 0)
 					{
@@ -174,7 +194,7 @@ namespace Epidesim.Simulation.Epidemic
 				}
 				else
 				{
-					float distanceToMove = creature.MoveSpeed * fDeltaTime;
+					float distanceToMove = creature.MoveSpeed * scaledDeltaTime;
 
 					if (Vector2.DistanceSquared(creature.TargetPoint, creature.Position) < distanceToMove * distanceToMove)
 					{
@@ -190,6 +210,28 @@ namespace Epidesim.Simulation.Epidemic
 					}
 
 					City.UpdateCreatureSectorFromPosition(creature);
+				}
+
+				if (Input.WasMouseButtonJustPressed(OpenTK.Input.MouseButton.Left))
+				{
+					float sqrDistance = Vector2.DistanceSquared(WorldMousePosition, creature.Position);
+
+					if (sqrDistance < 2f)
+					{
+						if (SelectedCreature == null)
+						{
+							SelectedCreature = creature;
+						}
+						else
+						{
+							float curSqrDistance = Vector2.DistanceSquared(WorldMousePosition, SelectedCreature.Position);
+
+							if (sqrDistance < curSqrDistance)
+							{
+								SelectedCreature = creature;
+							}
+						}
+					}
 				}
 			}
 		}

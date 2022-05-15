@@ -27,18 +27,18 @@ namespace Epidesim.Simulation.Epidemic
 			this.RoadWidth = roadWidth;
 			this.Cols = sectorCols;
 			this.Rows = sectorRows;
-			this.sectors = new Sector[sectorCols, sectorRows];
+			this.sectors = new Sector[sectorRows, sectorCols];
 			this.allCreatures = new LinkedList<Creature>();
 		}
 
 		public void SetSector(int col, int row, Sector sector)
 		{
-			this.sectors[col, row] = sector;
+			this.sectors[row, col] = sector;
 		}
 
 		public Sector GetSector(int col, int row)
 		{
-			return this.sectors[col, row];
+			return this.sectors[row, col];
 		}
 
 		public Sector this[int col, int row] => GetSector(col, row);
@@ -51,13 +51,13 @@ namespace Epidesim.Simulation.Epidemic
 
 		public Sector GetSectorAtLocation(Vector2 location)
 		{
-			int col = (int)Math.Round(location.X / SectorSize);
-			int row = (int)Math.Round(location.Y / SectorSize);
+			int col = (int)Math.Floor(location.X / SectorSize);
+			int row = (int)Math.Floor(location.Y / SectorSize);
 
-			if (col == Cols) col = Cols - 1;
+			if (col >= Cols) col = Cols - 1;
 			if (col < 0) col = 0;
 
-			if (row == Rows) row = Rows - 1;
+			if (row >= Rows) row = Rows - 1;
 			if (row < 0) row = 0;
 
 			return GetSector(col, row);

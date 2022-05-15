@@ -54,7 +54,10 @@ namespace Epidesim.Simulation.Epidemic
 			int width = toCol - fromCol + 1;
 			int height = toRow - fromRow + 1;
 
-			Sector[] neighbours = new Sector[width * height - 1];
+			System.Diagnostics.Debug.WriteLine(String.Format("col={0} row={1} fc={2} tc={3} fr={4} tr={5} w={6} h={7}",
+				col, row, fromCol, toCol, fromRow, toRow, width, height));
+
+			var neighbours = new Sector[width * height - 1];
 
 			int i = 0;
 			for (int r = fromRow; r <= toRow; ++r)
@@ -63,7 +66,10 @@ namespace Epidesim.Simulation.Epidemic
 				{
 					if (r == row && c == col) continue;
 
-					neighbours[i++] = city[c, r];
+					System.Diagnostics.Debug.WriteLine(String.Format("neighbour at c{0} r{1}", c, r));
+
+					neighbours[i] = city[c, r];
+					i++;
 				}
 			}
 
