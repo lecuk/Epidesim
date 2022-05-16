@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Epidesim.Simulation.Epidemic
+﻿namespace Epidesim.Simulation.Epidemic
 {
-	class CreatureBehaviourInfo
+	class CreatureBehaviour
 	{
 		public float PreferenceToStayInSameSectorMultiplier { get; set; }
 		public float PreferenceToStayInSameSectorWhenIllMultiplier { get; set; }
@@ -14,5 +8,9 @@ namespace Epidesim.Simulation.Epidemic
 
 		public int QuarantineThreshold { get; set; }
 		public int QuarantineCancelThreshold { get; set; }
+
+		public ValueDistribution SelfQuarantineDelayDistribution { get; set; }
+		public ValueDistribution SelfQuarantineCooldownDistribution { get; set; }
+		public float SelfQuarantineSpreadMultiplier { get; set; }
 	}
 }

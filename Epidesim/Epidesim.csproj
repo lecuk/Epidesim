@@ -83,7 +83,7 @@
     <Compile Include="Engine\MainWindow.cs" />
     <Compile Include="Simulation\Epidemic\CityBuilder.cs" />
     <Compile Include="Simulation\Epidemic\Creature.cs" />
-    <Compile Include="Simulation\Epidemic\CreatureBehaviourInfo.cs" />
+    <Compile Include="Simulation\Epidemic\CreatureBehaviour.cs" />
     <Compile Include="Simulation\Epidemic\CreatureCollection.cs" />
     <Compile Include="Simulation\Epidemic\Distributions\FixedDistribution.cs" />
     <Compile Include="Simulation\Epidemic\EpidemicSimulation.cs" />

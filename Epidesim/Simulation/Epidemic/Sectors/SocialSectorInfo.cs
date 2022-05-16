@@ -9,20 +9,20 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 {
 	class SocialSectorInfo : SectorInfo
 	{
-		public SocialSectorInfo()
+		public SocialSectorInfo(Random random)
 		{
 			Name = "Social";
 
 			SquareMetersPerCreature = 12f;
 
-			IdleTimeDistribution = new GaussianDistribution()
+			IdleTimeDistribution = new GaussianDistribution(random)
 			{
 				Mean = 60,
 				Deviation = 20,
 				Min = 10
 			};
 
-			PositionDistribution = new GaussianDistribution()
+			PositionDistribution = new GaussianDistribution(random)
 			{
 				Mean = 0,
 				Deviation = 0.4,
@@ -39,6 +39,9 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 			SpreadMultiplier = 1.25f;
 
 			CanBeQuarantined = true;
+			AllowInsideOnQuarantine = false;
+			AllowOutsideOnQuarantine = true;
+			CanBeSelfQuarantined = false;
 		}
 	}
 }

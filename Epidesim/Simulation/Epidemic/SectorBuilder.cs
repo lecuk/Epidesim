@@ -25,6 +25,8 @@ namespace Epidesim.Simulation.Epidemic
 				Col = col,
 				Row = row,
 
+				MaxCreatures = (int)Math.Round(city.SectorSize * city.SectorSize / info.SquareMetersPerCreature),
+
 				PreferenceHealthy = info.PreferenceHealthyCreatures,
 				PreferenceIll = info.PreferenceIllCreatures,
 				PreferenceImmune = info.PreferenceImmuneCreatures,
@@ -34,9 +36,11 @@ namespace Epidesim.Simulation.Epidemic
 				SpreadMultiplier = info.SpreadMultiplier,
 
 				CanBeQuarantined = info.CanBeQuarantined,
-				IsQuarantined = false,
+				CanBeSelfQuarantined = info.CanBeSelfQuarantined,
+				AllowInsideOnQuarantine = info.AllowInsideOnQuarantine,
+				AllowOutsideOnQuarantine = info.AllowOutsideOnQuarantine,
 
-				MaxCreatures = (int)Math.Round(city.SectorSize * city.SectorSize / info.SquareMetersPerCreature),
+				IsQuarantined = false,
 
 				Bounds = Rectangle.FromTwoPoints(
 					bottomLeftOfSector + new Vector2(city.RoadWidth / 2),

@@ -14,6 +14,9 @@
 		public float DeathRateMultiplier { get; protected set; }
 		public float SpreadMultiplier { get; protected set; }
 
-		public bool CanBeQuarantined { get; set; }
+		public bool CanBeQuarantined { get; protected set; }
+		public bool AllowInsideOnQuarantine { get; protected set; }
+		public bool AllowOutsideOnQuarantine { get; protected set; }
+		public bool CanBeSelfQuarantined { get; protected set; }
 	}
 }

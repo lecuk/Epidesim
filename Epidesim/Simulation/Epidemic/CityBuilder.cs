@@ -12,16 +12,22 @@ namespace Epidesim.Simulation.Epidemic
 		public float SectorSize { get; set; }
 		public float RoadWidth { get; set; }
 
-		private SectorInfo emptySector = new EmptySectorInfo();
-		private SectorInfo livingSector = new LivingSectorInfo();
-		private SectorInfo hospitalSector = new HospitalSectorInfo();
-		private SectorInfo socialSector = new SocialSectorInfo();
+		private Random random;
+
+		public CityBuilder(Random random)
+		{
+			this.random = random;
+		}
 
 		public City Build(int cols, int rows)
 		{
 			var city = new City(SectorSize, RoadWidth, cols, rows);
 			var builder = new SectorBuilder(city);
-			var random = new Random();
+
+			SectorInfo emptySector = new EmptySectorInfo(random);
+			SectorInfo livingSector = new LivingSectorInfo(random);
+			SectorInfo hospitalSector = new HospitalSectorInfo(random);
+			SectorInfo socialSector = new SocialSectorInfo(random);
 
 			for (int r = 0; r < rows; ++r)
 			{

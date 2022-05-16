@@ -49,7 +49,7 @@ namespace Epidesim.Simulation.Epidemic
 			if (!creature.IsDead)
 			{
 				UpdateCreatureIsHealthy(creature);
-				UpdateCreatureIsImmune(creature);
+				UpdateCreatureIsVulnerable(creature);
 			}
 		}
 
@@ -73,17 +73,17 @@ namespace Epidesim.Simulation.Epidemic
 				illCreatures.AddLast(creature);
 			}
 
-			if (creature.IsContagious)
+			if (creature.IsInfected)
 			{
 				contagiousCreatures.AddLast(creature);
 			}
 		}
 
-		private void UpdateCreatureIsImmune(Creature creature)
+		private void UpdateCreatureIsVulnerable(Creature creature)
 		{
 			vulnerableCreatures.Remove(creature);
 
-			if (!creature.IsContagious && !creature.IsImmune)
+			if (!creature.IsInfected && !creature.IsImmune)
 			{
 				vulnerableCreatures.AddLast(creature);
 			}

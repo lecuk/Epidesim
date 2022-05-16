@@ -103,7 +103,7 @@ namespace Epidesim.Simulation.Epidemic
 							: Color4.White);
 				}
 
-				if (creature.IsContagious)
+				if (creature.IsInfected && !creature.IsQuarantined)
 				{
 					haloRenderer.AddQuad(Rectangle.FromCenterAndSize(creature.Position, new Vector2(4)), Color4.Red);
 				}
@@ -139,7 +139,7 @@ namespace Epidesim.Simulation.Epidemic
 			}
 
 			int population = simulation.City.Count;
-			int ill = simulation.City.Count(cr => !cr.IsDead && cr.IsContagious);
+			int ill = simulation.City.Count(cr => !cr.IsDead && cr.IsInfected);
 			int totalIll = simulation.City.Count(cr => cr.WasIllAtSomePoint);
 			int immune = simulation.City.Count(cr => !cr.IsDead && cr.IsImmune);
 			int died = simulation.City.Count(cr => cr.IsDead);

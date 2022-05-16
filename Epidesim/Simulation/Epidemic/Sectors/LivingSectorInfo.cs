@@ -1,28 +1,24 @@
 ﻿using Epidesim.Simulation.Epidemic.Distributions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Epidesim.Simulation.Epidemic.Sectors
 {
 	class LivingSectorInfo : SectorInfo
 	{
-		public LivingSectorInfo()
+		public LivingSectorInfo(Random random)
 		{
 			Name = "Living";
 
 			SquareMetersPerCreature = 20f;
 
-			IdleTimeDistribution = new GaussianDistribution()
+			IdleTimeDistribution = new GaussianDistribution(random)
 			{
 				Mean = 60,
 				Deviation = 30,
 				Min = 10
 			};
 
-			PositionDistribution = new GaussianDistribution()
+			PositionDistribution = new GaussianDistribution(random)
 			{
 				Min = -1,
 				Max = 1,
@@ -39,6 +35,9 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 			SpreadMultiplier = 1f;
 
 			CanBeQuarantined = true;
+			AllowInsideOnQuarantine = true;
+			AllowOutsideOnQuarantine = false;
+			CanBeSelfQuarantined = true;
 		}
 	}
 }

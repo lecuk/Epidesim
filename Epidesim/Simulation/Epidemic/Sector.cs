@@ -25,7 +25,13 @@ namespace Epidesim.Simulation.Epidemic
 		public float SpreadMultiplier { get; set; }
 
 		public bool CanBeQuarantined { get; set; }
+		public bool AllowInsideOnQuarantine { get; set; }
+		public bool AllowOutsideOnQuarantine { get; set; }
+		public bool CanBeSelfQuarantined { get; set; }
 		public bool IsQuarantined { get; set; }
+
+		public bool AllowInside => !IsQuarantined || AllowInsideOnQuarantine;
+		public bool AllowOutside => !IsQuarantined || AllowOutsideOnQuarantine;
 
 		public readonly CreatureCollection Creatures;
 

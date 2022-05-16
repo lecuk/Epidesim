@@ -1,10 +1,12 @@
 ﻿using Epidesim.Engine;
 using Epidesim.Engine.Drawing.Types;
 using Epidesim.Simulation.Epidemic.Distributions;
+
 using OpenTK;
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 
 namespace Epidesim.Simulation.Epidemic
 {
@@ -35,21 +37,23 @@ namespace Epidesim.Simulation.Epidemic
 		public Creature SelectedCreature { get; private set; }
 
 		public Illness IllnessInfo { get; private set; }
-		public CreatureBehaviourInfo CreatureBehaviourInfo { get; private set; }
+		public CreatureBehaviour CreatureBehaviour { get; private set; }
 
 		private Random random;
 
 		public EpidemicSimulation()
 		{
-			var builder = new CityBuilder()
+			this.random = new Random();
+
+			var builder = new CityBuilder(random)
 			{
 				SectorSize = 25f,
 				RoadWidth = 4f
 			};
 
-			City = builder.Build(60, 40);
-			NumberOfCreatures = 20000;
-			TimeScale = 1f;
+			City = builder.Build(30, 20);
+			NumberOfCreatures = 8000;
+			TimeScale = 2f;
 
 			CoordinateSystem = new CoordinateSystem()
 			{
@@ -60,24 +64,24 @@ namespace Epidesim.Simulation.Epidemic
 			{
 				Name = "Test illness",
 				Description = "description",
-				IncubationPeriodSpread = 0.005f,
+				IncubationPeriodSpread = 0.0033f,
 				IllnessPeriodSpread = 0.008f,
 				FatalityRate = 0.001f,
 				ImmunityRate = 0.2f,
-				UnsymptomaticRate = 0f,
-				IncubationPeriodDuration = new GaussianDistribution()
+				UnsymptomaticRate = 0.05f,
+				IncubationPeriodDuration = new GaussianDistribution(random)
 				{
-					Mean = 40,
-					Deviation = 40,
-					Min = 20
+					Mean = 33,
+					Deviation = 16,
+					Min = 15
 				},
-				IllnessPeriodDuration = new GaussianDistribution()
+				IllnessPeriodDuration = new GaussianDistribution(random)
 				{
 					Mean = 70,
 					Deviation = 20,
 					Min = 30
 				},
-				TemporaryImmunityDuration = new GaussianDistribution()
+				TemporaryImmunityDuration = new GaussianDistribution(random)
 				{
 					Mean = 150,
 					Deviation = 30,
@@ -85,16 +89,27 @@ namespace Epidesim.Simulation.Epidemic
 				},
 			};
 
-			CreatureBehaviourInfo = new CreatureBehaviourInfo()
+			CreatureBehaviour = new CreatureBehaviour()
 			{
-				QuarantineThreshold = 5,
+				QuarantineThreshold = 4,
 				QuarantineCancelThreshold = 0,
 				PreferenceToStayInSameSectorMultiplier = 2f,
 				PreferenceToStayInSameSectorWhenIllMultiplier = 6f,
-				QuarantineSpreadMultiplier = 0.33f
+				QuarantineSpreadMultiplier = 0.33f,
+				SelfQuarantineSpreadMultiplier = 0.15f,
+				SelfQuarantineDelayDistribution = new GaussianDistribution(random)
+				{
+					Mean = 20,
+					Deviation = 10,
+					Min = 0
+				},
+				SelfQuarantineCooldownDistribution = new GaussianDistribution(random)
+				{
+					Mean = 200,
+					Deviation = 60,
+					Min = 60
+				}
 			};
-
-			random = new Random();
 		}
 
 		public void SetScreenSize(float screenWidth, float screenHeight)
@@ -149,7 +164,8 @@ namespace Epidesim.Simulation.Epidemic
 					TargetSector = sector,
 					MoveSpeed = (float)speedDeviation.GetRandomValue(),
 					City = City,
-					Illness = null
+					Illness = null,
+					Behaviour = CreatureBehaviour
 				};
 
 				creature.StoppedIdling += (cr) =>
@@ -296,6 +312,7 @@ namespace Epidesim.Simulation.Epidemic
 					Sector sector = City[c, r];
 					int contagious = sector.Creatures.Contagious.Count;
 					int ill = sector.Creatures.Ill.Count;
+					int quarantined = sector.Creatures.Ill.Count(cr => cr.IsQuarantined);
 					int latent = contagious - ill;
 
 					if (contagious > 0)
@@ -305,8 +322,9 @@ namespace Epidesim.Simulation.Epidemic
 
 						foreach (var possibleIllCreature in vulnerableCreatures)
 						{
-							float quarantineMultiplier = sector.IsQuarantined ? CreatureBehaviourInfo.QuarantineSpreadMultiplier : 1.0f;
-							float illCountMultiplier = latent * IllnessInfo.IncubationPeriodSpread + ill * IllnessInfo.IllnessPeriodSpread;
+							float quarantineMultiplier = sector.IsQuarantined ? CreatureBehaviour.QuarantineSpreadMultiplier : 1.0f;
+							float weightedIll = quarantined * CreatureBehaviour.SelfQuarantineSpreadMultiplier + ill;
+							float illCountMultiplier = latent * IllnessInfo.IncubationPeriodSpread + weightedIll * IllnessInfo.IllnessPeriodSpread;
 							float spreadProbabilityPerSecond = quarantineMultiplier * illCountMultiplier * sector.SpreadMultiplier;
 							float spreadPossibility = (float)random.NextDouble();
 
@@ -318,14 +336,14 @@ namespace Epidesim.Simulation.Epidemic
 
 						if (!sector.IsQuarantined)
 						{
-							if (sector.CanBeQuarantined && ill >= CreatureBehaviourInfo.QuarantineThreshold)
+							if (sector.CanBeQuarantined && ill >= CreatureBehaviour.QuarantineThreshold)
 							{
 								sector.IsQuarantined = true;
 							}
 						}
 						else
 						{
-							if (ill <= CreatureBehaviourInfo.QuarantineCancelThreshold)
+							if (ill <= CreatureBehaviour.QuarantineCancelThreshold)
 							{
 								sector.IsQuarantined = false;
 							}
@@ -345,28 +363,28 @@ namespace Epidesim.Simulation.Epidemic
 
 		void SetNextRandomTargetForCreature(Creature creature)
 		{
-			var neighbours = creature.CurrentSector.NeighbourSectors;
+			var sector = creature.CurrentSector;
+			var neighbours = sector.NeighbourSectors;
 
 			var possibleTargets = new ProbabilityTable<Sector>();
 			
 			float stayIdlePreference = (creature.IsIll) 
-				? CreatureBehaviourInfo.PreferenceToStayInSameSectorWhenIllMultiplier 
-				: CreatureBehaviourInfo.PreferenceToStayInSameSectorMultiplier;
+				? CreatureBehaviour.PreferenceToStayInSameSectorWhenIllMultiplier 
+				: CreatureBehaviour.PreferenceToStayInSameSectorMultiplier;
 
-			possibleTargets.AddOutcome(creature.CurrentSector,
-				stayIdlePreference * creature.CurrentSector.SectorCreaturePreference(creature));
+			possibleTargets.AddOutcome(sector, stayIdlePreference * sector.SectorCreaturePreference(creature));
 
-			if (!creature.IsImmune && !creature.CurrentSector.IsQuarantined)
+			if (!creature.IsImmune && sector.AllowOutside)
 			{
-				foreach (var sector in neighbours)
+				foreach (var neighbourSector in neighbours)
 				{
-					if (sector.IsQuarantined || sector.Creatures.Count > sector.MaxCreatures)
+					if (!neighbourSector.AllowInside || neighbourSector.Creatures.Count >= neighbourSector.MaxCreatures)
 					{
 						continue;
 					}
 
-					float preferenceCoefficient = sector.SectorCreaturePreference(creature);
-					possibleTargets.AddOutcome(sector, preferenceCoefficient);
+					float preferenceCoefficient = neighbourSector.SectorCreaturePreference(creature);
+					possibleTargets.AddOutcome(neighbourSector, preferenceCoefficient);
 				}
 			}
 
