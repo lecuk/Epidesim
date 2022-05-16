@@ -30,6 +30,7 @@ namespace Epidesim.Simulation.Epidemic
 		public Vector2 WorldMouseDelta { get; private set; }
 
 		public float TimeScale { get; set; }
+		public float TotalTimeElapsed { get; set; }
 
 		public Creature SelectedCreature { get; private set; }
 
@@ -43,8 +44,8 @@ namespace Epidesim.Simulation.Epidemic
 				RoadWidth = 4f
 			};
 
-			City = builder.Build(40, 25);
-			NumberOfCreatures = 15000;
+			City = builder.Build(60, 40);
+			NumberOfCreatures = 20000;
 			TimeScale = 1f;
 
 			CoordinateSystem = new CoordinateSystem()
@@ -127,6 +128,8 @@ namespace Epidesim.Simulation.Epidemic
 		public void Update(double deltaTime)
 		{
 			float scaledDeltaTime = (float)deltaTime * TimeScale;
+
+			TotalTimeElapsed += scaledDeltaTime;
 
 			if (Input.IsKeyDown(OpenTK.Input.Key.Up))
 			{
@@ -215,10 +218,12 @@ namespace Epidesim.Simulation.Epidemic
 
 				if (creature.IsIll)
 				{
+					var creatureSector = creature.CurrentSector;
+
 					creature.TimeSpentIll += scaledDeltaTime;
 
 					double deathPossibility = random.NextDouble();
-					double deathProbabilityPerSecond = 0.0002;
+					double deathProbabilityPerSecond = 0.0002 * creatureSector.DeathRateMultiplier;
 
 					if (deathPossibility < deathProbabilityPerSecond * scaledDeltaTime)
 					{
@@ -226,7 +231,7 @@ namespace Epidesim.Simulation.Epidemic
 					}
 
 					double recoverPossibility = random.NextDouble();
-					double recoverProbabilityPerSecond = 0.01;
+					double recoverProbabilityPerSecond = 0.01 * creatureSector.RecoveryMultiplier;
 
 					if (recoverPossibility < recoverProbabilityPerSecond * scaledDeltaTime)
 					{
@@ -237,6 +242,13 @@ namespace Epidesim.Simulation.Epidemic
 						if (immunityPossibility < immunityProbability)
 						{
 							creature.IsImmune = true;
+						}
+
+						if (creature.IsIdle)
+						{
+							creature.IdleTime = 0;
+							SetNextRandomTargetForCreature(creature);
+							creature.IsIdle = false;
 						}
 					}
 				}
@@ -270,21 +282,28 @@ namespace Epidesim.Simulation.Epidemic
 
 					City.UpdateCreatureSectorFromPosition(creature);
 				}
+			}
 
-				if (creature.IsIll)
+
+			for (int r = 0; r < City.Rows; ++r)
+			{
+				for (int c = 0; c < City.Cols; ++c)
 				{
-					List<Creature> possibleIllCreatures = FindNeighbouringVulnerableCreatures(creature);
-					foreach (var possibleIllCreature in possibleIllCreatures)
+					Sector sector = City[c, r];
+					int illCount = sector.Creatures.Ill.Count;
+
+					if (illCount > 0)
 					{
-						float distance = Vector2.DistanceSquared(creature.Position, possibleIllCreature.Position);
-						float maxContagiousDistance = 4.0f;
-						float spreadProbabilityPerSecond = 0.01f;
+						var vulnerableCreatures = new List<Creature>();
+						vulnerableCreatures.AddRange(sector.Creatures.Vulnerable);
 
-						if (distance < maxContagiousDistance * maxContagiousDistance)
+						foreach (var possibleIllCreature in vulnerableCreatures)
 						{
-							float randomPossibility = (float)random.NextDouble();
+							float illCountMultiplier = (float)Math.Sqrt(illCount);
+							float spreadProbabilityPerSecond = 0.005f * illCountMultiplier * sector.SpreadMultiplier;
+							float spreadPossibility = (float)random.NextDouble();
 
-							if (randomPossibility < spreadProbabilityPerSecond * scaledDeltaTime)
+							if (spreadPossibility < spreadProbabilityPerSecond * scaledDeltaTime)
 							{
 								MakeIll(possibleIllCreature);
 							}
@@ -307,7 +326,12 @@ namespace Epidesim.Simulation.Epidemic
 			var neighbours = creature.CurrentSector.NeighbourSectors;
 
 			var possibleTargets = new ProbabilityTable<Sector>();
-			possibleTargets.AddOutcome(creature.CurrentSector, creature.CurrentSector.SectorCreaturePreference(creature));
+
+			// if ill prefer not to change cell
+			float a = (creature.IsIll) ? 3.0f : 1.0f;
+
+			possibleTargets.AddOutcome(creature.CurrentSector,
+				a * creature.CurrentSector.SectorCreaturePreference(creature));
 
 			foreach (var sector in neighbours)
 			{

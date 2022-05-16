@@ -20,6 +20,10 @@ namespace Epidesim.Simulation.Epidemic
 		public float PreferenceIll { get; set; }
 		public float PreferenceImmune { get; set; }
 
+		public float RecoveryMultiplier { get; set; }
+		public float DeathRateMultiplier { get; set; }
+		public float SpreadMultiplier { get; set; }
+
 		public readonly CreatureCollection Creatures;
 
 		public Sector()

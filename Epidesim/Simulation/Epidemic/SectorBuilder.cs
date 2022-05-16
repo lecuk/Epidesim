@@ -28,6 +28,10 @@ namespace Epidesim.Simulation.Epidemic
 				PreferenceIll = info.PreferenceIllCreatures,
 				PreferenceImmune = info.PreferenceImmuneCreatures,
 
+				RecoveryMultiplier = info.RecoveryMultiplier,
+				DeathRateMultiplier = info.DeathRateMultiplier,
+				SpreadMultiplier = info.SpreadMultiplier,
+
 				MaxCreatures = (int)Math.Round(city.SectorSize * city.SectorSize / info.SquareMetersPerCreature),
 
 				Bounds = Rectangle.FromTwoPoints(

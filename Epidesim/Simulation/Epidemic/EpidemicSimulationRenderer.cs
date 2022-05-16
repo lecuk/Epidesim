@@ -18,10 +18,10 @@ namespace Epidesim.Simulation.Epidemic
 
 		public EpidemicSimulationRenderer()
 		{
-			this.cityRenderer = new PrimitiveRenderer(10000, 10000, 10000);
-			this.creatureRenderer = new PrimitiveRenderer(100000, 100000, 100000);
-			this.selectionRenderer = new PrimitiveRenderer(100000, 100000, 100000);
-			this.sectorBoundsRenderer = new PrimitiveRenderer(10000, 10000, 10000);
+			this.cityRenderer = new PrimitiveRenderer(100000, 100000, 100000);
+			this.creatureRenderer = new PrimitiveRenderer(1000000, 1000000, 1000000);
+			this.selectionRenderer = new PrimitiveRenderer(1000000, 1000000, 1000000);
+			this.sectorBoundsRenderer = new PrimitiveRenderer(100000, 100000, 100000);
 			this.sectorTextRenderer = new TextRenderer(2000);
 
 			sectorTextRenderer.LoadFont(ResourceManager.GetTextureFont("consolas"));
@@ -125,7 +125,8 @@ namespace Epidesim.Simulation.Epidemic
 			int immune = simulation.City.Count(cr => !cr.IsDead && cr.IsImmune);
 			int died = simulation.City.Count(cr => cr.IsDead);
 
-			string info = String.Format("Population: {0}\nIll: {1}\nImmune: {2}\nDead: {3}", population, ill, immune, died);
+			string info = String.Format("Population: {0}\nIll: {1}\nImmune: {2}\nDead: {3}\nTime elapsed: {4}", 
+				population, ill, immune, died, simulation.TotalTimeElapsed);
 
 			sectorTextRenderer.AddString(info, 14, new Vector2(0, -20), Color4.Yellow);
 

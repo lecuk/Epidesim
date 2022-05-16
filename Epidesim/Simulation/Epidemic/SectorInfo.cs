@@ -10,5 +10,8 @@
 		public float PreferenceHealthyCreatures { get; protected set; }
 		public float PreferenceIllCreatures { get; protected set; }
 		public float PreferenceImmuneCreatures { get; protected set; }
+		public float RecoveryMultiplier { get; protected set; }
+		public float DeathRateMultiplier { get; protected set; }
+		public float SpreadMultiplier { get; protected set; }
 	}
 }

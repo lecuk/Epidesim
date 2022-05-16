@@ -31,8 +31,12 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 			};
 
 			PreferenceHealthyCreatures = 1f;
-			PreferenceIllCreatures = 0.033f;
-			PreferenceImmuneCreatures = 0.75f;
+			PreferenceIllCreatures = 0.5f;
+			PreferenceImmuneCreatures = 0.9f;
+
+			RecoveryMultiplier = 1f;
+			DeathRateMultiplier = 0.8f;
+			SpreadMultiplier = 1f;
 		}
 	}
 }

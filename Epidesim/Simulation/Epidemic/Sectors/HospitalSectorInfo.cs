@@ -13,7 +13,7 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 		{
 			Name = "Hospital";
 
-			SquareMetersPerCreature = 30f;
+			SquareMetersPerCreature = 16f;
 
 			IdleTimeDistribution = new GaussianDistribution()
 			{
@@ -29,8 +29,12 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 			};
 
 			PreferenceHealthyCreatures = 0.05f;
-			PreferenceIllCreatures = 0.95f;
-			PreferenceImmuneCreatures = 0.8f;
+			PreferenceIllCreatures = 2.5f;
+			PreferenceImmuneCreatures = 0.75f;
+
+			RecoveryMultiplier = 2f;
+			DeathRateMultiplier = 0.2f;
+			SpreadMultiplier = 0.5f;
 		}
 	}
 }
