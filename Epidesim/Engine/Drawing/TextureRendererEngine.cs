@@ -81,7 +81,7 @@ namespace Epidesim.Engine.Drawing
 			Triangles++;
 		}
 
-		public void Reset()
+		public override void Reset()
 		{
 			Vertices = 0;
 			Triangles = 0;

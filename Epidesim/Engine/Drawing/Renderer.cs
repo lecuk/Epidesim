@@ -11,6 +11,10 @@ namespace Epidesim.Engine.Drawing
 		{
 		}
 
+		public virtual void Reset()
+		{
+		}
+
 		public virtual void Dispose()
 		{
 		}

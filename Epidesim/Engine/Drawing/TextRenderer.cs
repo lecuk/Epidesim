@@ -122,7 +122,7 @@ namespace Epidesim.Engine.Drawing
 			position = new Vector2(newLineX, position.Y - height);
 		}
 
-		public void Reset()
+		public override void Reset()
 		{
 			foreach (var info in Infos)
 			{

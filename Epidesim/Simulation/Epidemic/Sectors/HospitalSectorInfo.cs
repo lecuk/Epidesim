@@ -35,6 +35,8 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 			RecoveryMultiplier = 2f;
 			DeathRateMultiplier = 0.2f;
 			SpreadMultiplier = 0.5f;
+
+			CanBeQuarantined = false;
 		}
 	}
 }

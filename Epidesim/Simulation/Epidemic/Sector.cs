@@ -24,6 +24,9 @@ namespace Epidesim.Simulation.Epidemic
 		public float DeathRateMultiplier { get; set; }
 		public float SpreadMultiplier { get; set; }
 
+		public bool CanBeQuarantined { get; set; }
+		public bool IsQuarantined { get; set; }
+
 		public readonly CreatureCollection Creatures;
 
 		public Sector()

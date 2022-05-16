@@ -46,7 +46,7 @@ namespace Epidesim.Engine.Drawing
 			Vector2 half = new Vector2(width, height) / 2;
 		}
 
-		public void Reset()
+		public override void Reset()
 		{
 			engine.Reset();
 			Quads = 0;

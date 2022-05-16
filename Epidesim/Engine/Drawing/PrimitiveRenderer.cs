@@ -139,7 +139,7 @@ namespace Epidesim.Engine.Drawing
 			engine.DrawLines();
 		}
 
-		public void Reset()
+		public override void Reset()
 		{
 			engine.Reset();
 		}

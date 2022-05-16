@@ -13,5 +13,7 @@
 		public float RecoveryMultiplier { get; protected set; }
 		public float DeathRateMultiplier { get; protected set; }
 		public float SpreadMultiplier { get; protected set; }
+
+		public bool CanBeQuarantined { get; set; }
 	}
 }

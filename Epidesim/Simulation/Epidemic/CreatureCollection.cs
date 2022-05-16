@@ -11,16 +11,19 @@ namespace Epidesim.Simulation.Epidemic
 	{
 		private readonly LinkedList<Creature> allCreatures;
 		private readonly LinkedList<Creature> illCreatures;
+		private readonly LinkedList<Creature> contagiousCreatures;
 		private readonly LinkedList<Creature> vulnerableCreatures;
 
 		public CreatureCollection()
 		{ 
 			allCreatures = new LinkedList<Creature>();
 			illCreatures = new LinkedList<Creature>();
+			contagiousCreatures = new LinkedList<Creature>();
 			vulnerableCreatures = new LinkedList<Creature>();
 		}
 		
 		public IReadOnlyCollection<Creature> Ill => illCreatures;
+		public IReadOnlyCollection<Creature> Contagious => contagiousCreatures;
 		public IReadOnlyCollection<Creature> Vulnerable => vulnerableCreatures;
 
 		public int Count => this.allCreatures.Count;
@@ -35,6 +38,7 @@ namespace Epidesim.Simulation.Epidemic
 		{
 			allCreatures.Remove(creature);
 			illCreatures.Remove(creature);
+			contagiousCreatures.Remove(creature);
 			vulnerableCreatures.Remove(creature);
 		}
 
@@ -45,11 +49,7 @@ namespace Epidesim.Simulation.Epidemic
 			if (!creature.IsDead)
 			{
 				UpdateCreatureIsHealthy(creature);
-
-				if (!creature.IsIll)
-				{
-					UpdateCreatureIsImmune(creature);
-				}
+				UpdateCreatureIsImmune(creature);
 			}
 		}
 
@@ -58,6 +58,7 @@ namespace Epidesim.Simulation.Epidemic
 			if (creature.IsDead)
 			{
 				illCreatures.Remove(creature);
+				contagiousCreatures.Remove(creature);
 				vulnerableCreatures.Remove(creature);
 			}
 		}
@@ -65,11 +66,16 @@ namespace Epidesim.Simulation.Epidemic
 		private void UpdateCreatureIsHealthy(Creature creature)
 		{
 			illCreatures.Remove(creature);
+			contagiousCreatures.Remove(creature);
 
 			if (creature.IsIll)
 			{
-				vulnerableCreatures.Remove(creature);
 				illCreatures.AddLast(creature);
+			}
+
+			if (creature.IsContagious)
+			{
+				contagiousCreatures.AddLast(creature);
 			}
 		}
 

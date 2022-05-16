@@ -4,6 +4,7 @@ using Epidesim.Engine.Drawing.Types;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Epidesim.Simulation.Epidemic
@@ -15,6 +16,12 @@ namespace Epidesim.Simulation.Epidemic
 		private readonly PrimitiveRenderer selectionRenderer;
 		private readonly PrimitiveRenderer sectorBoundsRenderer;
 		private readonly TextRenderer sectorTextRenderer;
+		private readonly QuadTextureRenderer haloRenderer;
+
+		private IEnumerable<Renderer> AllRenderers => new Renderer[]
+		{
+			creatureRenderer, cityRenderer, selectionRenderer, sectorBoundsRenderer, sectorTextRenderer, haloRenderer
+		};
 
 		public EpidemicSimulationRenderer()
 		{
@@ -23,24 +30,19 @@ namespace Epidesim.Simulation.Epidemic
 			this.selectionRenderer = new PrimitiveRenderer(1000000, 1000000, 1000000);
 			this.sectorBoundsRenderer = new PrimitiveRenderer(100000, 100000, 100000);
 			this.sectorTextRenderer = new TextRenderer(2000);
+			this.haloRenderer = new QuadTextureRenderer(30000, ResourceManager.GetProgram("textureDefault"));
 
 			sectorTextRenderer.LoadFont(ResourceManager.GetTextureFont("consolas"));
 		}
 
 		public void Render(EpidemicSimulation simulation)
 		{
-			cityRenderer.Reset();
-			creatureRenderer.Reset();
-			selectionRenderer.Reset();
-			sectorBoundsRenderer.Reset();
-			sectorTextRenderer.Reset();
-
 			var transformMatrix = simulation.CoordinateSystem.GetTransformationMatrix();
-			cityRenderer.TransformMatrix = transformMatrix;
-			creatureRenderer.TransformMatrix = transformMatrix;
-			selectionRenderer.TransformMatrix = transformMatrix;
-			sectorBoundsRenderer.TransformMatrix = transformMatrix;
-			sectorTextRenderer.TransformMatrix = transformMatrix;
+			foreach (var renderer in AllRenderers)
+			{
+				renderer.Reset();
+				renderer.TransformMatrix = transformMatrix;
+			}
 
 			var city = simulation.City;
 			var cityBounds = city.Bounds;
@@ -62,9 +64,16 @@ namespace Epidesim.Simulation.Epidemic
 						cityRenderer.AddRectangle(sectorBounds, Color4.DarkSlateGray);
 					}
 
-					if (sector.Creatures.Ill.Count > 0)
+					if (sector.Creatures.Contagious.Count > 0)
 					{
-						sectorBoundsRenderer.AddRectangle(sectorBounds, Color4.Red);
+						if (sector.IsQuarantined)
+						{
+							sectorBoundsRenderer.AddRectangle(sectorBounds, Color4.Orange);
+						}
+						else
+						{
+							sectorBoundsRenderer.AddRectangle(sectorBounds, Color4.Red);
+						}
 					}
 				}
 			}
@@ -88,6 +97,11 @@ namespace Epidesim.Simulation.Epidemic
 						: creature.IsImmune
 							? Color4.Cyan
 							: Color4.White);
+				}
+
+				if (creature.IsContagious)
+				{
+					haloRenderer.AddQuad(Rectangle.FromCenterAndSize(creature.Position, new Vector2(4)), Color4.Red);
 				}
 			}
 
@@ -132,6 +146,7 @@ namespace Epidesim.Simulation.Epidemic
 
 			cityRenderer.DrawFilledElements();
 			sectorBoundsRenderer.DrawHollowElements();
+			haloRenderer.DrawTexture(ResourceManager.GetTexture("halo"));
 			creatureRenderer.DrawFilledElements();
 			sectorTextRenderer.DrawAll();
 			selectionRenderer.DrawHollowElements();

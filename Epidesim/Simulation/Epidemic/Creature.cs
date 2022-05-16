@@ -11,10 +11,10 @@ namespace Epidesim.Simulation.Epidemic
 		public Vector2 TargetPoint { get; set; }
 		public Sector TargetSector { get; set; }
 		public float IdleTime { get; set; }
+		public bool IsContagious { get; set; }
 		public bool IsIll { get; set; }
 		public bool IsIdle { get; set; }
 		public bool IsImmune { get; set; }
 		public bool IsDead { get; set; }
-		public float TimeSpentIll { get; set; }
 	}
 }

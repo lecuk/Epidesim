@@ -34,6 +34,9 @@ namespace Epidesim.Simulation.Epidemic
 
 		public Creature SelectedCreature { get; private set; }
 
+		public IllnessInfo IllnessInfo { get; private set; }
+		public CreatureBehaviourInfo CreatureBehaviourInfo { get; private set; }
+
 		private Random random;
 
 		public EpidemicSimulation()
@@ -51,6 +54,46 @@ namespace Epidesim.Simulation.Epidemic
 			CoordinateSystem = new CoordinateSystem()
 			{
 				ViewRectangle = City.Bounds
+			};
+
+			IllnessInfo = new IllnessInfo()
+			{
+				Name = "Test illness",
+				Description = "description",
+				IncubationPeriodSpread = 0.01f,
+				IllnessPeriodSpread = 0.02f,
+				FatalityRate = 0.0002f,
+				ImmunityRate = 0.2f,
+				UnsymptomaticRate = 0f,
+				IncubationPeriodDuration = new GaussianDistribution()
+				{
+					Mean = 3,
+					Deviation = 1,
+					Min = 1,
+					Max = 8
+				},
+				IllnessPeriodDuration = new GaussianDistribution()
+				{
+					Mean = 6,
+					Deviation = 2,
+					Min = 3,
+					Max = 12
+				},
+				TemporaryImmunityDuration = new GaussianDistribution()
+				{
+					Mean = 12,
+					Deviation = 3,
+					Min = 4
+				},
+			};
+
+			CreatureBehaviourInfo = new CreatureBehaviourInfo()
+			{
+				QuarantineThreshold = 1,
+				QuarantineCancelThreshold = 0,
+				PreferenceToStayInSameSectorMultiplier = 3f,
+				PreferenceToStayInSameSectorWhenIllMultiplier = 6f,
+				QuarantineSpreadMultiplier = 0.33f
 			};
 
 			random = new Random();
@@ -119,7 +162,7 @@ namespace Epidesim.Simulation.Epidemic
 			foreach (var creature in City)
 			{
 				//patient zero
-				MakeIll(creature);
+				MakeContagious(creature);
 				--firstIllCreatures;
 				if (firstIllCreatures <= 0) break;
 			}
@@ -216,14 +259,23 @@ namespace Epidesim.Simulation.Epidemic
 					continue;
 				}
 
+				if (creature.IsContagious)
+				{
+					double illPossibility = random.NextDouble();
+					double illProbabilityPerSecond = 0.05f;
+
+					if (illPossibility < illProbabilityPerSecond * scaledDeltaTime)
+					{
+						MakeIll(creature);
+					}
+				}
+
 				if (creature.IsIll)
 				{
 					var creatureSector = creature.CurrentSector;
-
-					creature.TimeSpentIll += scaledDeltaTime;
-
+					
 					double deathPossibility = random.NextDouble();
-					double deathProbabilityPerSecond = 0.0002 * creatureSector.DeathRateMultiplier;
+					double deathProbabilityPerSecond = IllnessInfo.FatalityRate * creatureSector.DeathRateMultiplier;
 
 					if (deathPossibility < deathProbabilityPerSecond * scaledDeltaTime)
 					{
@@ -238,7 +290,7 @@ namespace Epidesim.Simulation.Epidemic
 						MakeHealthyAgain(creature);
 
 						double immunityPossibility = random.NextDouble();
-						double immunityProbability = 0.33;
+						double immunityProbability = IllnessInfo.ImmunityRate;
 						if (immunityPossibility < immunityProbability)
 						{
 							creature.IsImmune = true;
@@ -246,7 +298,6 @@ namespace Epidesim.Simulation.Epidemic
 
 						if (creature.IsIdle)
 						{
-							creature.IdleTime = 0;
 							SetNextRandomTargetForCreature(creature);
 							creature.IsIdle = false;
 						}
@@ -290,22 +341,39 @@ namespace Epidesim.Simulation.Epidemic
 				for (int c = 0; c < City.Cols; ++c)
 				{
 					Sector sector = City[c, r];
-					int illCount = sector.Creatures.Ill.Count;
+					int contagious = sector.Creatures.Contagious.Count;
+					int ill = sector.Creatures.Ill.Count;
 
-					if (illCount > 0)
+					if (contagious > 0)
 					{
 						var vulnerableCreatures = new List<Creature>();
 						vulnerableCreatures.AddRange(sector.Creatures.Vulnerable);
 
 						foreach (var possibleIllCreature in vulnerableCreatures)
 						{
-							float illCountMultiplier = (float)Math.Sqrt(illCount);
-							float spreadProbabilityPerSecond = 0.005f * illCountMultiplier * sector.SpreadMultiplier;
+							float quarantineMultiplier = sector.IsQuarantined ? CreatureBehaviourInfo.QuarantineSpreadMultiplier : 1.0f;
+							float illCountMultiplier = (float)Math.Sqrt(contagious);
+							float spreadProbabilityPerSecond = IllnessInfo.IllnessPeriodSpread * quarantineMultiplier * illCountMultiplier * sector.SpreadMultiplier;
 							float spreadPossibility = (float)random.NextDouble();
 
 							if (spreadPossibility < spreadProbabilityPerSecond * scaledDeltaTime)
 							{
-								MakeIll(possibleIllCreature);
+								MakeContagious(possibleIllCreature);
+							}
+						}
+
+						if (!sector.IsQuarantined)
+						{
+							if (sector.CanBeQuarantined && ill >= CreatureBehaviourInfo.QuarantineThreshold)
+							{
+								sector.IsQuarantined = true;
+							}
+						}
+						else
+						{
+							if (ill <= CreatureBehaviourInfo.QuarantineCancelThreshold)
+							{
+								sector.IsQuarantined = false;
 							}
 						}
 					}
@@ -326,22 +394,26 @@ namespace Epidesim.Simulation.Epidemic
 			var neighbours = creature.CurrentSector.NeighbourSectors;
 
 			var possibleTargets = new ProbabilityTable<Sector>();
-
-			// if ill prefer not to change cell
-			float a = (creature.IsIll) ? 3.0f : 1.0f;
+			
+			float stayIdlePreference = (creature.IsIll) 
+				? CreatureBehaviourInfo.PreferenceToStayInSameSectorWhenIllMultiplier 
+				: CreatureBehaviourInfo.PreferenceToStayInSameSectorMultiplier;
 
 			possibleTargets.AddOutcome(creature.CurrentSector,
-				a * creature.CurrentSector.SectorCreaturePreference(creature));
+				stayIdlePreference * creature.CurrentSector.SectorCreaturePreference(creature));
 
-			foreach (var sector in neighbours)
+			if (!creature.CurrentSector.IsQuarantined)
 			{
-				if (sector.Creatures.Count > sector.MaxCreatures)
+				foreach (var sector in neighbours)
 				{
-					continue;
-				}
+					if (sector.IsQuarantined || sector.Creatures.Count > sector.MaxCreatures)
+					{
+						continue;
+					}
 
-				float preferenceCoefficient = sector.SectorCreaturePreference(creature);
-				possibleTargets.AddOutcome(sector, preferenceCoefficient);
+					float preferenceCoefficient = sector.SectorCreaturePreference(creature);
+					possibleTargets.AddOutcome(sector, preferenceCoefficient);
+				}
 			}
 
 			var targetSector = possibleTargets.GetRandomOutcome();
@@ -402,6 +474,12 @@ namespace Epidesim.Simulation.Epidemic
 			}
 		}
 
+		private void MakeContagious(Creature creature)
+		{
+			creature.IsContagious = true;
+			City.UpdateCreature(creature);
+		}
+
 		private void MakeIll(Creature creature)
 		{
 			creature.IsIll = true;
@@ -411,6 +489,7 @@ namespace Epidesim.Simulation.Epidemic
 		private void MakeHealthyAgain(Creature creature)
 		{
 			creature.IsIll = false;
+			creature.IsContagious = false;
 			City.UpdateCreature(creature);
 		}
 
@@ -423,6 +502,8 @@ namespace Epidesim.Simulation.Epidemic
 		
 		private void Kill(Creature creature)
 		{
+			creature.IsIll = false;
+			creature.IsContagious = false;
 			creature.IsDead = true;
 			City.UpdateCreature(creature);
 		}

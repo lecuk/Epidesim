@@ -1,6 +1,7 @@
 ﻿using Epidesim.Engine.Drawing.Types;
 using OpenTK;
 using System;
+using System.Collections.Generic;
 
 namespace Epidesim.Simulation.Epidemic
 {
@@ -32,6 +33,9 @@ namespace Epidesim.Simulation.Epidemic
 				DeathRateMultiplier = info.DeathRateMultiplier,
 				SpreadMultiplier = info.SpreadMultiplier,
 
+				CanBeQuarantined = info.CanBeQuarantined,
+				IsQuarantined = false,
+
 				MaxCreatures = (int)Math.Round(city.SectorSize * city.SectorSize / info.SquareMetersPerCreature),
 
 				Bounds = Rectangle.FromTwoPoints(
@@ -55,19 +59,12 @@ namespace Epidesim.Simulation.Epidemic
 			int width = toCol - fromCol + 1;
 			int height = toRow - fromRow + 1;
 
-			var neighbours = new Sector[width * height - 1];
+			var neighbours = new List<Sector>();
 
-			int i = 0;
-			for (int r = fromRow; r <= toRow; ++r)
-			{
-				for (int c = fromCol; c <= toCol; ++c)
-				{
-					if (r == row && c == col) continue;
-					
-					neighbours[i] = city[c, r];
-					i++;
-				}
-			}
+			if (fromCol != col) neighbours.Add(city[fromCol, row]);
+			if (toCol != col) neighbours.Add(city[toCol, row]);
+			if (fromRow != col) neighbours.Add(city[col, fromRow]);
+			if (toRow != col) neighbours.Add(city[col, toRow]);
 
 			sector.NeighbourSectors = neighbours;
 		}

@@ -137,7 +137,7 @@ namespace Epidesim.Engine.Drawing
 			vao.Unbind();
 		}
 
-		public void Reset()
+		public override void Reset()
 		{
 			Vertices = 0;
 			Triangles = 0;
