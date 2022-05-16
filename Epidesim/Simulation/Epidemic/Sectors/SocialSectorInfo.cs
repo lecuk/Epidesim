@@ -7,36 +7,36 @@ using System.Threading.Tasks;
 
 namespace Epidesim.Simulation.Epidemic.Sectors
 {
-	class LivingSectorInfo : SectorInfo
+	class SocialSectorInfo : SectorInfo
 	{
-		public LivingSectorInfo()
+		public SocialSectorInfo()
 		{
-			Name = "Living";
+			Name = "Social";
 
-			SquareMetersPerCreature = 20f;
+			SquareMetersPerCreature = 12f;
 
 			IdleTimeDistribution = new GaussianDistribution()
 			{
 				Mean = 60,
-				Deviation = 30,
+				Deviation = 20,
 				Min = 10
 			};
 
 			PositionDistribution = new GaussianDistribution()
 			{
-				Min = -1,
-				Max = 1,
 				Mean = 0,
-				Deviation = 0.333
+				Deviation = 0.4,
+				Min = -1,
+				Max = 1
 			};
 
 			PreferenceHealthyCreatures = 1f;
-			PreferenceIllCreatures = 0.33f;
-			PreferenceImmuneCreatures = 0.9f;
+			PreferenceIllCreatures = 0.15f;
+			PreferenceImmuneCreatures = 1f;
 
 			RecoveryMultiplier = 1f;
-			DeathRateMultiplier = 0.8f;
-			SpreadMultiplier = 1f;
+			DeathRateMultiplier = 1f;
+			SpreadMultiplier = 1.25f;
 
 			CanBeQuarantined = true;
 		}

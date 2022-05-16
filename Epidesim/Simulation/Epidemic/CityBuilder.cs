@@ -15,6 +15,7 @@ namespace Epidesim.Simulation.Epidemic
 		private SectorInfo emptySector = new EmptySectorInfo();
 		private SectorInfo livingSector = new LivingSectorInfo();
 		private SectorInfo hospitalSector = new HospitalSectorInfo();
+		private SectorInfo socialSector = new SocialSectorInfo();
 
 		public City Build(int cols, int rows)
 		{
@@ -28,9 +29,13 @@ namespace Epidesim.Simulation.Epidemic
 				{
 					SectorInfo info = null;
 
-					if (random.Next() % 3 == 0)
+					if (random.Next() % 4 == 0)
 					{
 						info = livingSector;
+					}
+					else if (random.Next() % 8 == 0)
+					{
+						info = socialSector;
 					}
 					else if (random.Next() % 16 == 0)
 					{

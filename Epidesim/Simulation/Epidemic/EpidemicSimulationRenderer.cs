@@ -63,6 +63,10 @@ namespace Epidesim.Simulation.Epidemic
 					{
 						cityRenderer.AddRectangle(sectorBounds, Color4.DarkSlateGray);
 					}
+					else if (sector.Name.StartsWith("Sector Social"))
+					{
+						cityRenderer.AddRectangle(sectorBounds, Color4.Olive);
+					}
 
 					if (sector.Creatures.Contagious.Count > 0)
 					{
@@ -125,7 +129,7 @@ namespace Epidesim.Simulation.Epidemic
 						creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(creature.Position, new Vector2(1.5f)),
 							creature.IsIll
 								? Color4.Red
-								: creature.IsImmune
+								: creature.IsPermanentlyImmune
 									? Color4.Cyan
 									: Color4.White);
 					}
@@ -135,12 +139,13 @@ namespace Epidesim.Simulation.Epidemic
 			}
 
 			int population = simulation.City.Count;
-			int ill = simulation.City.Count(cr => !cr.IsDead && cr.IsIll);
+			int ill = simulation.City.Count(cr => !cr.IsDead && cr.IsContagious);
+			int totalIll = simulation.City.Count(cr => cr.WasIllAtSomePoint);
 			int immune = simulation.City.Count(cr => !cr.IsDead && cr.IsImmune);
 			int died = simulation.City.Count(cr => cr.IsDead);
 
-			string info = String.Format("Population: {0}\nIll: {1}\nImmune: {2}\nDead: {3}\nTime elapsed: {4}", 
-				population, ill, immune, died, simulation.TotalTimeElapsed);
+			string info = String.Format("Population: {0}\nCurrent cases: {1}\nAffected population: {2}\nImmune: {3}\nDead: {4}\nTime elapsed: {5}", 
+				population, ill, totalIll, immune, died, simulation.TotalTimeElapsed);
 
 			sectorTextRenderer.AddString(info, 14, new Vector2(0, -20), Color4.Yellow);
 

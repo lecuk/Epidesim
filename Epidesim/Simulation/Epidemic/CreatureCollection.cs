@@ -83,7 +83,7 @@ namespace Epidesim.Simulation.Epidemic
 		{
 			vulnerableCreatures.Remove(creature);
 
-			if (!creature.IsIll && !creature.IsImmune)
+			if (!creature.IsContagious && !creature.IsImmune)
 			{
 				vulnerableCreatures.AddLast(creature);
 			}
