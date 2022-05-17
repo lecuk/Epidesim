@@ -32,7 +32,7 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 
 			RecoveryMultiplier = 1f;
 			DeathRateMultiplier = 0.8f;
-			SpreadMultiplier = 1f;
+			SpreadMultiplier = 0.6f;
 
 			CanBeQuarantined = true;
 			AllowInsideOnQuarantine = true;

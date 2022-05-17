@@ -91,7 +91,6 @@ namespace Epidesim.Simulation.Epidemic
 
 				creature.CurrentSector = newSector;
 				newSector.Creatures.Add(creature);
-				UpdateCreature(creature);
 			}
 		}
 

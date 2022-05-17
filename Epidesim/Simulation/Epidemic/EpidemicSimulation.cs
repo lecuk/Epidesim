@@ -64,10 +64,10 @@ namespace Epidesim.Simulation.Epidemic
 			{
 				Name = "Test illness",
 				Description = "description",
-				IncubationPeriodSpread = 0.0033f,
-				IllnessPeriodSpread = 0.008f,
-				FatalityRate = 0.001f,
-				ImmunityRate = 0.2f,
+				IncubationPeriodSpread = 0.0015f,
+				IllnessPeriodSpread = 0.004f,
+				FatalityRate = 0.00033f,
+				ImmunityRate = 0.0f,
 				UnsymptomaticRate = 0.05f,
 				IncubationPeriodDuration = new GaussianDistribution(random)
 				{
@@ -175,7 +175,7 @@ namespace Epidesim.Simulation.Epidemic
 
 				creature.Recovered += (cr) =>
 				{
-					SetNextRandomTargetForCreature(cr);
+					cr.StopIdling();
 				};
 
 				City.CreateCreature(creature);
@@ -314,7 +314,7 @@ namespace Epidesim.Simulation.Epidemic
 					int ill = sector.Creatures.Ill.Count;
 					int quarantined = sector.Creatures.Ill.Count(cr => cr.IsQuarantined);
 					int latent = contagious - ill;
-
+					
 					if (contagious > 0)
 					{
 						var vulnerableCreatures = new List<Creature>();
@@ -324,6 +324,7 @@ namespace Epidesim.Simulation.Epidemic
 						{
 							float quarantineMultiplier = sector.IsQuarantined ? CreatureBehaviour.QuarantineSpreadMultiplier : 1.0f;
 							float weightedIll = quarantined * CreatureBehaviour.SelfQuarantineSpreadMultiplier + ill;
+							float sqrlWeightedIll = (float)Math.Sqrt(weightedIll);
 							float illCountMultiplier = latent * IllnessInfo.IncubationPeriodSpread + weightedIll * IllnessInfo.IllnessPeriodSpread;
 							float spreadProbabilityPerSecond = quarantineMultiplier * illCountMultiplier * sector.SpreadMultiplier;
 							float spreadPossibility = (float)random.NextDouble();
@@ -333,21 +334,15 @@ namespace Epidesim.Simulation.Epidemic
 								possibleIllCreature.Contaminate(IllnessInfo);
 							}
 						}
+					}
 
-						if (!sector.IsQuarantined)
-						{
-							if (sector.CanBeQuarantined && ill >= CreatureBehaviour.QuarantineThreshold)
-							{
-								sector.IsQuarantined = true;
-							}
-						}
-						else
-						{
-							if (ill <= CreatureBehaviour.QuarantineCancelThreshold)
-							{
-								sector.IsQuarantined = false;
-							}
-						}
+					if (ill >= CreatureBehaviour.QuarantineThreshold && sector.CanBeQuarantined)
+					{
+						sector.IsQuarantined = true;
+					}
+					else if (ill <= CreatureBehaviour.QuarantineCancelThreshold)
+					{
+						sector.IsQuarantined = false;
 					}
 				}
 			}
@@ -365,7 +360,7 @@ namespace Epidesim.Simulation.Epidemic
 		{
 			var sector = creature.CurrentSector;
 			var neighbours = sector.NeighbourSectors;
-
+			
 			var possibleTargets = new ProbabilityTable<Sector>();
 			
 			float stayIdlePreference = (creature.IsIll) 
@@ -374,7 +369,7 @@ namespace Epidesim.Simulation.Epidemic
 
 			possibleTargets.AddOutcome(sector, stayIdlePreference * sector.SectorCreaturePreference(creature));
 
-			if (!creature.IsImmune && sector.AllowOutside)
+			if (creature.IsImmune || sector.AllowOutside)
 			{
 				foreach (var neighbourSector in neighbours)
 				{
