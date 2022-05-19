@@ -1,4 +1,5 @@
 ﻿using Epidesim.Simulation.Epidemic.Distributions;
+using OpenTK.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Epidesim.Simulation.Epidemic.Sectors
 {
-	class SocialSectorInfo : SectorInfo
+	class SocialSectorType : SectorType
 	{
-		public SocialSectorInfo(Random random)
+		public SocialSectorType(Random random)
 		{
 			Name = "Social";
 
@@ -42,6 +43,8 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 			AllowInsideOnQuarantine = false;
 			AllowOutsideOnQuarantine = true;
 			CanBeSelfQuarantined = false;
+
+			DisplayColor = Color4.Olive;
 		}
 	}
 }

@@ -96,7 +96,7 @@ namespace Epidesim.Simulation.Epidemic
 
 				if (IsIll)
 				{
-					if (WaitingForQuarantine && CurrentSector.CanBeSelfQuarantined)
+					if (WaitingForQuarantine && CurrentSector.Type.CanBeSelfQuarantined)
 					{
 						if (SelfQuarantineWaiting <= deltaTime)
 						{
@@ -105,7 +105,7 @@ namespace Epidesim.Simulation.Epidemic
 						else SelfQuarantineWaiting -= deltaTime;
 					}
 
-					float recoveryRate = deltaTime * CurrentSector.RecoveryMultiplier;
+					float recoveryRate = deltaTime * CurrentSector.Type.RecoveryMultiplier;
 					if (IllnessDuration <= recoveryRate)
 					{
 						Recover();
@@ -115,7 +115,7 @@ namespace Epidesim.Simulation.Epidemic
 						IllnessDuration -= recoveryRate;
 
 						double deathPossibility = random.NextDouble();
-						double deathProbabilityPerSecond = Illness.FatalityRate * CurrentSector.DeathRateMultiplier;
+						double deathProbabilityPerSecond = Illness.FatalityRate * CurrentSector.Type.DeathRateMultiplier;
 
 						if (deathPossibility < deathProbabilityPerSecond * deltaTime)
 						{
@@ -135,7 +135,7 @@ namespace Epidesim.Simulation.Epidemic
 
 		public void StartIdling()
 		{
-			IdleDuration = (float)CurrentSector.IdleTimeDistribution.GetRandomValue();
+			IdleDuration = (float)CurrentSector.Type.IdleTimeDistribution.GetRandomValue();
 			StartedIdling?.Invoke(this);
 		}
 

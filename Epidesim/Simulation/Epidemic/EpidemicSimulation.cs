@@ -51,8 +51,8 @@ namespace Epidesim.Simulation.Epidemic
 				RoadWidth = 4f
 			};
 
-			City = builder.Build(30, 20);
-			NumberOfCreatures = 8000;
+			City = builder.Build(50, 40);
+			NumberOfCreatures = 16000;
 			TimeScale = 2f;
 
 			CoordinateSystem = new CoordinateSystem()
@@ -64,21 +64,21 @@ namespace Epidesim.Simulation.Epidemic
 			{
 				Name = "Test illness",
 				Description = "description",
-				IncubationPeriodSpread = 0.0015f,
-				IllnessPeriodSpread = 0.004f,
+				IncubationPeriodSpread = 0.002f,
+				IllnessPeriodSpread = 0.005f,
 				FatalityRate = 0.00033f,
 				ImmunityRate = 0.0f,
 				UnsymptomaticRate = 0.05f,
 				IncubationPeriodDuration = new GaussianDistribution(random)
 				{
-					Mean = 33,
-					Deviation = 16,
+					Mean = 50,
+					Deviation = 20,
 					Min = 15
 				},
 				IllnessPeriodDuration = new GaussianDistribution(random)
 				{
-					Mean = 70,
-					Deviation = 20,
+					Mean = 120,
+					Deviation = 30,
 					Min = 30
 				},
 				TemporaryImmunityDuration = new GaussianDistribution(random)
@@ -91,21 +91,21 @@ namespace Epidesim.Simulation.Epidemic
 
 			CreatureBehaviour = new CreatureBehaviour()
 			{
-				QuarantineThreshold = 4,
+				QuarantineThreshold = 3,
 				QuarantineCancelThreshold = 0,
-				PreferenceToStayInSameSectorMultiplier = 2f,
-				PreferenceToStayInSameSectorWhenIllMultiplier = 6f,
+				PreferenceToStayInSameSectorMultiplier = 0f,
+				PreferenceToStayInSameSectorWhenIllMultiplier = 999f,
 				QuarantineSpreadMultiplier = 0.33f,
 				SelfQuarantineSpreadMultiplier = 0.15f,
 				SelfQuarantineDelayDistribution = new GaussianDistribution(random)
 				{
 					Mean = 20,
 					Deviation = 10,
-					Min = 0
+					Min = 1
 				},
 				SelfQuarantineCooldownDistribution = new GaussianDistribution(random)
 				{
-					Mean = 200,
+					Mean = 300,
 					Deviation = 60,
 					Min = 60
 				}
@@ -197,56 +197,7 @@ namespace Epidesim.Simulation.Epidemic
 
 			TotalTimeElapsed += scaledDeltaTime;
 
-			if (Input.IsKeyDown(OpenTK.Input.Key.Up))
-			{
-				TranslateCamera(0, Camera.Height * scaledDeltaTime);
-			}
-
-			if (Input.IsKeyDown(OpenTK.Input.Key.Down))
-			{
-				TranslateCamera(0, -Camera.Height * scaledDeltaTime);
-			}
-
-			if (Input.IsKeyDown(OpenTK.Input.Key.Left))
-			{
-				TranslateCamera(-Camera.Width * scaledDeltaTime, 0);
-			}
-
-			if (Input.IsKeyDown(OpenTK.Input.Key.Right))
-			{
-				TranslateCamera(Camera.Width * scaledDeltaTime, 0);
-			}
-
-			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Right))
-			{
-				TranslateCamera(-WorldMouseDelta);
-			}
-
-			if (Input.GetMouseWheelDelta() > 0)
-			{
-				ScaleCamera(1 / 1.1f);
-			}
-
-			if (Input.GetMouseWheelDelta() < 0)
-			{
-				ScaleCamera(1.1f);
-			}
-
-			if (Input.IsKeyDown(OpenTK.Input.Key.Plus))
-			{
-				TimeScale *= MathHelper.Clamp(1.0f + (float)deltaTime * 2.5f, 0.1f, 2f);
-			}
-
-			if (Input.IsKeyDown(OpenTK.Input.Key.Minus))
-			{
-				TimeScale /= MathHelper.Clamp(1.0f + (float)deltaTime * 2.5f, 0.1f, 2f);
-			}
-
-			MousePosition = Input.GetMouseLocalPosition();
-			WorldMousePosition = CoordinateSystem.ScreenCoordinateToWorldCoordinate(MousePosition);
-
-			MouseDelta = Input.GetMouseDelta();
-			WorldMouseDelta = CoordinateSystem.ScreenDeltaToWorldDelta(MouseDelta);
+			HandleMouseAndCamera((float)deltaTime);
 
 			if (Input.WasMouseButtonJustPressed(OpenTK.Input.MouseButton.Left))
 			{
@@ -324,9 +275,8 @@ namespace Epidesim.Simulation.Epidemic
 						{
 							float quarantineMultiplier = sector.IsQuarantined ? CreatureBehaviour.QuarantineSpreadMultiplier : 1.0f;
 							float weightedIll = quarantined * CreatureBehaviour.SelfQuarantineSpreadMultiplier + ill;
-							float sqrlWeightedIll = (float)Math.Sqrt(weightedIll);
 							float illCountMultiplier = latent * IllnessInfo.IncubationPeriodSpread + weightedIll * IllnessInfo.IllnessPeriodSpread;
-							float spreadProbabilityPerSecond = quarantineMultiplier * illCountMultiplier * sector.SpreadMultiplier;
+							float spreadProbabilityPerSecond = quarantineMultiplier * illCountMultiplier * sector.Type.SpreadMultiplier;
 							float spreadPossibility = (float)random.NextDouble();
 
 							if (spreadPossibility < spreadProbabilityPerSecond * scaledDeltaTime)
@@ -336,7 +286,7 @@ namespace Epidesim.Simulation.Epidemic
 						}
 					}
 
-					if (ill >= CreatureBehaviour.QuarantineThreshold && sector.CanBeQuarantined)
+					if (ill >= CreatureBehaviour.QuarantineThreshold && sector.Type.CanBeQuarantined)
 					{
 						sector.IsQuarantined = true;
 					}
@@ -386,6 +336,61 @@ namespace Epidesim.Simulation.Epidemic
 			var targetSector = possibleTargets.GetRandomOutcome();
 			creature.TargetPoint = targetSector.GetRandomPoint();
 			creature.TargetSector = targetSector;
+		}
+
+		void HandleMouseAndCamera(float deltaTime)
+		{
+			if (Input.IsKeyDown(OpenTK.Input.Key.Up))
+			{
+				TranslateCamera(0, Camera.Height * deltaTime);
+			}
+
+			if (Input.IsKeyDown(OpenTK.Input.Key.Down))
+			{
+				TranslateCamera(0, -Camera.Height * deltaTime);
+			}
+
+			if (Input.IsKeyDown(OpenTK.Input.Key.Left))
+			{
+				TranslateCamera(-Camera.Width * deltaTime, 0);
+			}
+
+			if (Input.IsKeyDown(OpenTK.Input.Key.Right))
+			{
+				TranslateCamera(Camera.Width * deltaTime, 0);
+			}
+
+			if (Input.IsMouseButtonDown(OpenTK.Input.MouseButton.Right))
+			{
+				TranslateCamera(-WorldMouseDelta);
+			}
+
+			if (Input.GetMouseWheelDelta() > 0)
+			{
+				ScaleCamera(1 / 1.1f);
+			}
+
+			if (Input.GetMouseWheelDelta() < 0)
+			{
+				ScaleCamera(1.1f);
+			}
+
+			if (Input.IsKeyDown(OpenTK.Input.Key.Plus))
+			{
+				TimeScale *= MathHelper.Clamp(1.0f + (float)deltaTime * 2.5f, 0.1f, 2f);
+			}
+
+			if (Input.IsKeyDown(OpenTK.Input.Key.Minus))
+			{
+				TimeScale /= MathHelper.Clamp(1.0f + (float)deltaTime * 2.5f, 0.1f, 2f);
+			}
+
+			MousePosition = Input.GetMouseLocalPosition();
+			WorldMousePosition = CoordinateSystem.ScreenCoordinateToWorldCoordinate(MousePosition);
+
+			MouseDelta = Input.GetMouseDelta();
+			WorldMouseDelta = CoordinateSystem.ScreenDeltaToWorldDelta(MouseDelta);
+
 		}
 
 		void TranslateCamera(float offsetX, float offsetY)

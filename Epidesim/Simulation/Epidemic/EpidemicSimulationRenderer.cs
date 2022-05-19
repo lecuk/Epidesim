@@ -55,18 +55,7 @@ namespace Epidesim.Simulation.Epidemic
 				{
 					Sector sector = city[c, r];
 					var sectorBounds = sector.Bounds;
-					if (sector.Name.StartsWith("Sector Living"))
-					{
-						cityRenderer.AddRectangle(sectorBounds, Color4.DarkGreen);
-					}
-					else if (sector.Name.StartsWith("Sector Hospital"))
-					{
-						cityRenderer.AddRectangle(sectorBounds, Color4.DarkSlateGray);
-					}
-					else if (sector.Name.StartsWith("Sector Social"))
-					{
-						cityRenderer.AddRectangle(sectorBounds, Color4.Olive);
-					}
+					cityRenderer.AddRectangle(sectorBounds, sector.Type.DisplayColor);
 
 					if (sector.Creatures.Contagious.Count > 0)
 					{

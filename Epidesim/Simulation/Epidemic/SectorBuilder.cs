@@ -14,40 +14,26 @@ namespace Epidesim.Simulation.Epidemic
 			this.city = city;
 		}
 
-		public Sector Build(int col, int row, SectorInfo info)
+		public Sector Build(int col, int row, SectorType type)
 		{
 			Vector2 bottomLeftOfSector = new Vector2(col, row) * city.SectorSize;
 
 			return new Sector()
 			{
-				Name = String.Format("Sector {0}{1}{2}", info.Name, col, row),
+				Name = String.Format("Sector {0}{1}{2}", type.Name, col, row),
 
 				Col = col,
 				Row = row,
 
-				MaxCreatures = (int)Math.Round(city.SectorSize * city.SectorSize / info.SquareMetersPerCreature),
-
-				PreferenceHealthy = info.PreferenceHealthyCreatures,
-				PreferenceIll = info.PreferenceIllCreatures,
-				PreferenceImmune = info.PreferenceImmuneCreatures,
-
-				RecoveryMultiplier = info.RecoveryMultiplier,
-				DeathRateMultiplier = info.DeathRateMultiplier,
-				SpreadMultiplier = info.SpreadMultiplier,
-
-				CanBeQuarantined = info.CanBeQuarantined,
-				CanBeSelfQuarantined = info.CanBeSelfQuarantined,
-				AllowInsideOnQuarantine = info.AllowInsideOnQuarantine,
-				AllowOutsideOnQuarantine = info.AllowOutsideOnQuarantine,
+				MaxCreatures = (int)Math.Round(city.SectorSize * city.SectorSize / type.SquareMetersPerCreature),
+				
+				Type = type,
 
 				IsQuarantined = false,
 
 				Bounds = Rectangle.FromTwoPoints(
 					bottomLeftOfSector + new Vector2(city.RoadWidth / 2),
-					bottomLeftOfSector - new Vector2(city.RoadWidth / 2) + new Vector2(city.SectorSize)),
-
-				IdleTimeDistribution = info.IdleTimeDistribution,
-				PositionDistribution = info.PositionDistribution
+					bottomLeftOfSector - new Vector2(city.RoadWidth / 2) + new Vector2(city.SectorSize))
 			};
 		}
 

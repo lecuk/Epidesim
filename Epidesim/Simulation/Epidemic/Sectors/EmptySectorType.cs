@@ -1,11 +1,12 @@
 ﻿using Epidesim.Simulation.Epidemic.Distributions;
+using OpenTK.Graphics;
 using System;
 
 namespace Epidesim.Simulation.Epidemic.Sectors
 {
-	class EmptySectorInfo : SectorInfo
+	class EmptySectorType : SectorType
 	{
-		public EmptySectorInfo(Random random)
+		public EmptySectorType(Random random)
 		{
 			Name = "Empty";
 
@@ -34,6 +35,8 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 
 			CanBeQuarantined = false;
 			CanBeSelfQuarantined = false;
+
+			DisplayColor = Color4.Transparent;
 		}
 	}
 }

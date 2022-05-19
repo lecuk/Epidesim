@@ -97,11 +97,11 @@
     <Compile Include="Simulation\Epidemic\Sector.cs" />
     <Compile Include="Simulation\Epidemic\City.cs" />
     <Compile Include="Simulation\Epidemic\SectorBuilder.cs" />
-    <Compile Include="Simulation\Epidemic\SectorInfo.cs" />
-    <Compile Include="Simulation\Epidemic\Sectors\EmptySectorInfo.cs" />
-    <Compile Include="Simulation\Epidemic\Sectors\SocialSectorInfo.cs" />
-    <Compile Include="Simulation\Epidemic\Sectors\HospitalSectorInfo.cs" />
-    <Compile Include="Simulation\Epidemic\Sectors\LivingSectorInfo.cs" />
+    <Compile Include="Simulation\Epidemic\SectorType.cs" />
+    <Compile Include="Simulation\Epidemic\Sectors\EmptySectorType.cs" />
+    <Compile Include="Simulation\Epidemic\Sectors\SocialSectorType.cs" />
+    <Compile Include="Simulation\Epidemic\Sectors\HospitalSectorType.cs" />
+    <Compile Include="Simulation\Epidemic\Sectors\LivingSectorType.cs" />
     <Compile Include="Simulation\Epidemic\ValueDistribution.cs" />
     <Compile Include="Simulation\Polygon\PolygonSimulationRenderer.cs" />
     <Compile Include="Simulation\Polygon\Polygon.cs" />

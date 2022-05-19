@@ -12,26 +12,12 @@ namespace Epidesim.Simulation.Epidemic
 		public int Row { get; set; }
 		public int MaxCreatures { get; set; }
 		public Rectangle Bounds { get; set; }
-		public ValueDistribution IdleTimeDistribution { get; set; }
-		public ValueDistribution PositionDistribution { get; set; }
 		public IReadOnlyList<Sector> NeighbourSectors { get; set; }
-
-		public float PreferenceHealthy { get; set; }
-		public float PreferenceIll { get; set; }
-		public float PreferenceImmune { get; set; }
-
-		public float RecoveryMultiplier { get; set; }
-		public float DeathRateMultiplier { get; set; }
-		public float SpreadMultiplier { get; set; }
-
-		public bool CanBeQuarantined { get; set; }
-		public bool AllowInsideOnQuarantine { get; set; }
-		public bool AllowOutsideOnQuarantine { get; set; }
-		public bool CanBeSelfQuarantined { get; set; }
+		public SectorType Type { get; set; }
 		public bool IsQuarantined { get; set; }
 
-		public bool AllowInside => !IsQuarantined || AllowInsideOnQuarantine;
-		public bool AllowOutside => !IsQuarantined || AllowOutsideOnQuarantine;
+		public bool AllowInside => !IsQuarantined || Type.AllowInsideOnQuarantine;
+		public bool AllowOutside => !IsQuarantined || Type.AllowOutsideOnQuarantine;
 
 		public readonly CreatureCollection Creatures;
 
@@ -57,17 +43,17 @@ namespace Epidesim.Simulation.Epidemic
 		
 		public Vector2 GetRandomPoint()
 		{
-			float a = (float)PositionDistribution.GetRandomValue();
-			float b = (float)PositionDistribution.GetRandomValue();
+			float a = (float)Type.PositionDistribution.GetRandomValue();
+			float b = (float)Type.PositionDistribution.GetRandomValue();
 
 			return Bounds.Center + new Vector2(a, b) * new Vector2(Bounds.Width, Bounds.Height) / 2;
 		}
 
 		public float SectorCreaturePreference(Creature creature)
 		{
-			return (creature.IsIll) ? PreferenceIll
-				: (creature.IsImmune) ? PreferenceImmune
-				: PreferenceHealthy;
+			return (creature.IsIll) ? Type.PreferenceIllCreatures
+				: (creature.IsImmune) ? Type.PreferenceImmuneCreatures
+				: Type.PreferenceHealthyCreatures;
 		}
 	}
 }

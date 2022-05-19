@@ -1,11 +1,12 @@
 ﻿using Epidesim.Simulation.Epidemic.Distributions;
+using OpenTK.Graphics;
 using System;
 
 namespace Epidesim.Simulation.Epidemic.Sectors
 {
-	class HospitalSectorInfo : SectorInfo
+	class HospitalSectorType : SectorType
 	{
-		public HospitalSectorInfo(Random random)
+		public HospitalSectorType(Random random)
 		{
 			Name = "Hospital";
 
@@ -36,6 +37,8 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 			AllowInsideOnQuarantine = true;
 			AllowOutsideOnQuarantine = false;
 			CanBeSelfQuarantined = true;
+
+			DisplayColor = Color4.DarkSlateBlue;
 		}
 	}
 }

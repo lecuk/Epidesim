@@ -1,6 +1,8 @@
-﻿namespace Epidesim.Simulation.Epidemic
+﻿using OpenTK.Graphics;
+
+namespace Epidesim.Simulation.Epidemic
 {
-	abstract class SectorInfo
+	abstract class SectorType
 	{
 		public string Name { get; protected set; }
 		public ValueDistribution IdleTimeDistribution { get; protected set; }
@@ -18,5 +20,7 @@
 		public bool AllowInsideOnQuarantine { get; protected set; }
 		public bool AllowOutsideOnQuarantine { get; protected set; }
 		public bool CanBeSelfQuarantined { get; protected set; }
+
+		public Color4 DisplayColor { get; protected set; }
 	}
 }
