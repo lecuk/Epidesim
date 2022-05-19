@@ -48,7 +48,7 @@ namespace Epidesim.Simulation.Epidemic
 			var cityBounds = city.Bounds;
 
 			cityRenderer.AddRectangle(cityBounds, Color4.DimGray);
-
+			
 			for (int r = 0; r < city.Rows; ++r)
 			{
 				for (int c = 0; c < city.Cols; ++c)
@@ -128,13 +128,14 @@ namespace Epidesim.Simulation.Epidemic
 			}
 
 			int population = simulation.City.Count;
+			int maxPopulation = simulation.City.MaxPopulation;
 			int ill = simulation.City.Count(cr => !cr.IsDead && cr.IsInfected);
 			int totalIll = simulation.City.Count(cr => cr.WasIllAtSomePoint);
 			int immune = simulation.City.Count(cr => !cr.IsDead && cr.IsImmune);
 			int died = simulation.City.Count(cr => cr.IsDead);
 
-			string info = String.Format("Population: {0}\nCurrent cases: {1}\nAffected population: {2}\nImmune: {3}\nDead: {4}\nTime elapsed: {5}", 
-				population, ill, totalIll, immune, died, simulation.TotalTimeElapsed);
+			string info = String.Format("Population: {0}/{1}\nCurrent cases: {2}\nAffected population: {3}\nImmune: {4}\nDead: {5}\nTime elapsed: {6}", 
+				population, maxPopulation, ill, totalIll, immune, died, simulation.TotalTimeElapsed);
 
 			sectorTextRenderer.AddString(info, 14, new Vector2(0, -20), Color4.Yellow);
 

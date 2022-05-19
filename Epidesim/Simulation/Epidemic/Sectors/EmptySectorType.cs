@@ -14,8 +14,8 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 
 			IdleTimeDistribution = new GaussianDistribution(random)
 			{
-				Mean = 20,
-				Deviation = 10,
+				Mean = 14,
+				Deviation = 8,
 				Min = 2
 			};
 
@@ -25,9 +25,9 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 				Max = 1
 			};
 
-			PreferenceHealthyCreatures = 1f;
-			PreferenceIllCreatures = 0.1f;
-			PreferenceImmuneCreatures = 1f;
+			PreferenceHealthyCreatures = 0.75f;
+			PreferenceIllCreatures = 0.075f;
+			PreferenceImmuneCreatures = 0.75f;
 
 			RecoveryMultiplier = 0.5f;
 			DeathRateMultiplier = 1f;

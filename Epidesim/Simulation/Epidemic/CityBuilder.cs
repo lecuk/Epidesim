@@ -35,15 +35,15 @@ namespace Epidesim.Simulation.Epidemic
 				{
 					SectorType info = null;
 
-					if (random.Next() % 4 == 0)
+					if (random.Next() % 7 == 0)
 					{
 						info = livingSector;
 					}
-					else if (random.Next() % 8 == 0)
+					else if (random.Next() % 12 == 0)
 					{
 						info = socialSector;
 					}
-					else if (random.Next() % 16 == 0)
+					else if (random.Next() % 24 == 0)
 					{
 						info = hospitalSector;
 					}
@@ -64,6 +64,8 @@ namespace Epidesim.Simulation.Epidemic
 					builder.InitSectorNeighbours(city, city[c, r]);
 				}
 			}
+
+			city.RecalculateMaxPopulation();
 
 			return city;
 		}

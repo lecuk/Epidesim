@@ -2,6 +2,8 @@
 {
 	class CreatureBehaviour
 	{
+		public ValueDistribution MoveSpeedDistribution { get; set; }
+
 		public float PreferenceToStayInSameSectorMultiplier { get; set; }
 		public float PreferenceToStayInSameSectorWhenIllMultiplier { get; set; }
 		public float QuarantineSpreadMultiplier { get; set; }

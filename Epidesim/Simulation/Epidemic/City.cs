@@ -20,6 +20,7 @@ namespace Epidesim.Simulation.Epidemic
 		private readonly List<Creature> allCreatures;
 
 		public Rectangle Bounds => Rectangle.FromTwoPoints(Vector2.Zero, new Vector2(Cols, Rows) * SectorSize);
+		public int MaxPopulation { get; private set; }
 
 		public int Count => this.allCreatures.Count;
 
@@ -65,6 +66,19 @@ namespace Epidesim.Simulation.Epidemic
 			if (row < 0) row = 0;
 
 			return GetSector(col, row);
+		}
+
+		public void RecalculateMaxPopulation()
+		{
+			MaxPopulation = 0;
+			for (int r = 0; r < Rows; ++r)
+			{
+				for (int c = 0; c < Cols; ++c)
+				{
+					Sector sector = GetSector(c, r);
+					MaxPopulation += sector.MaxCreatures;
+				}
+			}
 		}
 
 		public void UpdateCreatureSectorFromPosition(Creature creature)

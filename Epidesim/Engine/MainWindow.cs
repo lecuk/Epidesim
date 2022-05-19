@@ -39,7 +39,7 @@ namespace Epidesim.Engine
 		#region Constructors
 
 		private MainWindow(int width, int height, string title)
-			: base(width, height, GraphicsMode.Default, title)
+			: base(width, height, new GraphicsMode(ColorFormat.Empty, 1, 1, 4), title)
 		{
 			InitResources();
 			
@@ -66,8 +66,10 @@ namespace Epidesim.Engine
 			GL.Enable(EnableCap.Blend);
 			GL.Enable(EnableCap.AlphaTest);
 			GL.Enable(EnableCap.Texture2D);
+			GL.Enable(EnableCap.Multisample);
 
 			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+			GL.Hint(HintTarget.MultisampleFilterHintNv, HintMode.Fastest);
 
 			SimulationToRun.Start();
 		}

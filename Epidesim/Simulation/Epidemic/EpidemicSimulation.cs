@@ -36,7 +36,7 @@ namespace Epidesim.Simulation.Epidemic
 
 		public Creature SelectedCreature { get; private set; }
 
-		public Illness IllnessInfo { get; private set; }
+		public Illness Illness { get; private set; }
 		public CreatureBehaviour CreatureBehaviour { get; private set; }
 
 		private Random random;
@@ -47,12 +47,12 @@ namespace Epidesim.Simulation.Epidemic
 
 			var builder = new CityBuilder(random)
 			{
-				SectorSize = 25f,
+				SectorSize = 30f,
 				RoadWidth = 4f
 			};
 
-			City = builder.Build(50, 40);
-			NumberOfCreatures = 16000;
+			City = builder.Build(50, 24);
+			NumberOfCreatures = 12000;
 			TimeScale = 2f;
 
 			CoordinateSystem = new CoordinateSystem()
@@ -60,37 +60,43 @@ namespace Epidesim.Simulation.Epidemic
 				ViewRectangle = City.Bounds
 			};
 
-			IllnessInfo = new Illness()
+			Illness = new Illness()
 			{
 				Name = "Test illness",
 				Description = "description",
 				IncubationPeriodSpread = 0.002f,
 				IllnessPeriodSpread = 0.005f,
 				FatalityRate = 0.00033f,
-				ImmunityRate = 0.0f,
+				ImmunityRate = 0.5f,
 				UnsymptomaticRate = 0.05f,
 				IncubationPeriodDuration = new GaussianDistribution(random)
 				{
-					Mean = 50,
+					Mean = 60,
 					Deviation = 20,
 					Min = 15
 				},
 				IllnessPeriodDuration = new GaussianDistribution(random)
 				{
-					Mean = 120,
-					Deviation = 30,
-					Min = 30
+					Mean = 180,
+					Deviation = 80,
+					Min = 60
 				},
 				TemporaryImmunityDuration = new GaussianDistribution(random)
 				{
-					Mean = 150,
-					Deviation = 30,
-					Min = 60
+					Mean = 400,
+					Deviation = 100,
+					Min = 120
 				},
 			};
 
 			CreatureBehaviour = new CreatureBehaviour()
 			{
+				MoveSpeedDistribution = new GaussianDistribution(random)
+				{
+					Mean = 7,
+					Deviation = 3,
+					Min = 4
+				},
 				QuarantineThreshold = 3,
 				QuarantineCancelThreshold = 0,
 				PreferenceToStayInSameSectorMultiplier = 0f,
@@ -139,13 +145,6 @@ namespace Epidesim.Simulation.Epidemic
 				Min = 0
 			};
 
-			var speedDeviation = new GaussianDistribution(random)
-			{
-				Mean = 7,
-				Deviation = 3,
-				Min = 4
-			};
-
 			for (int i = 0; i < NumberOfCreatures; ++i)
 			{
 				int randomCol = random.Next(City.Cols);
@@ -162,7 +161,7 @@ namespace Epidesim.Simulation.Epidemic
 					CurrentSector = sector,
 					TargetPoint = position,
 					TargetSector = sector,
-					MoveSpeed = (float)speedDeviation.GetRandomValue(),
+					MoveSpeed = (float)CreatureBehaviour.MoveSpeedDistribution.GetRandomValue(),
 					City = City,
 					Illness = null,
 					Behaviour = CreatureBehaviour
@@ -185,7 +184,7 @@ namespace Epidesim.Simulation.Epidemic
 			foreach (var creature in City)
 			{
 				//patient zero
-				creature.Contaminate(IllnessInfo);
+				creature.Contaminate(Illness);
 				--firstIllCreatures;
 				if (firstIllCreatures <= 0) break;
 			}
@@ -263,25 +262,20 @@ namespace Epidesim.Simulation.Epidemic
 					Sector sector = City[c, r];
 					int contagious = sector.Creatures.Contagious.Count;
 					int ill = sector.Creatures.Ill.Count;
-					int quarantined = sector.Creatures.Ill.Count(cr => cr.IsQuarantined);
-					int latent = contagious - ill;
 					
 					if (contagious > 0)
 					{
 						var vulnerableCreatures = new List<Creature>();
 						vulnerableCreatures.AddRange(sector.Creatures.Vulnerable);
+						float spreadProbabilityPerSecond = sector.GetInfectionProbability(Illness, CreatureBehaviour);
 
 						foreach (var possibleIllCreature in vulnerableCreatures)
 						{
-							float quarantineMultiplier = sector.IsQuarantined ? CreatureBehaviour.QuarantineSpreadMultiplier : 1.0f;
-							float weightedIll = quarantined * CreatureBehaviour.SelfQuarantineSpreadMultiplier + ill;
-							float illCountMultiplier = latent * IllnessInfo.IncubationPeriodSpread + weightedIll * IllnessInfo.IllnessPeriodSpread;
-							float spreadProbabilityPerSecond = quarantineMultiplier * illCountMultiplier * sector.Type.SpreadMultiplier;
 							float spreadPossibility = (float)random.NextDouble();
 
 							if (spreadPossibility < spreadProbabilityPerSecond * scaledDeltaTime)
 							{
-								possibleIllCreature.Contaminate(IllnessInfo);
+								possibleIllCreature.Contaminate(Illness);
 							}
 						}
 					}
