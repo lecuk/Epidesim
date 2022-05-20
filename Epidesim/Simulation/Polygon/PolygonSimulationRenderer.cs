@@ -15,6 +15,7 @@ namespace Epidesim.Simulation.Polygon
 		private readonly PrimitiveRenderer selectionRectangleRenderer;
 		private readonly PrimitiveRenderer wireframeRenderer;
 		private readonly QuadTextureRenderer textureRenderer;
+		private readonly QuadTextureRenderer backgroundRenderer;
 		private readonly TextRenderer textRenderer;
 
 		public void Render(PolygonSimulation simulation)
@@ -25,14 +26,19 @@ namespace Epidesim.Simulation.Polygon
 			textureRenderer.Reset();
 			selectionRectangleRenderer.Reset();
 			textRenderer.Reset();
+			backgroundRenderer.Reset();
 
 			var transformMatrix = simulation.CurrentCoordinateSystem.GetTransformationMatrix();
+			var space = ResourceManager.GetTexture("space");
 
 			primitiveRenderer.TransformMatrix = transformMatrix;
 			textureRenderer.TransformMatrix = transformMatrix;
 			wireframeRenderer.TransformMatrix = transformMatrix;
 			selectionRectangleRenderer.TransformMatrix = transformMatrix;
 			textRenderer.TransformMatrix = transformMatrix;
+			backgroundRenderer.TransformMatrix = transformMatrix;
+
+			backgroundRenderer.AddQuad(Rectangle.FromTwoPoints(-new Vector2(space.Width, space.Height) / 2, new Vector2(space.Width, space.Height) * 2), Color4.White);
 
 			foreach (var polygon in simulation.UnSelectedPolygons)
 			{
@@ -58,7 +64,7 @@ namespace Epidesim.Simulation.Polygon
 			
 			if (simulation.CreateMode)
 			{
-				primitiveRenderer.AddRightPolygon(simulation.MouseWorldPosition, 
+				primitiveRenderer.AddRightPolygon(simulation.WorldMousePosition, 
 					simulation.PolygonToCreate.Radius, 
 					simulation.PolygonToCreate.Edges, 
 					simulation.PolygonToCreate.Rotation, 
@@ -67,27 +73,27 @@ namespace Epidesim.Simulation.Polygon
 
 			var v2 = new Vector2();
 
-			primitiveRenderer.AddRightPolygon(v2,
-				simulation.PolygonToCreate.Radius,
-				simulation.PolygonToCreate.Edges,
-				simulation.PolygonToCreate.Rotation,
-				Color4.White);
+			textRenderer.AddString("hello world!", 40, v2 - new Vector2(2), Color4.Black);
+			textRenderer.AddString("hello world!", 40, v2, Color4.White);
+			textRenderer.AddString("abcd\nefghijkl\nmnopqrstuvw\nxyz", 40, v2 - new Vector2(2, 42), Color4.Black);
+			textRenderer.AddString("abcd\nefghijkl\nmnopqrstuvw\nxyz", 40, v2 - new Vector2(0, 40), Color4.Lime);
 
-			textRenderer.AddString("hello world!", 8, v2, Color4.White);
+			for (int i = 0; i < 17; ++i)
+			{
+				primitiveRenderer.AddRightPolygon(new Vector2(-50, i * 20),
+					8,
+					3 + i,
+					0,
+					Color4.White);
 
-			primitiveRenderer.AddRightPolygon(v2,
-				simulation.PolygonToCreate.Radius,
-				simulation.PolygonToCreate.Edges,
-				simulation.PolygonToCreate.Rotation,
-				Color4.White);
+				primitiveRenderer.AddRightPolygon(new Vector2(-100, i * 20),
+					8,
+					4,
+					(i * 15 + 45) * (float)Math.PI / 180,
+					Color4.White);
+			}
 
-			textRenderer.AddString("abcd\nefghijkl\nmnopqrstuvw\nxyz", 8, v2, Color4.Lime);
-
-			primitiveRenderer.AddRightPolygon(v2,
-				simulation.PolygonToCreate.Radius,
-				simulation.PolygonToCreate.Edges,
-				simulation.PolygonToCreate.Rotation,
-				Color4.White);
+			backgroundRenderer.DrawTexture(space);
 
 			if (simulation.WireframeMode)
 			{
@@ -119,6 +125,7 @@ namespace Epidesim.Simulation.Polygon
 			selectionRectangleRenderer = new PrimitiveRenderer(4, 2, 4) { WireframeMode = false };
 			textureRenderer = new QuadTextureRenderer(60000, ResourceManager.GetProgram("textureDefault"));
 			textRenderer = new TextRenderer(1000);
+			backgroundRenderer = new QuadTextureRenderer(60000, ResourceManager.GetProgram("textureDefault"));
 			textRenderer.LoadFont(ResourceManager.GetTextureFont("consolas"));
 		}
 	}

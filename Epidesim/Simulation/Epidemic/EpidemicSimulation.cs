@@ -384,7 +384,6 @@ namespace Epidesim.Simulation.Epidemic
 
 			MouseDelta = Input.GetMouseDelta();
 			WorldMouseDelta = CoordinateSystem.ScreenDeltaToWorldDelta(MouseDelta);
-
 		}
 
 		void TranslateCamera(float offsetX, float offsetY)

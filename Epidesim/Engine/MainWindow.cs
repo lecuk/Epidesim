@@ -19,8 +19,8 @@ namespace Epidesim.Engine
 	{
 		#region Fields
 
-		private EpidemicSimulation SimulationToRun;
-		private ISimulationRenderer<EpidemicSimulation> SimulationRenderer;
+		private PolygonSimulation SimulationToRun;
+		private ISimulationRenderer<PolygonSimulation> SimulationRenderer;
 		
 		public Color4 BackgroundColor { get; set; }
 
@@ -43,8 +43,8 @@ namespace Epidesim.Engine
 		{
 			InitResources();
 			
-			SimulationRenderer = new EpidemicSimulationRenderer();
-			SimulationToRun = new EpidemicSimulation();
+			SimulationRenderer = new PolygonSimulationRenderer();
+			SimulationToRun = new PolygonSimulation(1000, 1000);
 			BackgroundColor = Color.MidnightBlue;
 		}
 
@@ -167,6 +167,9 @@ namespace Epidesim.Engine
 
 			ResourceManager.AddTexture("prometheus",
 				Texture2DLoader.LoadFromFile("Resources/prometheus.jpg"));
+
+			ResourceManager.AddTexture("space",
+				Texture2DLoader.LoadFromFile("Resources/space.jpg"));
 		}
 
 		private void InitFonts()
