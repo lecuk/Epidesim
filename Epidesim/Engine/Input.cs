@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Epidesim.Engine
 {
-	class Input
+	public class Input
 	{
 		private static MainWindow Window { get; set; }
 

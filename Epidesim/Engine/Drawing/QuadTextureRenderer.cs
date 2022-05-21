@@ -4,7 +4,7 @@ using OpenTK.Graphics;
 
 namespace Epidesim.Engine.Drawing
 {
-	class QuadTextureRenderer : Renderer
+	public class QuadTextureRenderer : Renderer
 	{
 		private TextureRendererEngine engine;
 

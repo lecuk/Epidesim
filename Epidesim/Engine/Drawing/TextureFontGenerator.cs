@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Epidesim.Engine.Drawing
 {
-	static class TextureFontGenerator
+	public static class TextureFontGenerator
 	{
 		public static TextureFont Generate(string fontPath, uint pixelSize, IList<char> characters)
 		{

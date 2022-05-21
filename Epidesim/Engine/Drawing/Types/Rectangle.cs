@@ -3,7 +3,7 @@ using System;
 
 namespace Epidesim.Engine.Drawing.Types
 {
-	struct Rectangle
+	public struct Rectangle
 	{
 		public Vector2 A;
 		public Vector2 B;

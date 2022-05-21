@@ -10,7 +10,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Epidesim.Engine.Drawing.Types
 {
-	class Texture2D
+	public class Texture2D
 	{
 		private readonly int handle;
 

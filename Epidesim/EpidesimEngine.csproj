@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{9831359F-174D-45B7-94AF-D40623DACC15}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>Epidesim</RootNamespace>
     <AssemblyName>Epidesim</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -80,14 +80,13 @@
     <Compile Include="Engine\Drawing\Types\VertexArrayObject.cs" />
     <Compile Include="Engine\Input.cs" />
     <Compile Include="Engine\ISimulation.cs" />
-    <Compile Include="Engine\MainWindow.cs" />
+    <Compile Include="Engine\Drawing\MainWindow.cs" />
     <Compile Include="Simulation\Epidemic\CityBuilder.cs" />
     <Compile Include="Simulation\Epidemic\Creature.cs" />
     <Compile Include="Simulation\Epidemic\CreatureBehaviour.cs" />
     <Compile Include="Simulation\Epidemic\CreatureCollection.cs" />
     <Compile Include="Simulation\Epidemic\Distributions\FixedDistribution.cs" />
     <Compile Include="Simulation\Epidemic\EpidemicSimulation.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Simulation\Epidemic\EpidemicSimulationRenderer.cs" />
     <Compile Include="Simulation\Epidemic\Illness.cs" />
@@ -106,7 +105,7 @@
     <Compile Include="Simulation\Polygon\PolygonSimulationRenderer.cs" />
     <Compile Include="Simulation\Polygon\Polygon.cs" />
     <Compile Include="Simulation\Polygon\PolygonSimulation.cs" />
-    <Compile Include="Simulation\CoordinateSystem.cs" />
+    <Compile Include="Engine\CoordinateSystem.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

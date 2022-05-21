@@ -2,9 +2,9 @@
 using OpenTK;
 using System;
 
-namespace Epidesim.Simulation
+namespace Epidesim.Engine
 {
-	class CoordinateSystem
+	public class CoordinateSystem
 	{
 		public Rectangle ViewRectangle { get; set; }
 		public float ScreenWidth { get; set; }
@@ -19,31 +19,31 @@ namespace Epidesim.Simulation
 
 		public Vector2 WorldCoordinateToScreenCoordinate(Vector2 world)
 		{
-			Vector2 leftBottom = new Vector2(ViewRectangle.Lft, ViewRectangle.Bot);
-			Vector2 screenSize = new Vector2(ScreenWidth, ScreenHeight);
-			Vector2 screenPos = Vector2.Divide(world - leftBottom, ViewRectangle.Size);
+			var leftBottom = new Vector2(ViewRectangle.Lft, ViewRectangle.Bot);
+			var screenSize = new Vector2(ScreenWidth, ScreenHeight);
+			var screenPos = Vector2.Divide(world - leftBottom, ViewRectangle.Size);
 			return screenPos * screenSize;
 		}
 
 		public Vector2 ScreenCoordinateToWorldCoordinate(Vector2 screen)
 		{
-			Vector2 leftBottom = new Vector2(ViewRectangle.Lft, ViewRectangle.Bot);
-			Vector2 screenSize = new Vector2(ScreenWidth, ScreenHeight);
-			Vector2 screenPos = Vector2.Divide(screen, screenSize);
+			var leftBottom = new Vector2(ViewRectangle.Lft, ViewRectangle.Bot);
+			var screenSize = new Vector2(ScreenWidth, ScreenHeight);
+			var screenPos = Vector2.Divide(screen, screenSize);
 			return screenPos * ViewRectangle.Size + leftBottom;
 		}
 
 		public Vector2 WorldDeltaScreenDelta(Vector2 world)
 		{
-			Vector2 screenSize = new Vector2(ScreenWidth, ScreenHeight);
-			Vector2 screenPos = Vector2.Divide(world, ViewRectangle.Size);
+			var screenSize = new Vector2(ScreenWidth, ScreenHeight);
+			var screenPos = Vector2.Divide(world, ViewRectangle.Size);
 			return screenPos * screenSize;
 		}
 
 		public Vector2 ScreenDeltaToWorldDelta(Vector2 screen)
 		{
-			Vector2 screenSize = new Vector2(ScreenWidth, ScreenHeight);
-			Vector2 screenPos = Vector2.Divide(screen, screenSize);
+			var screenSize = new Vector2(ScreenWidth, ScreenHeight);
+			var screenPos = Vector2.Divide(screen, screenSize);
 			return screenPos * ViewRectangle.Size;
 		}
 	}

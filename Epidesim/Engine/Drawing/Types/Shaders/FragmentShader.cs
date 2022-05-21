@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Epidesim.Engine.Drawing.Types.Shaders
 {
-	class FragmentShader : Shader
+	public class FragmentShader : Shader
 	{
 		public FragmentShader(string source) : base(source, ShaderType.FragmentShader)
 		{

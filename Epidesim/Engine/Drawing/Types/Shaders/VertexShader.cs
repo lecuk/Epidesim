@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Epidesim.Engine.Drawing.Types.Shaders
 {
-	class VertexShader : Shader
+	public class VertexShader : Shader
 	{
 		public VertexShader(string source) : base(source, ShaderType.VertexShader)
 		{

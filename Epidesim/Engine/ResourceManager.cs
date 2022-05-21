@@ -3,7 +3,7 @@ using Epidesim.Engine.Drawing.Types.Shaders;
 
 namespace Epidesim.Engine
 {
-	static class ResourceManager
+	public static class ResourceManager
 	{
 		private static readonly ResourceStorage<Shader> ShaderStorage = new ResourceStorage<Shader>();
 		private static readonly ResourceStorage<ShaderProgram> ShaderProgramStorage = new ResourceStorage<ShaderProgram>();

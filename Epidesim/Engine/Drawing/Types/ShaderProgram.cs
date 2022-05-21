@@ -6,7 +6,7 @@ using OpenTK;
 
 namespace Epidesim.Engine.Drawing.Types
 {
-	class ShaderProgram : IDisposable
+	public class ShaderProgram : IDisposable
 	{
 		private readonly int handle;
 		private readonly VertexShader vertexShader;

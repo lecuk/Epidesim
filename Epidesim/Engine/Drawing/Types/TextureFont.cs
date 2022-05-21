@@ -2,7 +2,7 @@
 
 namespace Epidesim.Engine.Drawing.Types
 {
-	class TextureFont
+	public class TextureFont
 	{
 		public struct Glyph
 		{

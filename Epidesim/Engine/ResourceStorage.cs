@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Epidesim.Engine
 {
-	class ResourceStorage<T> : IEnumerable<T>
+	public class ResourceStorage<T> : IEnumerable<T>
 	{
 		private Dictionary<string, T> table = new Dictionary<string, T>();
 

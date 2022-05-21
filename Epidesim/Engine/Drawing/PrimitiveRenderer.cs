@@ -6,7 +6,7 @@ using System;
 
 namespace Epidesim.Engine.Drawing
 {
-	internal class PrimitiveRenderer : Renderer
+	public class PrimitiveRenderer : Renderer
 	{
 		private PrimitiveRendererEngine engine;
 

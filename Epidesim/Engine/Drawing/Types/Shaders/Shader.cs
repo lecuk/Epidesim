@@ -5,7 +5,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Epidesim.Engine.Drawing.Types.Shaders
 {
-	class Shader : IDisposable
+	public class Shader : IDisposable
 	{
 		private readonly int handle;
 		public readonly ShaderType Type;

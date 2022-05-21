@@ -1,6 +1,6 @@
 ﻿namespace Epidesim.Engine
 {
-	interface ISimulation
+	public interface ISimulation
 	{
 		void Start();
 		void Update(double deltaTime);

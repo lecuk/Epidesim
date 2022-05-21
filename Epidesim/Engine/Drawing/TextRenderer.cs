@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Epidesim.Engine.Drawing
 {
-	class TextRenderer : Renderer
+	public class TextRenderer : Renderer
 	{
 		private class CharacterInfo
 		{
