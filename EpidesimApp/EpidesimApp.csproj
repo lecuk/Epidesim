@@ -34,6 +34,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="GLWpfControl, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.GLWpfControl.3.3.0\lib\net452\GLWpfControl.dll</HintPath>
@@ -43,6 +47,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -61,7 +66,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="MainWindow.cs" />
+    <Compile Include="EpidesimGLControl.cs" />
+    <Compile Include="Input.cs" />
+    <Compile Include="MainWindow2.cs" />
+    <Compile Include="ResourceInitializer.cs" />
     <Compile Include="Simulation\Epidemic\City.cs" />
     <Compile Include="Simulation\Epidemic\CityBuilder.cs" />
     <Compile Include="Simulation\Epidemic\Creature.cs" />
@@ -85,6 +93,8 @@
     <Compile Include="Simulation\Polygon\Polygon.cs" />
     <Compile Include="Simulation\Polygon\PolygonSimulation.cs" />
     <Compile Include="Simulation\Polygon\PolygonSimulationRenderer.cs" />
+    <Compile Include="MainViewModel.cs" />
+    <Compile Include="ViewModelBase.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -122,6 +132,12 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Resources\arial.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\consolas.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -131,6 +147,17 @@
       <Project>{9831359f-174d-45b7-94af-d40623dacc15}</Project>
       <Name>EpidesimEngine</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\halo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\osu.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\prometheus.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -4,7 +4,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Epidesim.Engine.Drawing
 {
-	static class Texture2DLoader
+	public static class Texture2DLoader
 	{
 		public static Texture2D LoadFromFile(string path)
 		{

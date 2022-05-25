@@ -3,6 +3,7 @@ using Epidesim.Engine.Drawing;
 using Epidesim.Engine.Drawing.Types;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,15 @@ namespace Epidesim.Simulation.Epidemic
 			this.haloRenderer = new QuadTextureRenderer(30000, ResourceManager.GetProgram("textureDefault"));
 
 			sectorTextRenderer.LoadFont(ResourceManager.GetTextureFont("consolas"));
+			
+			GL.Enable(EnableCap.Blend);
+			GL.Enable(EnableCap.AlphaTest);
+			GL.Enable(EnableCap.Texture2D);
+			GL.Enable(EnableCap.Multisample);
+
+			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+			GL.Hint(HintTarget.MultisampleFilterHintNv, HintMode.Fastest);
+
 		}
 
 		public void Render(EpidemicSimulation simulation)
@@ -138,6 +148,9 @@ namespace Epidesim.Simulation.Epidemic
 				population, maxPopulation, ill, totalIll, immune, died, simulation.TotalTimeElapsed);
 
 			sectorTextRenderer.AddString(info, 14, new Vector2(0, -20), Color4.Yellow);
+
+			GL.ClearColor(Color4.DarkBlue);
+			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
 			cityRenderer.DrawFilledElements();
 			sectorBoundsRenderer.DrawHollowElements();

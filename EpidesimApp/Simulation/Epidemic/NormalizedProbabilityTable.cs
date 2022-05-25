@@ -5,14 +5,14 @@ namespace Epidesim.Simulation.Epidemic
 {
 	class NormalizedProbabilityTable<T>
 	{
-		class Outcome<T>
+		class Outcome
 		{
 			public double Probability { get; set; }
 			public T Thing { get; set; }
 		}
 
 		private T defaultOutcome;
-		private List<Outcome<T>> possibleOutcomes;
+		private List<Outcome> possibleOutcomes;
 		private Random random;
 		double probabilityOfDefaultOutcome;
 
@@ -20,7 +20,7 @@ namespace Epidesim.Simulation.Epidemic
 		{
 			this.defaultOutcome = defaultOutcome;
 
-			possibleOutcomes = new List<Outcome<T>>();
+			possibleOutcomes = new List<Outcome>();
 			random = new Random();
 			probabilityOfDefaultOutcome = 1.0;
 		}
@@ -34,7 +34,7 @@ namespace Epidesim.Simulation.Epidemic
 
 			probabilityOfDefaultOutcome -= probability;
 
-			possibleOutcomes.Add(new Outcome<T>()
+			possibleOutcomes.Add(new Outcome()
 			{
 				Probability = probability,
 				Thing = thing
@@ -46,7 +46,7 @@ namespace Epidesim.Simulation.Epidemic
 			double prediction = random.NextDouble();
 			double probability = 0;
 
-			foreach (Outcome<T> outcome in possibleOutcomes)
+			foreach (Outcome outcome in possibleOutcomes)
 			{
 				probability += outcome.Probability;
 

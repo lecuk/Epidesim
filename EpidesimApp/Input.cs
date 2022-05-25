@@ -1,27 +1,17 @@
 ﻿using OpenTK;
 using OpenTK.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 
-namespace Epidesim.Engine
+namespace Epidesim
 {
 	public class Input
 	{
-		private static MainWindow Window { get; set; }
+		public static Window Window { get; set; }
 
 		private static MouseState PreviousMouseState { get; set; }
 		private static MouseState MouseState { get; set; }
-
 		private static KeyboardState PreviousKeyboardState { get; set; }
 		private static KeyboardState KeyboardState { get; set; }
-
-		static Input()
-		{
-			Window = MainWindow.Get();
-		}
 
 		public static void Refresh()
 		{
@@ -89,8 +79,8 @@ namespace Epidesim.Engine
 
 		public static Vector2 GetMouseLocalPosition()
 		{
-			var point = Window.PointToClient(new System.Drawing.Point(MouseState.X, MouseState.Y));
-			return new Vector2(point.X, Window.Height - point.Y);
+			var point = Window.PointFromScreen(new Point(MouseState.X, MouseState.Y));
+			return new Vector2((float)point.X, (float)(Window.Height - point.Y));
 		}
 	}
 }

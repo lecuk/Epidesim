@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Epidesim;
+using OpenTK.Wpf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,19 +15,33 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace EpidesimApp
+namespace Epidesim
 {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		private MainViewModel ViewModel => DataContext as MainViewModel;
+
 		public MainWindow()
 		{
 			InitializeComponent();
 
-			var main = Epidesim.MainWindow.Get();
-			main.Run(60.0);
+			Input.Window = this;
+
+			GLControl.Start(new GLWpfControlSettings()
+			{
+				MajorVersion = 3,
+				MinorVersion = 0
+			});
+
+			ResourceInitializer.Init();
+
+			ViewModel.Simulation = new Simulation.Epidemic.EpidemicSimulation();
+			ViewModel.SimulationRenderer = new Simulation.Epidemic.EpidemicSimulationRenderer();
+			ViewModel.IsInitialized = true;
+			ViewModel.Simulation.Start();
 		}
 	}
 }
