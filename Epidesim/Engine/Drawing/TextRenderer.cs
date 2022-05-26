@@ -89,6 +89,11 @@ namespace Epidesim.Engine.Drawing
 				return;
 			}
 
+			if (!infoDictionary.ContainsKey(character))
+			{
+				character = '?';
+			}
+
 			var info = infoDictionary[character];
 			var glyph = info.Glyph;
 			var size = new Vector2(glyph.Width, -glyph.Height) * fontSize / pixelSize;

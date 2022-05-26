@@ -6,7 +6,7 @@ namespace Epidesim
 {
 	public class Input
 	{
-		public static Window Window { get; set; }
+		public static FrameworkElement Origin { get; set; }
 
 		private static MouseState PreviousMouseState { get; set; }
 		private static MouseState MouseState { get; set; }
@@ -79,8 +79,8 @@ namespace Epidesim
 
 		public static Vector2 GetMouseLocalPosition()
 		{
-			var point = Window.PointFromScreen(new Point(MouseState.X, MouseState.Y));
-			return new Vector2((float)point.X, (float)(Window.Height - point.Y));
+			var point = Origin.PointFromScreen(new Point(MouseState.X, MouseState.Y));
+			return new Vector2((float)point.X, (float)(Origin.ActualHeight - point.Y));
 		}
 	}
 }

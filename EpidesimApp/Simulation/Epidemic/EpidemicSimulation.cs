@@ -52,7 +52,7 @@ namespace Epidesim.Simulation.Epidemic
 			};
 
 			City = builder.Build(50, 24);
-			NumberOfCreatures = 12000;
+			NumberOfCreatures = 7000;
 			TimeScale = 2f;
 
 			CoordinateSystem = new CoordinateSystem()
@@ -384,7 +384,6 @@ namespace Epidesim.Simulation.Epidemic
 
 			MouseDelta = Input.GetMouseDelta();
 			WorldMouseDelta = CoordinateSystem.ScreenDeltaToWorldDelta(MouseDelta);
-
 		}
 
 		void TranslateCamera(float offsetX, float offsetY)

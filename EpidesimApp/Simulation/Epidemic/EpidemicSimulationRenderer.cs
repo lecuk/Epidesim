@@ -18,10 +18,22 @@ namespace Epidesim.Simulation.Epidemic
 		private readonly PrimitiveRenderer sectorBoundsRenderer;
 		private readonly TextRenderer sectorTextRenderer;
 		private readonly QuadTextureRenderer haloRenderer;
+		private readonly PrimitiveRenderer uiPanelRenderer;
+		private readonly TextRenderer uiTextRenderer;
 
 		private IEnumerable<Renderer> AllRenderers => new Renderer[]
 		{
+			creatureRenderer, cityRenderer, selectionRenderer, sectorBoundsRenderer, sectorTextRenderer, haloRenderer, uiPanelRenderer, uiTextRenderer
+		};
+
+		private IEnumerable<Renderer> WorldRenderers => new Renderer[]
+		{
 			creatureRenderer, cityRenderer, selectionRenderer, sectorBoundsRenderer, sectorTextRenderer, haloRenderer
+		};
+
+		private IEnumerable<Renderer> UIRenderers => new Renderer[]
+		{
+			uiPanelRenderer, uiTextRenderer
 		};
 
 		public EpidemicSimulationRenderer()
@@ -32,8 +44,11 @@ namespace Epidesim.Simulation.Epidemic
 			this.sectorBoundsRenderer = new PrimitiveRenderer(100000, 100000, 100000);
 			this.sectorTextRenderer = new TextRenderer(2000);
 			this.haloRenderer = new QuadTextureRenderer(30000, ResourceManager.GetProgram("textureDefault"));
+			this.uiPanelRenderer = new PrimitiveRenderer(10000, 10000, 10000);
+			this.uiTextRenderer = new TextRenderer(200);
 
 			sectorTextRenderer.LoadFont(ResourceManager.GetTextureFont("consolas"));
+			uiTextRenderer.LoadFont(ResourceManager.GetTextureFont("consolas"));
 			
 			GL.Enable(EnableCap.Blend);
 			GL.Enable(EnableCap.AlphaTest);
@@ -42,16 +57,22 @@ namespace Epidesim.Simulation.Epidemic
 
 			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 			GL.Hint(HintTarget.MultisampleFilterHintNv, HintMode.Fastest);
-
 		}
 
 		public void Render(EpidemicSimulation simulation)
 		{
-			var transformMatrix = simulation.CoordinateSystem.GetTransformationMatrix();
-			foreach (var renderer in AllRenderers)
+			var worldTransformMatrix = simulation.CoordinateSystem.GetTransformationMatrix();
+			foreach (var renderer in WorldRenderers)
 			{
 				renderer.Reset();
-				renderer.TransformMatrix = transformMatrix;
+				renderer.TransformMatrix = worldTransformMatrix;
+			}
+
+			var uiTransformMatrix = Matrix4.Identity;
+			foreach (var renderer in UIRenderers)
+			{
+				renderer.Reset();
+				renderer.TransformMatrix = uiTransformMatrix;
 			}
 
 			var city = simulation.City;
@@ -149,6 +170,8 @@ namespace Epidesim.Simulation.Epidemic
 
 			sectorTextRenderer.AddString(info, 14, new Vector2(0, -20), Color4.Yellow);
 
+			string debug = String.Format("Real: {0}  World: {1}", simulation.MousePosition, simulation.WorldMousePosition);
+			uiTextRenderer.AddString(debug, 0.04f, new Vector2(-0.98f, 0.95f), Color4.White);
 			GL.ClearColor(Color4.DarkBlue);
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -158,6 +181,8 @@ namespace Epidesim.Simulation.Epidemic
 			creatureRenderer.DrawFilledElements();
 			sectorTextRenderer.DrawAll();
 			selectionRenderer.DrawHollowElements();
+			uiPanelRenderer.DrawFilledElements();
+			uiTextRenderer.DrawAll();
 		}
 	}
 }

@@ -28,12 +28,13 @@ namespace Epidesim
 		{
 			InitializeComponent();
 
-			Input.Window = this;
+			Input.Origin = GLControl;
 
 			GLControl.Start(new GLWpfControlSettings()
 			{
 				MajorVersion = 3,
-				MinorVersion = 0
+				MinorVersion = 0,
+				RenderContinuously = true
 			});
 
 			ResourceInitializer.Init();
