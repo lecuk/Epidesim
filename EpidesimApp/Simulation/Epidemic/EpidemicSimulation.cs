@@ -12,10 +12,18 @@ namespace Epidesim.Simulation.Epidemic
 {
 	class EpidemicSimulation : ISimulation
 	{
+		public bool IsPaused { get; set; }
+		public float TimeScale { get; set; }
+
+		public Illness Illness { get; set; }
+		public CreatureBehaviour CreatureBehaviour { get; set; }
+
 		public City City { get; private set; }
 		public int NumberOfCreatures { get; private set; }
 
 		public CoordinateSystem CoordinateSystem { get; private set; }
+		public CoordinateSystem ScreenCoordinateSystem { get; private set; }
+
 		public Rectangle Camera
 		{
 			get => CoordinateSystem.ViewRectangle;
@@ -25,19 +33,26 @@ namespace Epidesim.Simulation.Epidemic
 			}
 		}
 
+		public Vector2 ScreenSize => new Vector2(CoordinateSystem.ScreenWidth, CoordinateSystem.ScreenHeight);
+
 		public Vector2 MousePosition { get; private set; }
 		public Vector2 WorldMousePosition { get; private set; }
 
 		public Vector2 MouseDelta { get; private set; }
 		public Vector2 WorldMouseDelta { get; private set; }
 
-		public float TimeScale { get; set; }
-		public float TotalTimeElapsed { get; set; }
+		public float DeltaTime { get; private set; }
+		public float ScaledDeltaTime { get; private set; }
+		public float TotalTimeElapsed { get; private set; }
+
+		private Queue<float> FPSList { get; set; }
+		public float FPS => FPSList.Average();
+
+		public bool IsIncreasingSpeed { get; private set; }
+		public bool IsDecreasingSpeed { get; private set; }
 
 		public Creature SelectedCreature { get; private set; }
-
-		public Illness Illness { get; private set; }
-		public CreatureBehaviour CreatureBehaviour { get; private set; }
+		public Sector SelectedSector { get; private set; }
 
 		private Random random;
 
@@ -51,71 +66,25 @@ namespace Epidesim.Simulation.Epidemic
 				RoadWidth = 4f
 			};
 
+			FPSList = new Queue<float>();
+
 			City = builder.Build(50, 24);
 			NumberOfCreatures = 7000;
 			TimeScale = 2f;
+			IsPaused = true;
 
 			CoordinateSystem = new CoordinateSystem()
 			{
 				ViewRectangle = City.Bounds
 			};
 
-			Illness = new Illness()
+			ScreenCoordinateSystem = new CoordinateSystem()
 			{
-				Name = "Test illness",
-				Description = "description",
-				IncubationPeriodSpread = 0.002f,
-				IllnessPeriodSpread = 0.005f,
-				FatalityRate = 0.00033f,
-				ImmunityRate = 0.5f,
-				UnsymptomaticRate = 0.05f,
-				IncubationPeriodDuration = new GaussianDistribution(random)
-				{
-					Mean = 60,
-					Deviation = 20,
-					Min = 15
-				},
-				IllnessPeriodDuration = new GaussianDistribution(random)
-				{
-					Mean = 180,
-					Deviation = 80,
-					Min = 60
-				},
-				TemporaryImmunityDuration = new GaussianDistribution(random)
-				{
-					Mean = 400,
-					Deviation = 100,
-					Min = 120
-				},
+				ViewRectangle = Rectangle.FromTwoPoints(Vector2.Zero, Vector2.One)
 			};
 
-			CreatureBehaviour = new CreatureBehaviour()
-			{
-				MoveSpeedDistribution = new GaussianDistribution(random)
-				{
-					Mean = 7,
-					Deviation = 3,
-					Min = 4
-				},
-				QuarantineThreshold = 3,
-				QuarantineCancelThreshold = 0,
-				PreferenceToStayInSameSectorMultiplier = 0f,
-				PreferenceToStayInSameSectorWhenIllMultiplier = 999f,
-				QuarantineSpreadMultiplier = 0.33f,
-				SelfQuarantineSpreadMultiplier = 0.15f,
-				SelfQuarantineDelayDistribution = new GaussianDistribution(random)
-				{
-					Mean = 20,
-					Deviation = 10,
-					Min = 1
-				},
-				SelfQuarantineCooldownDistribution = new GaussianDistribution(random)
-				{
-					Mean = 300,
-					Deviation = 60,
-					Min = 60
-				}
-			};
+			Illness = Illness.Default(random);
+			CreatureBehaviour = CreatureBehaviour.Default(random);
 		}
 
 		public void SetScreenSize(float screenWidth, float screenHeight)
@@ -134,6 +103,11 @@ namespace Epidesim.Simulation.Epidemic
 
 			CoordinateSystem.ScreenWidth = screenWidth;
 			CoordinateSystem.ScreenHeight = screenHeight;
+
+			ScreenCoordinateSystem.ScreenWidth = screenWidth;
+			ScreenCoordinateSystem.ScreenHeight = screenHeight;
+
+			ScreenCoordinateSystem.ViewRectangle = Rectangle.FromTwoPoints(Vector2.Zero, new Vector2(screenWidth, screenHeight));
 		}
 
 		public void Start()
@@ -169,7 +143,7 @@ namespace Epidesim.Simulation.Epidemic
 
 				creature.StoppedIdling += (cr) =>
 				{
-					SetNextRandomTargetForCreature(cr);
+					cr.SelectNextTarget();
 				};
 
 				creature.Recovered += (cr) =>
@@ -192,15 +166,22 @@ namespace Epidesim.Simulation.Epidemic
 
 		public void Update(double deltaTime)
 		{
-			float scaledDeltaTime = (float)deltaTime * TimeScale;
+			DeltaTime = (float)deltaTime;
+			ScaledDeltaTime = DeltaTime * TimeScale;
 
-			TotalTimeElapsed += scaledDeltaTime;
+			HandleMouseAndCamera(DeltaTime);
 
-			HandleMouseAndCamera((float)deltaTime);
+			if (FPSList.Count > 10)
+			{
+				FPSList.Dequeue();
+			}
+
+			FPSList.Enqueue(1.0f / DeltaTime);
 
 			if (Input.WasMouseButtonJustPressed(OpenTK.Input.MouseButton.Left))
 			{
 				SelectedCreature = null;
+				SelectedSector = City.GetSectorAtLocation(WorldMousePosition);
 			}
 
 			foreach (var creature in City)
@@ -226,17 +207,32 @@ namespace Epidesim.Simulation.Epidemic
 						}
 					}
 				}
+			}
 
+			if (SelectedCreature != null)
+			{
+				SelectedSector = SelectedCreature.CurrentSector;
+			}
+
+			if (IsPaused)
+			{
+				return;
+			}
+
+			TotalTimeElapsed += ScaledDeltaTime;
+
+			foreach (var creature in City)
+			{
 				if (creature.IsDead)
 				{
 					continue;
 				}
 
-				creature.Update(scaledDeltaTime);
+				creature.Update(ScaledDeltaTime);
 
 				if (!creature.IsIdle)
 				{
-					float distanceToMove = creature.MoveSpeed * scaledDeltaTime;
+					float distanceToMove = creature.MoveSpeed * ScaledDeltaTime;
 
 					if (Vector2.DistanceSquared(creature.TargetPoint, creature.Position) < distanceToMove * distanceToMove)
 					{
@@ -253,7 +249,6 @@ namespace Epidesim.Simulation.Epidemic
 					City.UpdateCreatureSectorFromPosition(creature);
 				}
 			}
-
 
 			for (int r = 0; r < City.Rows; ++r)
 			{
@@ -273,7 +268,7 @@ namespace Epidesim.Simulation.Epidemic
 						{
 							float spreadPossibility = (float)random.NextDouble();
 
-							if (spreadPossibility < spreadProbabilityPerSecond * scaledDeltaTime)
+							if (spreadPossibility < spreadProbabilityPerSecond * ScaledDeltaTime)
 							{
 								possibleIllCreature.Contaminate(Illness);
 							}
@@ -298,38 +293,6 @@ namespace Epidesim.Simulation.Epidemic
 			var neighbourSectors = sector.NeighbourSectors;
 			List<Creature> neighbours = new List<Creature>(sector.Creatures.Vulnerable);
 			return neighbours;
-		}
-
-		void SetNextRandomTargetForCreature(Creature creature)
-		{
-			var sector = creature.CurrentSector;
-			var neighbours = sector.NeighbourSectors;
-			
-			var possibleTargets = new ProbabilityTable<Sector>();
-			
-			float stayIdlePreference = (creature.IsIll) 
-				? CreatureBehaviour.PreferenceToStayInSameSectorWhenIllMultiplier 
-				: CreatureBehaviour.PreferenceToStayInSameSectorMultiplier;
-
-			possibleTargets.AddOutcome(sector, stayIdlePreference * sector.SectorCreaturePreference(creature));
-
-			if (creature.IsImmune || sector.AllowOutside)
-			{
-				foreach (var neighbourSector in neighbours)
-				{
-					if (!neighbourSector.AllowInside || neighbourSector.Creatures.Count >= neighbourSector.MaxCreatures)
-					{
-						continue;
-					}
-
-					float preferenceCoefficient = neighbourSector.SectorCreaturePreference(creature);
-					possibleTargets.AddOutcome(neighbourSector, preferenceCoefficient);
-				}
-			}
-
-			var targetSector = possibleTargets.GetRandomOutcome();
-			creature.TargetPoint = targetSector.GetRandomPoint();
-			creature.TargetSector = targetSector;
 		}
 
 		void HandleMouseAndCamera(float deltaTime)
@@ -371,12 +334,27 @@ namespace Epidesim.Simulation.Epidemic
 
 			if (Input.IsKeyDown(OpenTK.Input.Key.Plus))
 			{
-				TimeScale *= MathHelper.Clamp(1.0f + (float)deltaTime * 2.5f, 0.1f, 2f);
+				TimeScale *= MathHelper.Clamp(1.0f + (float)deltaTime, 0.1f, 2f);
+				IsIncreasingSpeed = true;
+			}
+			else
+			{
+				IsIncreasingSpeed = false;
 			}
 
 			if (Input.IsKeyDown(OpenTK.Input.Key.Minus))
 			{
-				TimeScale /= MathHelper.Clamp(1.0f + (float)deltaTime * 2.5f, 0.1f, 2f);
+				TimeScale /= MathHelper.Clamp(1.0f + (float)deltaTime, 0.1f, 2f);
+				IsDecreasingSpeed = true;
+			}
+			else
+			{
+				IsDecreasingSpeed = false;
+			}
+
+			if (Input.WasKeyJustPressed(OpenTK.Input.Key.Space))
+			{
+				IsPaused = !IsPaused;
 			}
 
 			MousePosition = Input.GetMouseLocalPosition();

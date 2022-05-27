@@ -72,7 +72,7 @@ namespace Epidesim
 
 		private static void InitFonts()
 		{
-			string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,;:/\\()<>{}[]+-=|!?\"\'";
+			string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,;:/\\()<>{}[]+-=|!?\"\'%";
 
 			ResourceManager.AddTextureFont("arial",
 				TextureFontGenerator.Generate("Resources/arial.ttf", 128, alphabet.ToCharArray()));

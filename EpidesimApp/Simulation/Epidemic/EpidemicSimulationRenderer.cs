@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace Epidesim.Simulation.Epidemic
 {
-	class EpidemicSimulationRenderer : ISimulationRenderer<EpidemicSimulation>
+	internal class EpidemicSimulationRenderer : ISimulationRenderer<EpidemicSimulation>
 	{
 		private readonly PrimitiveRenderer creatureRenderer;
 		private readonly PrimitiveRenderer cityRenderer;
@@ -49,7 +49,7 @@ namespace Epidesim.Simulation.Epidemic
 
 			sectorTextRenderer.LoadFont(ResourceManager.GetTextureFont("consolas"));
 			uiTextRenderer.LoadFont(ResourceManager.GetTextureFont("consolas"));
-			
+
 			GL.Enable(EnableCap.Blend);
 			GL.Enable(EnableCap.AlphaTest);
 			GL.Enable(EnableCap.Texture2D);
@@ -68,7 +68,7 @@ namespace Epidesim.Simulation.Epidemic
 				renderer.TransformMatrix = worldTransformMatrix;
 			}
 
-			var uiTransformMatrix = Matrix4.Identity;
+			var uiTransformMatrix = simulation.ScreenCoordinateSystem.GetTransformationMatrix();
 			foreach (var renderer in UIRenderers)
 			{
 				renderer.Reset();
@@ -79,7 +79,7 @@ namespace Epidesim.Simulation.Epidemic
 			var cityBounds = city.Bounds;
 
 			cityRenderer.AddRectangle(cityBounds, Color4.DimGray);
-			
+
 			for (int r = 0; r < city.Rows; ++r)
 			{
 				for (int c = 0; c < city.Cols; ++c)
@@ -128,34 +128,75 @@ namespace Epidesim.Simulation.Epidemic
 					haloRenderer.AddQuad(Rectangle.FromCenterAndSize(creature.Position, new Vector2(4)), Color4.Red);
 				}
 			}
-
+			
 			if (simulation.SelectedCreature != null)
 			{
 				var selectedCreature = simulation.SelectedCreature;
-				selectionRenderer.AddRectangle(Rectangle.FromCenterAndSize(selectedCreature.Position, new Vector2(3f)),
-					Color4.Cyan);
-
-				var sector = selectedCreature.CurrentSector;
-				sectorBoundsRenderer.AddRectangle(sector.Bounds, Color4.Yellow);
-
-				var vector = new Vector2(sector.Bounds.Lft, sector.Bounds.Bot);
-				string message = String.Format("{0}/{1}", sector.Creatures.Count, sector.MaxCreatures);
-				sectorTextRenderer.AddString(message, 4, vector, Color4.White);
-
-				foreach (var creature in sector)
-				{
-					if (!creature.IsDead)
-					{
-						creatureRenderer.AddRectangle(Rectangle.FromCenterAndSize(creature.Position, new Vector2(1.5f)),
-							creature.IsIll
-								? Color4.Red
-								: creature.IsPermanentlyImmune
-									? Color4.Cyan
-									: Color4.White);
-					}
-				}
 
 				sectorBoundsRenderer.AddLine(selectedCreature.Position, selectedCreature.TargetPoint, Color4.Lime);
+
+				var possibleSectors = selectedCreature.GetPossibleSectorTargets();
+				foreach (var sector in possibleSectors.AllOutcomes)
+				{
+					double probability = 100 * possibleSectors.GetNormalizedOutcomeProbability(sector);
+					Vector2 position = new Vector2(sector.Bounds.Lft, sector.Bounds.Bot) + new Vector2(2);
+					string probabilityString = String.Format("{0:0.00}%", probability);
+
+					sectorTextRenderer.AddString(probabilityString, 4, position, Color4.Yellow);
+					sectorBoundsRenderer.AddRectangle(sector.Bounds, Color4.Yellow);
+				}
+
+				selectionRenderer.AddRectangle(Rectangle.FromCenterAndSize(selectedCreature.Position, new Vector2(3f)),
+					Color4.White);
+
+				string creatureInfo = String.Empty;
+				if (selectedCreature.IsDead)
+				{
+					creatureInfo = String.Format("{0} (Dead)", selectedCreature.Name);
+				}
+				else
+				{
+					creatureInfo = String.Format("{0}\n{1}\n{2}\n{3}\n{4}\n{5}",
+					selectedCreature.Name,
+					selectedCreature.IsIdle ? String.Format("Idle ({0:0.0}s)", selectedCreature.IdleDuration) : "Moving",
+					selectedCreature.IsLatent
+						? String.Format("Latent for {0:0.0}s", selectedCreature.IncubationDuration)
+						: selectedCreature.IsIll
+							? String.Format("Ill for {0:0.0}s", selectedCreature.IllnessDuration)
+							: selectedCreature.IsImmune && !selectedCreature.IsPermanentlyImmune
+								? String.Format("Immune for {0:0.0}s", selectedCreature.ImmunityDuration)
+								: selectedCreature.IsPermanentlyImmune
+									? "Permamently immune"
+									: "Healthy",
+					selectedCreature.IsRestingFromSelfQuarantine
+						? String.Format("Not able to quarantine for {0:0.0}s", selectedCreature.SelfQuarantineCooldown)
+						: "Able to self-quarantine",
+					selectedCreature.IsWaitingForQuarantine
+						? String.Format("Quarantine in {0:0.0}s", selectedCreature.SelfQuarantineWaiting)
+						: selectedCreature.IsQuarantined
+							? "In quarantine"
+							: "Not in quarantine",
+					selectedCreature.WasIllAtSomePoint
+						? "Was ill at least once"
+						: "Never was ill");
+				}
+
+				uiTextRenderer.AddString(creatureInfo, 18f, new Vector2(simulation.ScreenSize.X - 250 - 1, 180 - 1), Color4.Black);
+				uiTextRenderer.AddString(creatureInfo, 18f, new Vector2(simulation.ScreenSize.X - 250, 180), Color4.White);
+			}
+
+			if (simulation.SelectedSector != null)
+			{
+				var selectedSector = simulation.SelectedSector;
+				sectorBoundsRenderer.AddRectangle(selectedSector.Bounds, Color4.White);
+
+				var vector = new Vector2(selectedSector.Bounds.Lft, selectedSector.Bounds.Bot);
+				string sectorInfo = String.Format("{0}\n{1}\n{2}", 
+					selectedSector.Name,
+					String.Format("{0}/{1}", selectedSector.Creatures.Count, selectedSector.MaxCreatures),
+					String.Format("Infection prob. {0:0.000}%", 100f * selectedSector.GetInfectionProbability(simulation.Illness, simulation.CreatureBehaviour)));
+				uiTextRenderer.AddString(sectorInfo, 18f, new Vector2(simulation.ScreenSize.X - 250 - 1, 50 - 1), Color4.Black);
+				uiTextRenderer.AddString(sectorInfo, 18f, new Vector2(simulation.ScreenSize.X - 250, 50), Color4.White);
 			}
 
 			int population = simulation.City.Count;
@@ -165,15 +206,31 @@ namespace Epidesim.Simulation.Epidemic
 			int immune = simulation.City.Count(cr => !cr.IsDead && cr.IsImmune);
 			int died = simulation.City.Count(cr => cr.IsDead);
 
-			string info = String.Format("Population: {0}/{1}\nCurrent cases: {2}\nAffected population: {3}\nImmune: {4}\nDead: {5}\nTime elapsed: {6}", 
+			string info = String.Format("Population: {0}/{1}\nCurrent cases: {2}\nAffected population: {3}\nImmune: {4}\nDead: {5}\nTime elapsed: {6:0.0}",
 				population, maxPopulation, ill, totalIll, immune, died, simulation.TotalTimeElapsed);
+			uiTextRenderer.AddString(info, 14f, new Vector2(5 - 1, simulation.ScreenSize.Y - 16 - 1), Color4.Black);
+			uiTextRenderer.AddString(info, 14f, new Vector2(5, simulation.ScreenSize.Y - 16), Color4.White);
 
-			sectorTextRenderer.AddString(info, 14, new Vector2(0, -20), Color4.Yellow);
-
-			string debug = String.Format("Real: {0}  World: {1}", simulation.MousePosition, simulation.WorldMousePosition);
-			uiTextRenderer.AddString(debug, 0.04f, new Vector2(-0.98f, 0.95f), Color4.White);
+			string debug = String.Format("FPS: {0:0.00}\nSpeed: {1:0.00}x", simulation.FPS, simulation.TimeScale);
+			uiTextRenderer.AddString(debug, 14f, new Vector2(2 - 1, 16 - 1), Color4.Black);
+			uiTextRenderer.AddString(debug, 14f, new Vector2(2, 16), Color4.White);
 			GL.ClearColor(Color4.DarkBlue);
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+			if (simulation.IsIncreasingSpeed)
+			{
+				uiPanelRenderer.AddRightPolygon(new Vector2(20, 50), 16, 3, 0, Color4.Lime);
+			}
+
+			if (simulation.IsDecreasingSpeed)
+			{
+				uiPanelRenderer.AddRightPolygon(new Vector2(20, 50), 16, 3, (float)Math.PI, Color4.Red);
+			}
+
+			if (simulation.IsPaused)
+			{
+				uiTextRenderer.AddString("Paused", 20f, new Vector2(simulation.ScreenSize.X / 2 - 50, simulation.ScreenSize.Y - 20), Color4.Orange);
+			}
 
 			cityRenderer.DrawFilledElements();
 			sectorBoundsRenderer.DrawHollowElements();

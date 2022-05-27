@@ -10,7 +10,49 @@
     <Window.DataContext>
         <local:MainViewModel />
     </Window.DataContext>
-    <Grid>
-        <local:EpidesimGLControl x:Name="GLControl" DataContext="{Binding}" />
+    <Grid Background="#333333">
+        <TabControl FontSize="18" Background="#333333" BorderThickness="0" Margin="-1">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter Property="IsTabStop" Value="False"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type TabItem}">
+                                <Grid>
+                                    <Border Name="Border" Background="Transparent"
+                                            BorderBrush="Transparent" BorderThickness="0,6,0,0" CornerRadius="0">
+                                        <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center"
+                                            HorizontalAlignment="Center"
+                                            ContentSource="Header" Margin="20,6"
+                                            RecognizesAccessKey="True">
+                                        </ContentPresenter>
+                                    </Border>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Foreground" Value="Cyan" />
+                                        <Setter TargetName="Border" Property="BorderBrush" Value="Cyan" />
+                                        <Setter TargetName="Border" Property="BorderThickness" Value="0,2,0,0"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Foreground" Value="Cyan" />
+                                        <Setter TargetName="Border" Property="BorderBrush" Value="Cyan" />
+                                        <Setter TargetName="Border" Property="BorderThickness" Value="0,6,0,0"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.ItemContainerStyle>
+            <TabItem Header="Setup" Background="#333333">
+            </TabItem>
+            <TabItem Header="Simulate">
+                <local:EpidesimGLControl x:Name="GLControl"/>
+            </TabItem>
+            <TabItem Header="Statistics">
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

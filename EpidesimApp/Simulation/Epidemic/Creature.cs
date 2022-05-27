@@ -28,8 +28,8 @@ namespace Epidesim.Simulation.Epidemic
 		public bool IsIdle => IdleDuration > 0;
 		public bool IsImmune => ImmunityDuration > 0;
 		public bool IsInfected => Illness != null;
-		public bool WaitingForQuarantine => IsIll && SelfQuarantineWaiting > 0;
-		public bool IsQuarantined => IsIll && !WaitingForQuarantine;
+		public bool IsWaitingForQuarantine => IsIll && SelfQuarantineWaiting > 0;
+		public bool IsQuarantined => IsIll && !IsWaitingForQuarantine;
 		public bool IsRestingFromSelfQuarantine => SelfQuarantineCooldown > 0;
 		public bool IsPermanentlyImmune => ImmunityDuration == Single.PositiveInfinity;
 		public bool IsIll => IllnessDuration > 0;
@@ -96,7 +96,7 @@ namespace Epidesim.Simulation.Epidemic
 
 				if (IsIll)
 				{
-					if (WaitingForQuarantine && CurrentSector.Type.CanBeSelfQuarantined)
+					if (IsWaitingForQuarantine && CurrentSector.Type.CanBeSelfQuarantined)
 					{
 						if (SelfQuarantineWaiting <= deltaTime)
 						{
@@ -217,6 +217,44 @@ namespace Epidesim.Simulation.Epidemic
 			IsDead = true;
 			City.UpdateCreature(this);
 			Died?.Invoke(this);
+		}
+
+		public ProbabilityTable<Sector> GetPossibleSectorTargets()
+		{
+			var sector = CurrentSector;
+			var neighbours = sector.NeighbourSectors;
+
+			var possibleTargets = new ProbabilityTable<Sector>();
+
+			float stayIdlePreference = IsIll
+				? Behaviour.PreferenceToStayInSameSectorWhenIllMultiplier
+				: Behaviour.PreferenceToStayInSameSectorMultiplier;
+
+			possibleTargets.AddOutcome(sector, stayIdlePreference * sector.SectorCreaturePreference(this));
+
+			if (IsImmune || sector.AllowOutside)
+			{
+				foreach (var neighbourSector in neighbours)
+				{
+					if (!neighbourSector.AllowInside || neighbourSector.Creatures.Count >= neighbourSector.MaxCreatures)
+					{
+						continue;
+					}
+
+					float preferenceCoefficient = neighbourSector.SectorCreaturePreference(this);
+					possibleTargets.AddOutcome(neighbourSector, preferenceCoefficient);
+				}
+			}
+
+			return possibleTargets;
+		}
+
+		public void SelectNextTarget()
+		{
+			var possibleSectors = GetPossibleSectorTargets();
+
+			TargetSector = possibleSectors.GetRandomOutcome();
+			TargetPoint = TargetSector.GetRandomPoint();
 		}
 	}
 }

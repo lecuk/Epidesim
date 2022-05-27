@@ -1,4 +1,7 @@
 using Epidesim.Simulation.Epidemic;
+using System;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Epidesim
 {
@@ -41,5 +44,39 @@ namespace Epidesim
 				RaisePropertyChanged(nameof(IsInitialized));
 			}
 		}
+		
+		public bool IsRunning
+		{
+			get => (Simulation != null) && !Simulation.IsPaused;
+			set
+			{
+				Simulation.IsPaused = !value;
+				RaisePropertyChanged(nameof(IsRunning));
+			}
+		}
+
+		public string StartStopString => IsRunning ? "Stop" : "Start";
+		public Brush StartStopColor => IsRunning ? Brushes.Yellow : Brushes.Lime;
+
+		public ICommand StartStop => new DelegateCommand((param) =>
+		{
+			IsRunning = !IsRunning;
+		});
+
+		public ICommand Setup => new DelegateCommand((param) =>
+		{
+			IsRunning = false;
+			IsInitialized = true;
+			Simulation.Start();
+		});
+
+		public ICommand Update => new DelegateCommand((param) =>
+		{
+			var timeSpan = (TimeSpan)param;
+			
+			Input.Refresh();
+			Simulation.Update((float)timeSpan.TotalSeconds);
+			SimulationRenderer.Render(Simulation);
+		});
 	}
 }

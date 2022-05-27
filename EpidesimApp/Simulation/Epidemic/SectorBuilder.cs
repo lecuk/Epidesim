@@ -20,7 +20,7 @@ namespace Epidesim.Simulation.Epidemic
 
 			return new Sector()
 			{
-				Name = String.Format("Sector {0}{1}{2}", type.Name, col, row),
+				Name = String.Format("Sector {0} {1}:{2}", type.Name, col, row),
 
 				Col = col,
 				Row = row,
@@ -53,8 +53,8 @@ namespace Epidesim.Simulation.Epidemic
 
 			if (fromCol != col) neighbours.Add(city[fromCol, row]);
 			if (toCol != col) neighbours.Add(city[toCol, row]);
-			if (fromRow != col) neighbours.Add(city[col, fromRow]);
-			if (toRow != col) neighbours.Add(city[col, toRow]);
+			if (fromRow != row) neighbours.Add(city[col, fromRow]);
+			if (toRow != row) neighbours.Add(city[col, toRow]);
 
 			sector.NeighbourSectors = neighbours;
 		}

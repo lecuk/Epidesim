@@ -66,6 +66,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DelegateCommand.cs" />
     <Compile Include="EpidesimGLControl.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="MainWindow2.cs" />
@@ -80,7 +81,6 @@
     <Compile Include="Simulation\Epidemic\EpidemicSimulation.cs" />
     <Compile Include="Simulation\Epidemic\EpidemicSimulationRenderer.cs" />
     <Compile Include="Simulation\Epidemic\Illness.cs" />
-    <Compile Include="Simulation\Epidemic\NormalizedProbabilityTable.cs" />
     <Compile Include="Simulation\Epidemic\ProbabilityTable.cs" />
     <Compile Include="Simulation\Epidemic\Sector.cs" />
     <Compile Include="Simulation\Epidemic\SectorBuilder.cs" />

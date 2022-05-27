@@ -13,14 +13,9 @@ namespace Epidesim
 			SizeChanged += EpidesimGLControl_SizeChanged;
 		}
 
-		private void EpidesimGLControl_Render(System.TimeSpan obj)
+		private void EpidesimGLControl_Render(System.TimeSpan timeSpan)
 		{
-			if (ViewModel.IsInitialized)
-			{
-				Input.Refresh();
-				ViewModel.Simulation.Update(0.016);
-				ViewModel.SimulationRenderer.Render(ViewModel.Simulation);
-			}
+			ViewModel.Update.Execute(timeSpan);
 		}
 
 		private void EpidesimGLControl_SizeChanged(object sender, System.Windows.SizeChangedEventArgs e)
