@@ -15,11 +15,11 @@ namespace Epidesim.Simulation.Epidemic
 		public bool IsPaused { get; set; }
 		public float TimeScale { get; set; }
 
+		public CityBlueprint CityBlueprint { get; set; }
 		public Illness Illness { get; set; }
 		public CreatureBehaviour CreatureBehaviour { get; set; }
 
 		public City City { get; private set; }
-		public int NumberOfCreatures { get; private set; }
 
 		public CoordinateSystem CoordinateSystem { get; private set; }
 		public CoordinateSystem ScreenCoordinateSystem { get; private set; }
@@ -60,22 +60,11 @@ namespace Epidesim.Simulation.Epidemic
 		{
 			this.random = new Random();
 
-			var builder = new CityBuilder(random)
-			{
-				SectorSize = 30f,
-				RoadWidth = 4f
-			};
-
 			FPSList = new Queue<float>();
-
-			City = builder.Build(50, 24);
-			NumberOfCreatures = 7000;
-			TimeScale = 2f;
-			IsPaused = true;
 
 			CoordinateSystem = new CoordinateSystem()
 			{
-				ViewRectangle = City.Bounds
+				ViewRectangle = Rectangle.FromTwoPoints(Vector2.Zero, Vector2.One),
 			};
 
 			ScreenCoordinateSystem = new CoordinateSystem()
@@ -83,6 +72,7 @@ namespace Epidesim.Simulation.Epidemic
 				ViewRectangle = Rectangle.FromTwoPoints(Vector2.Zero, Vector2.One)
 			};
 
+			CityBlueprint = CityBlueprint.Default(random);
 			Illness = Illness.Default(random);
 			CreatureBehaviour = CreatureBehaviour.Default(random);
 		}
@@ -110,16 +100,30 @@ namespace Epidesim.Simulation.Epidemic
 			ScreenCoordinateSystem.ViewRectangle = Rectangle.FromTwoPoints(Vector2.Zero, new Vector2(screenWidth, screenHeight));
 		}
 
+		public void Reset()
+		{
+			TotalTimeElapsed = 0;
+			TimeScale = 1;
+			IsPaused = true;
+		}
+
 		public void Start()
 		{
+			Reset();
+
+			var builder = new CityBuilder(random);
+
+			City = builder.Build(CityBlueprint);
+			CoordinateSystem.ViewRectangle = City.Bounds;
+
 			var startIdleDeviation = new GaussianDistribution(random)
 			{
-				Mean = 60,
-				Deviation = 60,
+				Mean = 40,
+				Deviation = 20,
 				Min = 0
 			};
 
-			for (int i = 0; i < NumberOfCreatures; ++i)
+			for (int i = 0; i < CityBlueprint.Population; ++i)
 			{
 				int randomCol = random.Next(City.Cols);
 				int randomRow = random.Next(City.Rows);

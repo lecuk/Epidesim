@@ -189,14 +189,18 @@ namespace Epidesim.Simulation.Epidemic
 			{
 				var selectedSector = simulation.SelectedSector;
 				sectorBoundsRenderer.AddRectangle(selectedSector.Bounds, Color4.White);
-
-				var vector = new Vector2(selectedSector.Bounds.Lft, selectedSector.Bounds.Bot);
-				string sectorInfo = String.Format("{0}\n{1}\n{2}", 
+				float infectionProbabilityPerSecond = selectedSector.GetInfectionProbability(simulation.Illness, simulation.CreatureBehaviour);
+				
+				string sectorInfo = String.Format("{0}\n{1}\n{2}\n{3}", 
 					selectedSector.Name,
-					String.Format("{0}/{1}", selectedSector.Creatures.Count, selectedSector.MaxCreatures),
-					String.Format("Infection prob. {0:0.000}%", 100f * selectedSector.GetInfectionProbability(simulation.Illness, simulation.CreatureBehaviour)));
-				uiTextRenderer.AddString(sectorInfo, 18f, new Vector2(simulation.ScreenSize.X - 250 - 1, 50 - 1), Color4.Black);
-				uiTextRenderer.AddString(sectorInfo, 18f, new Vector2(simulation.ScreenSize.X - 250, 50), Color4.White);
+					String.Format("Capacity {0}/{1} creatures", selectedSector.Creatures.Count, selectedSector.MaxCreatures),
+					String.Format("Infection chance {0:0.000}%", 100f * infectionProbabilityPerSecond),
+					selectedSector.IsQuarantined
+						? "In quarantine"
+						: "Not in quarantine");
+
+				uiTextRenderer.AddString(sectorInfo, 18f, new Vector2(simulation.ScreenSize.X - 250 - 1, 64 - 1), Color4.Black);
+				uiTextRenderer.AddString(sectorInfo, 18f, new Vector2(simulation.ScreenSize.X - 250, 64), Color4.White);
 			}
 
 			int population = simulation.City.Count;
@@ -211,9 +215,9 @@ namespace Epidesim.Simulation.Epidemic
 			uiTextRenderer.AddString(info, 14f, new Vector2(5 - 1, simulation.ScreenSize.Y - 16 - 1), Color4.Black);
 			uiTextRenderer.AddString(info, 14f, new Vector2(5, simulation.ScreenSize.Y - 16), Color4.White);
 
-			string debug = String.Format("FPS: {0:0.00}\nSpeed: {1:0.00}x", simulation.FPS, simulation.TimeScale);
-			uiTextRenderer.AddString(debug, 14f, new Vector2(2 - 1, 16 - 1), Color4.Black);
-			uiTextRenderer.AddString(debug, 14f, new Vector2(2, 16), Color4.White);
+			string fps = String.Format("FPS: {0:0.00}\nSpeed: {1:0.00}x", simulation.FPS, simulation.TimeScale);
+			uiTextRenderer.AddString(fps, 14f, new Vector2(2 - 1, 16 - 1), Color4.Black);
+			uiTextRenderer.AddString(fps, 14f, new Vector2(2, 16), Color4.White);
 			GL.ClearColor(Color4.DarkBlue);
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 

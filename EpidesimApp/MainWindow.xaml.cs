@@ -39,10 +39,10 @@ namespace Epidesim
 
 			ResourceInitializer.Init();
 
-			ViewModel.Simulation = new Simulation.Epidemic.EpidemicSimulation();
-			ViewModel.SimulationRenderer = new Simulation.Epidemic.EpidemicSimulationRenderer();
-			ViewModel.IsInitialized = true;
-			ViewModel.Simulation.Start();
+			ViewModel.SimulationViewModel.Simulation = new Simulation.Epidemic.EpidemicSimulation();
+			ViewModel.SimulationViewModel.SimulationRenderer = new Simulation.Epidemic.EpidemicSimulationRenderer();
+			ViewModel.SimulationViewModel.Simulation.Start();
+			ViewModel.SimulationViewModel.IsInitialized = true;
 		}
 	}
 }

@@ -28,7 +28,7 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 			};
 
 			PreferenceHealthyCreatures = 1f;
-			PreferenceIllCreatures = 0.33f;
+			PreferenceIllCreatures = 0.13f;
 			PreferenceImmuneCreatures = 0.9f;
 
 			RecoveryMultiplier = 1f;
@@ -41,6 +41,7 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 			CanBeSelfQuarantined = true;
 
 			DisplayColor = Color4.DarkGreen;
+			ProbabilityToAppear = 21;
 		}
 	}
 }

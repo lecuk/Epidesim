@@ -9,74 +9,11 @@ namespace Epidesim
 	{
 		public MainViewModel()
 		{
-			IsInitialized = false;
+			SetupViewModel = new SetupViewModel(this);
+			SimulationViewModel = new SimulationViewModel(this);
 		}
 
-		private EpidemicSimulation _simulation;
-		public EpidemicSimulation Simulation
-		{
-			get => _simulation;
-			set
-			{
-				_simulation = value;
-				RaisePropertyChanged(nameof(Simulation));
-			}
-		}
-
-		private EpidemicSimulationRenderer _simulationRenderer;
-		public EpidemicSimulationRenderer SimulationRenderer
-		{
-			get => _simulationRenderer;
-			set
-			{
-				_simulationRenderer = value;
-				RaisePropertyChanged(nameof(SimulationRenderer));
-			}
-		}
-
-		private bool _isInitialized;
-		public bool IsInitialized
-		{
-			get => _isInitialized;
-			set
-			{
-				_isInitialized = value;
-				RaisePropertyChanged(nameof(IsInitialized));
-			}
-		}
-		
-		public bool IsRunning
-		{
-			get => (Simulation != null) && !Simulation.IsPaused;
-			set
-			{
-				Simulation.IsPaused = !value;
-				RaisePropertyChanged(nameof(IsRunning));
-			}
-		}
-
-		public string StartStopString => IsRunning ? "Stop" : "Start";
-		public Brush StartStopColor => IsRunning ? Brushes.Yellow : Brushes.Lime;
-
-		public ICommand StartStop => new DelegateCommand((param) =>
-		{
-			IsRunning = !IsRunning;
-		});
-
-		public ICommand Setup => new DelegateCommand((param) =>
-		{
-			IsRunning = false;
-			IsInitialized = true;
-			Simulation.Start();
-		});
-
-		public ICommand Update => new DelegateCommand((param) =>
-		{
-			var timeSpan = (TimeSpan)param;
-			
-			Input.Refresh();
-			Simulation.Update((float)timeSpan.TotalSeconds);
-			SimulationRenderer.Render(Simulation);
-		});
+		public SetupViewModel SetupViewModel { get; set; }
+		public SimulationViewModel SimulationViewModel { get; set; }
 	}
 }

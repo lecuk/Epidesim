@@ -14,8 +14,8 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 
 			IdleTimeDistribution = new GaussianDistribution(random)
 			{
-				Mean = 180,
-				Deviation = 60,
+				Mean = 90,
+				Deviation = 40,
 				Min = 40
 			};
 
@@ -26,7 +26,7 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 			};
 
 			PreferenceHealthyCreatures = 0.05f;
-			PreferenceIllCreatures = 999f;
+			PreferenceIllCreatures = 2f;
 			PreferenceImmuneCreatures = 0.75f;
 
 			RecoveryMultiplier = 2f;
@@ -39,6 +39,7 @@ namespace Epidesim.Simulation.Epidemic.Sectors
 			CanBeSelfQuarantined = true;
 
 			DisplayColor = Color4.DarkSlateBlue;
+			ProbabilityToAppear = 6;
 		}
 	}
 }

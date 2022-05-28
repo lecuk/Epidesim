@@ -9,9 +9,6 @@ namespace Epidesim.Simulation.Epidemic
 {
 	class CityBuilder
 	{
-		public float SectorSize { get; set; }
-		public float RoadWidth { get; set; }
-
 		private Random random;
 
 		public CityBuilder(Random random)
@@ -19,47 +16,30 @@ namespace Epidesim.Simulation.Epidemic
 			this.random = random;
 		}
 
-		public City Build(int cols, int rows)
+		public City Build(CityBlueprint blueprint)
 		{
-			var city = new City(SectorSize, RoadWidth, cols, rows);
+			var city = new City(blueprint.SectorSize, blueprint.RoadWidth, blueprint.SectorColumns, blueprint.SectorRows);
 			var builder = new SectorBuilder(city);
+			var possibleTypes = new ProbabilityTable<SectorType>(random);
 
-			SectorType emptySector = new EmptySectorType(random);
-			SectorType livingSector = new LivingSectorType(random);
-			SectorType hospitalSector = new HospitalSectorType(random);
-			SectorType socialSector = new SocialSectorType(random);
-
-			for (int r = 0; r < rows; ++r)
+			foreach (var sectorType in blueprint.SectorTypes)
 			{
-				for (int c = 0; c < cols; ++c)
+				possibleTypes.AddOutcome(sectorType, sectorType.ProbabilityToAppear);
+			}
+
+			for (int r = 0; r < blueprint.SectorRows; ++r)
+			{
+				for (int c = 0; c < blueprint.SectorColumns; ++c)
 				{
-					SectorType info = null;
-
-					if (random.Next() % 7 == 0)
-					{
-						info = livingSector;
-					}
-					else if (random.Next() % 12 == 0)
-					{
-						info = socialSector;
-					}
-					else if (random.Next() % 24 == 0)
-					{
-						info = hospitalSector;
-					}
-					else
-					{
-						info = emptySector;
-					}
-
-					var sector = builder.Build(c, r, info);
+					SectorType sectorType = possibleTypes.GetRandomOutcome();
+					var sector = builder.Build(c, r, sectorType);
 					city.SetSector(c, r, sector);
 				}
 			}
 
-			for (int r = 0; r < rows; ++r)
+			for (int r = 0; r < blueprint.SectorRows; ++r)
 			{
-				for (int c = 0; c < cols; ++c)
+				for (int c = 0; c < blueprint.SectorColumns; ++c)
 				{
 					builder.InitSectorNeighbours(city, city[c, r]);
 				}
