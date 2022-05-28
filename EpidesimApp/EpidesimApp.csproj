@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{D42F675C-E7BB-47A5-8729-590BE72A662B}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>EpidesimApp</RootNamespace>
+    <RootNamespace>Epidesim</RootNamespace>
     <AssemblyName>EpidesimApp</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -108,11 +108,16 @@
     <Compile Include="Simulation\Epidemic\Sectors\LivingSectorType.cs" />
     <Compile Include="Simulation\Epidemic\Sectors\SocialSectorType.cs" />
     <Compile Include="Simulation\Epidemic\SectorType.cs" />
+    <Compile Include="Simulation\Epidemic\SimulationStats.cs" />
     <Compile Include="Simulation\Epidemic\ValueDistribution.cs" />
     <Compile Include="Simulation\Polygon\Polygon.cs" />
     <Compile Include="Simulation\Polygon\PolygonSimulation.cs" />
     <Compile Include="Simulation\Polygon\PolygonSimulationRenderer.cs" />
     <Compile Include="MainViewModel.cs" />
+    <Compile Include="StatisticsTab.xaml.cs">
+      <DependentUpon>StatisticsTab.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="StatisticsViewModel.cs" />
     <Compile Include="ViewModelBase.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -127,6 +132,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="SetupTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StatisticsTab.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

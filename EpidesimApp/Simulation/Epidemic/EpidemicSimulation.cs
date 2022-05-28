@@ -14,6 +14,7 @@ namespace Epidesim.Simulation.Epidemic
 	{
 		public bool IsPaused { get; set; }
 		public float TimeScale { get; set; }
+		public float PeriodSize { get; set; }
 
 		public CityBlueprint CityBlueprint { get; set; }
 		public Illness Illness { get; set; }
@@ -43,6 +44,7 @@ namespace Epidesim.Simulation.Epidemic
 
 		public float DeltaTime { get; private set; }
 		public float ScaledDeltaTime { get; private set; }
+		public float TotalScaledTimeElapsed { get; private set; }
 		public float TotalTimeElapsed { get; private set; }
 
 		private Queue<float> FPSList { get; set; }
@@ -53,6 +55,10 @@ namespace Epidesim.Simulation.Epidemic
 
 		public Creature SelectedCreature { get; private set; }
 		public Sector SelectedSector { get; private set; }
+
+		public SimulationStats Stats { get; private set; }
+		public SimulationStats.Period CurrentPeriod { get; private set; }
+		public float NextPeriodUpdateAt { get; private set; }
 
 		private Random random;
 
@@ -103,13 +109,18 @@ namespace Epidesim.Simulation.Epidemic
 		public void Reset()
 		{
 			TotalTimeElapsed = 0;
+			TotalScaledTimeElapsed = 0;
 			TimeScale = 1;
+			PeriodSize = 10;
+			NextPeriodUpdateAt = PeriodSize;
 			IsPaused = true;
+			Stats = new SimulationStats();
 		}
 
 		public void Start()
 		{
 			Reset();
+			ResetPeriod();
 
 			var builder = new CityBuilder(random);
 
@@ -145,6 +156,21 @@ namespace Epidesim.Simulation.Epidemic
 					Behaviour = CreatureBehaviour
 				};
 
+				creature.Infected += (cr) =>
+				{
+					CurrentPeriod.NewInfections++;
+				};
+
+				creature.ShownSymptoms += (cr) =>
+				{
+					CurrentPeriod.NewConfirmedCases++;
+				};
+
+				creature.Died += (cr) =>
+				{
+					CurrentPeriod.NewDeaths++;
+				};
+
 				creature.StoppedIdling += (cr) =>
 				{
 					cr.SelectNextTarget();
@@ -152,6 +178,7 @@ namespace Epidesim.Simulation.Epidemic
 
 				creature.Recovered += (cr) =>
 				{
+					CurrentPeriod.NewRecoveries++;
 					cr.StopIdling();
 				};
 
@@ -218,12 +245,14 @@ namespace Epidesim.Simulation.Epidemic
 				SelectedSector = SelectedCreature.CurrentSector;
 			}
 
+			TotalTimeElapsed += DeltaTime;
+
 			if (IsPaused)
 			{
 				return;
 			}
 
-			TotalTimeElapsed += ScaledDeltaTime;
+			TotalScaledTimeElapsed += ScaledDeltaTime;
 
 			foreach (var creature in City)
 			{
@@ -288,6 +317,14 @@ namespace Epidesim.Simulation.Epidemic
 						sector.IsQuarantined = false;
 					}
 				}
+			}
+
+			if (TotalScaledTimeElapsed > NextPeriodUpdateAt)
+			{
+				NextPeriodUpdateAt = TotalScaledTimeElapsed + PeriodSize;
+
+				FixDataAndAddCurrentPeriod();
+				ResetPeriod();
 			}
 		}
 
@@ -419,6 +456,28 @@ namespace Epidesim.Simulation.Epidemic
 			{
 				Camera = Camera.Scale(scale);
 			}
+		}
+
+		void ResetPeriod()
+		{
+			CurrentPeriod = new SimulationStats.Period()
+			{
+				StartTime = TotalScaledTimeElapsed,
+				NewConfirmedCases = 0,
+				NewDeaths = 0,
+				NewInfections = 0,
+				NewRecoveries = 0
+			};
+		}
+
+		void FixDataAndAddCurrentPeriod()
+		{
+			CurrentPeriod.EndTime = TotalScaledTimeElapsed;
+			CurrentPeriod.TotalInfections = City.Count(creature => creature.IsInfected);
+			CurrentPeriod.TotalDeaths = City.Count(creature => creature.IsDead);
+			CurrentPeriod.TotalImmune = City.Count(creature => creature.IsImmune);
+
+			Stats.AddPeriod(CurrentPeriod);
 		}
 	}
 }

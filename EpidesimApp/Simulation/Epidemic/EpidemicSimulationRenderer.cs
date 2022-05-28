@@ -211,7 +211,7 @@ namespace Epidesim.Simulation.Epidemic
 			int died = simulation.City.Count(cr => cr.IsDead);
 
 			string info = String.Format("Population: {0}/{1}\nCurrent cases: {2}\nAffected population: {3}\nImmune: {4}\nDead: {5}\nTime elapsed: {6:0.0}",
-				population, maxPopulation, ill, totalIll, immune, died, simulation.TotalTimeElapsed);
+				population, maxPopulation, ill, totalIll, immune, died, simulation.TotalScaledTimeElapsed);
 			uiTextRenderer.AddString(info, 14f, new Vector2(5 - 1, simulation.ScreenSize.Y - 16 - 1), Color4.Black);
 			uiTextRenderer.AddString(info, 14f, new Vector2(5, simulation.ScreenSize.Y - 16), Color4.White);
 

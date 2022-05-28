@@ -39,7 +39,7 @@ namespace Epidesim.Simulation.Epidemic
 
 		public event CreatureEventHandler StoppedIdling;
 		public event CreatureEventHandler StartedIdling;
-		public event CreatureEventHandler Contaminated;
+		public event CreatureEventHandler Infected;
 		public event CreatureEventHandler ShownSymptoms;
 		public event CreatureEventHandler Quarantined;
 		public event CreatureEventHandler Dequarantined;
@@ -158,7 +158,7 @@ namespace Epidesim.Simulation.Epidemic
 			WasIllAtSomePoint = true;
 			IncubationDuration = (float)Illness.IncubationPeriodDuration.GetRandomValue();
 			City.UpdateCreature(this);
-			Contaminated?.Invoke(this);
+			Infected?.Invoke(this);
 		}
 
 		private void StartQuarantine()

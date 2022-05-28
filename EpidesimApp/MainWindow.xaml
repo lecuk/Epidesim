@@ -53,6 +53,7 @@
                 <local:EpidesimGLControl x:Name="GLControl" DataContext="{Binding SimulationViewModel}"/>
             </TabItem>
             <TabItem Header="Statistics">
+                <local:StatisticsTab DataContext="{Binding StatisticsViewModel}"/>
             </TabItem>
         </TabControl>
     </Grid>
