@@ -8,14 +8,15 @@
              xmlns:oxy="clr-namespace:OxyPlot;assembly=OxyPlot"
              xmlns:series="clr-namespace:OxyPlot.Series;assembly=OxyPlot"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded" IsVisibleChanged="UserControl_IsVisibleChanged">
+             d:DesignHeight="450" d:DesignWidth="800" FontSize="14" Foreground="Black"
+             Loaded="UserControl_Loaded" IsVisibleChanged="UserControl_IsVisibleChanged">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <oxyWpf:PlotView x:Name="CasesPerDayGraph" Grid.Row="0" Margin="5"/>
-        <oxyWpf:PlotView x:Name="TotalCasesGraph" Grid.Row="1" Margin="5"/>
+        <oxyWpf:PlotView x:Name="CasesPerDayGraph" Grid.Row="0" Margin="5" />
+        <oxyWpf:PlotView x:Name="TotalCasesGraph" Grid.Row="1" Margin="5" />
     </Grid>
 </UserControl>

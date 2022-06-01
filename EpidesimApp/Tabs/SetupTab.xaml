@@ -378,7 +378,7 @@
                             </Grid.RowDefinitions>
 
                             <TextBlock Text="Permanent immunity rate" Grid.Row="0" Grid.Column="0" TextAlignment="Center" VerticalAlignment="Center" Margin="5"/>
-                            <TextBox Text="{Binding Illness.ImmunityRate, StringFormat=0.0}" TextAlignment="Center" Width="80" Grid.Row="0" Grid.Column="2" Margin="5"/>
+                            <TextBox Text="{Binding Illness.ImmunityRate, StringFormat=0.00}" TextAlignment="Center" Width="80" Grid.Row="0" Grid.Column="2" Margin="5"/>
                             <Slider Value="{Binding Illness.ImmunityRate}" Minimum="0" Maximum="1" Grid.Row="1" Grid.ColumnSpan="3" Margin="5" />
                         </Grid>
                     </StackPanel>
@@ -477,7 +477,7 @@
                             </Grid.RowDefinitions>
 
                             <TextBlock Text="Sector quarantine spread multiplier" Grid.Row="0" Grid.Column="0" TextAlignment="Center" VerticalAlignment="Center" Margin="5"/>
-                            <TextBox Text="{Binding CreatureBehaviour.QuarantineSpreadMultiplier, StringFormat=0.0}" TextAlignment="Center" Width="80" Grid.Row="0" Grid.Column="2" Margin="5"/>
+                            <TextBox Text="{Binding CreatureBehaviour.QuarantineSpreadMultiplier, StringFormat=0.000}" TextAlignment="Center" Width="80" Grid.Row="0" Grid.Column="2" Margin="5"/>
                             <Slider Value="{Binding CreatureBehaviour.QuarantineSpreadMultiplier}" Minimum="0" Maximum="1" Grid.Row="1" Grid.ColumnSpan="3" Margin="5" />
                         </Grid>
 

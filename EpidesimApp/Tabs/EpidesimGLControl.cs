@@ -32,12 +32,19 @@ namespace Epidesim
 
 		private void EpidesimGLControl_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
 		{
-			if (IsVisible && Width != 0 && Height != 0)
+			if (IsVisible)
 			{
-				if (ViewModel.IsInitialized)
+				if (Width != 0 && Height != 0)
 				{
-					ViewModel.Simulation.SetScreenSize((float)ActualWidth, (float)ActualHeight);
+					if (ViewModel.IsInitialized)
+					{
+						ViewModel.Simulation.SetScreenSize((float)ActualWidth, (float)ActualHeight);
+					}
 				}
+			}
+			else
+			{
+				ViewModel.Simulation.IsPaused = true;
 			}
 		}
 	}

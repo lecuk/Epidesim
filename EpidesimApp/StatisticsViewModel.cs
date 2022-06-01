@@ -26,10 +26,12 @@ namespace Epidesim
 		{
 			ParentViewModel = parentViewModel;
 
+			var reddish = OxyColor.FromArgb(255, 200, 100, 100);
+
 			TotalCasesGraph = new AreaSeries()
 			{
-				Color = OxyColors.Pink,
-				Fill = OxyColors.Pink
+				Color = reddish,
+				Fill = reddish
 			};
 			TotalDeathsGraph = new AreaSeries()
 			{
@@ -48,8 +50,8 @@ namespace Epidesim
 			};
 			NewConfirmedCasesGraph = new AreaSeries()
 			{
-				Color = OxyColors.Red,
-				Fill = OxyColors.Red
+				Color = reddish,
+				Fill = reddish
 			};
 			NewDeathsGraph = new AreaSeries()
 			{
@@ -85,17 +87,29 @@ namespace Epidesim
 				for (int i = currentPeriodCount; i < stats.Periods.Count; ++i)
 				{
 					var period = stats.Periods[i];
+					float periodLength = period.EndTime - period.StartTime;
 
-					TotalCasesGraph.Points.Add(new DataPoint(period.EndTime, period.TotalInfections));
-					TotalDeathsGraph.Points.Add(new DataPoint(period.EndTime, period.TotalDeaths));
-					TotalImmuneGraph.Points.Add(new DataPoint(period.EndTime, period.TotalImmune));
+					TotalImmuneGraph.Points.Add(new DataPoint(period.EndTime, 
+						period.TotalDeaths + period.TotalInfections + period.TotalImmune));
+					TotalCasesGraph.Points.Add(new DataPoint(period.EndTime, 
+						period.TotalDeaths + period.TotalInfections));
+					TotalDeathsGraph.Points.Add(new DataPoint(period.EndTime, 
+						period.TotalDeaths));
 
+					NewCasesGraph.Points.Add(new DataPoint(period.StartTime, 0));
 					NewCasesGraph.Points.Add(new DataPoint(period.StartTime, period.NewInfections));
-					NewCasesGraph.Points.Add(new DataPoint(period.EndTime, period.NewInfections));
-					NewConfirmedCasesGraph.Points.Add(new DataPoint(period.StartTime, period.NewConfirmedCases));
-					NewConfirmedCasesGraph.Points.Add(new DataPoint(period.EndTime, period.NewConfirmedCases));
-					NewDeathsGraph.Points.Add(new DataPoint(period.StartTime, period.NewDeaths));
+					NewCasesGraph.Points.Add(new DataPoint(period.StartTime + periodLength / 3, period.NewInfections));
+					NewCasesGraph.Points.Add(new DataPoint(period.StartTime + periodLength / 3, 0));
+
+					NewConfirmedCasesGraph.Points.Add(new DataPoint(period.StartTime + periodLength / 3, 0));
+					NewConfirmedCasesGraph.Points.Add(new DataPoint(period.StartTime + periodLength / 3, period.NewConfirmedCases));
+					NewConfirmedCasesGraph.Points.Add(new DataPoint(period.EndTime - periodLength / 3, period.NewConfirmedCases));
+					NewConfirmedCasesGraph.Points.Add(new DataPoint(period.EndTime - periodLength / 3, 0));
+
+					NewDeathsGraph.Points.Add(new DataPoint(period.EndTime - periodLength / 3, 0));
+					NewDeathsGraph.Points.Add(new DataPoint(period.EndTime - periodLength / 3, period.NewDeaths));
 					NewDeathsGraph.Points.Add(new DataPoint(period.EndTime, period.NewDeaths));
+					NewDeathsGraph.Points.Add(new DataPoint(period.EndTime, 0));
 				}
 			}
 			else if (stats.Periods.Count == 0)

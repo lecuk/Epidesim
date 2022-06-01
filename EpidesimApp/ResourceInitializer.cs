@@ -62,12 +62,6 @@ namespace Epidesim
 		{
 			ResourceManager.AddTexture("halo",
 				Texture2DLoader.LoadFromFile("Resources/halo.png"));
-
-			ResourceManager.AddTexture("osu",
-				Texture2DLoader.LoadFromFile("Resources/osu.png"));
-
-			ResourceManager.AddTexture("prometheus",
-				Texture2DLoader.LoadFromFile("Resources/prometheus.jpg"));
 		}
 
 		private static void InitFonts()

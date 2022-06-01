@@ -55,9 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Engine\Drawing\CircleRenderer.cs" />
     <Compile Include="Engine\Drawing\PrimitiveRendererEngine.cs" />
-    <Compile Include="Engine\Drawing\PrimitiveRendererImmediateMode.cs" />
     <Compile Include="Engine\Drawing\PrimitiveRenderer.cs" />
     <Compile Include="Engine\Drawing\Renderer.cs" />
     <Compile Include="Engine\Drawing\ISimulationRenderer.cs" />
@@ -90,12 +88,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <None Include="Shaders\Circle\FragmentShader.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Shaders\Circle\VertexShader.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Shaders\Simple\FragmentShader.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

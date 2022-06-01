@@ -38,6 +38,9 @@
     <StartupObject>
     </StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\epidesim.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="GLWpfControl, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.GLWpfControl.3.3.0\lib\net452\GLWpfControl.dll</HintPath>
@@ -80,11 +83,14 @@
     </ApplicationDefinition>
     <Compile Include="Converters\Color4ToBrushConverter.cs" />
     <Compile Include="DelegateCommand.cs" />
-    <Compile Include="EpidesimGLControl.cs" />
+    <Compile Include="Tabs\AboutTab.xaml.cs">
+      <DependentUpon>AboutTab.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tabs\EpidesimGLControl.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="MainWindow2.cs" />
     <Compile Include="ResourceInitializer.cs" />
-    <Compile Include="SetupTab.xaml.cs">
+    <Compile Include="Tabs\SetupTab.xaml.cs">
       <DependentUpon>SetupTab.xaml</DependentUpon>
     </Compile>
     <Compile Include="SetupViewModel.cs" />
@@ -114,7 +120,7 @@
     <Compile Include="Simulation\Polygon\PolygonSimulation.cs" />
     <Compile Include="Simulation\Polygon\PolygonSimulationRenderer.cs" />
     <Compile Include="MainViewModel.cs" />
-    <Compile Include="StatisticsTab.xaml.cs">
+    <Compile Include="Tabs\StatisticsTab.xaml.cs">
       <DependentUpon>StatisticsTab.xaml</DependentUpon>
     </Compile>
     <Compile Include="StatisticsViewModel.cs" />
@@ -131,11 +137,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="SetupTab.xaml">
+    <Page Include="Tabs\AboutTab.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="StatisticsTab.xaml">
+    <Page Include="Tabs\SetupTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tabs\StatisticsTab.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -164,12 +174,12 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Resources\arial.ttf">
+    <Content Include="Resources\arial.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\consolas.ttf">
+    </Content>
+    <Content Include="Resources\consolas.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -181,15 +191,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\halo.png">
+    <Resource Include="Resources\epidesim.ico" />
+    <Content Include="Resources\halo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\osu.png">
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\epidesim.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\prometheus.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

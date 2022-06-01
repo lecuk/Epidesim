@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Epidesim"
         xmlns:wpf="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1200" MinWidth="1200">
+        Title="Epidesim" Height="600" Width="1200" MinWidth="1200">
     <Window.DataContext>
         <local:MainViewModel />
     </Window.DataContext>
@@ -46,6 +46,9 @@
                     </Setter>
                 </Style>
             </TabControl.ItemContainerStyle>
+            <TabItem Header="About">
+                <local:AboutTab/>
+            </TabItem>
             <TabItem Header="Setup">
                 <local:SetupTab DataContext="{Binding SetupViewModel}"/>
             </TabItem>

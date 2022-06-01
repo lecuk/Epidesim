@@ -111,7 +111,7 @@ namespace Epidesim.Simulation.Epidemic
 			TotalTimeElapsed = 0;
 			TotalScaledTimeElapsed = 0;
 			TimeScale = 1;
-			PeriodSize = 10;
+			PeriodSize = 30;
 			NextPeriodUpdateAt = PeriodSize;
 			IsPaused = true;
 			Stats = new SimulationStats();
